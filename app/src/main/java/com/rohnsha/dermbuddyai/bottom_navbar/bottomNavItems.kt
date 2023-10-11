@@ -2,9 +2,11 @@ package com.rohnsha.dermbuddyai.bottom_navbar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.SpaceDashboard
 import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.SpaceDashboard
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -22,10 +24,10 @@ sealed class bottomNavItems(
         selectedIcon = Icons.Filled.Home
     )
     object Insights: bottomNavItems(
-        title = "Insights",
-        route = "insights",
-        unselectedIcon = Icons.Outlined.SpaceDashboard,
-        selectedIcon = Icons.Filled.SpaceDashboard
+        title = "Community",
+        route = "community",
+        unselectedIcon = Icons.Outlined.Forum,
+        selectedIcon = Icons.Filled.Forum
     )
     object Settings: bottomNavItems(
         title = "More",
