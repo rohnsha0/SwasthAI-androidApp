@@ -39,6 +39,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import com.rohnsha.dermbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.dermbuddyai.ui.theme.BGMain
 import com.rohnsha.dermbuddyai.ui.theme.ViewDash
 import com.rohnsha.dermbuddyai.ui.theme.fontFamily
@@ -46,7 +49,8 @@ import com.rohnsha.dermbuddyai.ui.theme.fontFamily
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavHostController
 ) {
     Scaffold(
         topBar = {
@@ -85,7 +89,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(top = 18.dp, start = 24.dp)
             )
-            explore_home()
+            explore_home(navController = navController)
             Text(
                 text = "Read about Diseases",
                 fontFamily = fontFamily,
@@ -94,7 +98,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(top = 30.dp, start = 24.dp)
             )
-            explore_diseases()
+            explore_diseases(navController = navController)
             Text(
                 text = "Current Medical Affairs",
                 fontFamily = fontFamily,
@@ -108,7 +112,9 @@ fun HomeScreen(
 }
 
 @Composable
-fun explore_diseases() {
+fun explore_diseases(
+    navController: NavHostController
+) {
     Column(
         modifier = Modifier
             .padding(top = 16.dp, start = 24.dp, end = 24.dp)
@@ -118,24 +124,26 @@ fun explore_diseases() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Neural", icon = Icons.Filled.Psychology, weight = .49f)
+            explore_tabs(title = "Neural", icon = Icons.Filled.Psychology, weight = .49f, navController = navController,)
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Derma", icon = Icons.Filled.EmojiPeople, weight = 1f)
+            explore_tabs(title = "Derma", icon = Icons.Filled.EmojiPeople, weight = 1f, navController = navController,)
         }
         Row(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Respiratory", icon = Icons.Filled.SelfImprovement, weight = .49f)
+            explore_tabs(title = "Respiratory", icon = Icons.Filled.SelfImprovement, weight = .49f, navController = navController,)
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "More", icon = Icons.Filled.ReadMore, weight = 1f)
+            explore_tabs(title = "More", icon = Icons.Filled.ReadMore, weight = 1f, navController = navController)
         }
     }
 }
 
 @Composable
-fun explore_home() {
+fun explore_home(
+    navController: NavHostController
+) {
     Column(
         modifier = Modifier
             .padding(top = 16.dp, start = 24.dp, end = 24.dp)
@@ -145,9 +153,20 @@ fun explore_home() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Scan", icon = Icons.Filled.CameraAlt, weight = .4f)
+            explore_tabs(
+                title = "Scan",
+                icon = Icons.Filled.CameraAlt,
+                weight = .4f,
+                navController = navController,
+                route = bottomNavItems.Scan.route
+            )
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Import Reports", icon = Icons.Filled.Biotech, weight = 1f)
+            explore_tabs(
+                title = "Import Reports",
+                icon = Icons.Filled.Biotech,
+                weight = 1f,
+                navController = navController,
+            )
         }
     }
 }
@@ -157,7 +176,8 @@ fun explore_tabs(
     title: String,
     icon: ImageVector,
     weight: Float,
-    onClick: (() -> Unit)? = null
+    navController: NavHostController,
+    route: String= bottomNavItems.Insights.route
 ) {
     Box(
         modifier = Modifier
@@ -166,7 +186,7 @@ fun explore_tabs(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .clickable {
-                       onClick
+                navController.navigate(route)
             },
         contentAlignment = Alignment.CenterStart
     ){
@@ -245,10 +265,12 @@ fun ScanCard() {
                         fontSize = 15.sp,
                         fontFamily = fontFamily,
                         text = "Rohan Shaw",
+                        letterSpacing = 0.1.sp
                     )
                     Text(
                         fontSize = 13.sp,
                         text = "20 | Male",
+                        letterSpacing = 0.1.sp
                     )
                 }
                 Column(
@@ -260,6 +282,7 @@ fun ScanCard() {
                         fontWeight = FontWeight(600),
                         fontSize = 15.sp,
                         text = "PROFILE",
+                        letterSpacing = 0.1.sp,
                         color = MaterialTheme.typography.bodyMedium.color.copy(alpha = .6f),
                         modifier = Modifier
                             .padding(top = 10.dp, end = 13.dp)
@@ -273,11 +296,13 @@ fun ScanCard() {
                 Text(
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily,
-                    text = "Medical Condition: "
+                    text = "Medical Condition: ",
+                    letterSpacing = 0.1.sp
                 )
                 Text(
                     text = "Fit",
-                    fontFamily = fontFamily
+                    fontFamily = fontFamily,
+                    letterSpacing = 0.1.sp
                     )
             }
             Row(
@@ -290,11 +315,13 @@ fun ScanCard() {
                 Text(
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily,
-                    text = "Last Scan: "
+                    text = "Last Scan: ",
+                    letterSpacing = 0.1.sp
                 )
                 Text(
                     fontFamily = fontFamily,
-                    text = "10 Aug, 2023 at 21:36"
+                    text = "10 Aug, 2023 at 21:36",
+                    letterSpacing = 0.1.sp
                 )
             }
             /*
@@ -343,5 +370,5 @@ fun ScanCard() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
-    HomeScreen(padding = PaddingValues(all = 0.dp))
+    HomeScreen(padding = PaddingValues(all = 0.dp), navController = rememberNavController())
 }

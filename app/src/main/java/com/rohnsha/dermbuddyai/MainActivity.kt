@@ -45,33 +45,36 @@ class MainActivity : ComponentActivity() {
                 val navcontroller= rememberNavController()
                 val navBackStackEntry by navcontroller.currentBackStackEntryAsState()
                 val currentDestination= navBackStackEntry?.destination
+                val bottomDestination= items.any { it.route== currentDestination?.route }
 
                 Scaffold(
                     bottomBar = {
-                        NavigationBar {
-                            items.forEachIndexed { index, bottomNavItems ->
-                                NavigationBarItem(
-                                    selected = currentDestination?.hierarchy?.any {
-                                        it.route == bottomNavItems.route
-                                    } == true,
-                                    onClick = {
-                                        selectedItemIndex= index
-                                        navcontroller.navigate(bottomNavItems.route){
-                                            popUpTo(navcontroller.graph.findStartDestination().id)
-                                            launchSingleTop= true
-                                        }
-                                    },
-                                    label = {
-                                        Text(text = bottomNavItems.title)
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector = if (selectedItemIndex==index){
-                                                bottomNavItems.selectedIcon
-                                            } else bottomNavItems.unselectedIcon,
-                                            contentDescription = bottomNavItems.title
-                                        )
-                                    })
+                        if (bottomDestination){
+                            NavigationBar {
+                                items.forEachIndexed { index, bottomNavItems ->
+                                    NavigationBarItem(
+                                        selected = currentDestination?.hierarchy?.any {
+                                            it.route == bottomNavItems.route
+                                        } == true,
+                                        onClick = {
+                                            selectedItemIndex= index
+                                            navcontroller.navigate(bottomNavItems.route){
+                                                popUpTo(navcontroller.graph.findStartDestination().id)
+                                                launchSingleTop= true
+                                            }
+                                        },
+                                        label = {
+                                            Text(text = bottomNavItems.title)
+                                        },
+                                        icon = {
+                                            Icon(
+                                                imageVector = if (selectedItemIndex==index){
+                                                    bottomNavItems.selectedIcon
+                                                } else bottomNavItems.unselectedIcon,
+                                                contentDescription = bottomNavItems.title
+                                            )
+                                        })
+                                }
                             }
                         }
                     }
