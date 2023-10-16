@@ -41,4 +41,10 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
+    object ScanResult: bottomNavItems(
+        title = "ScanResults",
+        route = "scan_result/{bitmap}",
+        unselectedIcon = Icons.Outlined.AdminPanelSettings,
+        selectedIcon = Icons.Filled.AdminPanelSettings
+    )
 }
