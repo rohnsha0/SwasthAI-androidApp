@@ -67,6 +67,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -86,7 +87,6 @@ import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.support.image.ops.ResizeOp
 import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
@@ -364,7 +364,6 @@ private fun getMaxIndex(floatArray: FloatArray): Int {
     return max
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanMainScreen() {
     val controller= remember {
@@ -395,6 +394,37 @@ fun ScanMainScreen() {
                     .fillMaxHeight(.9f),
                 imgBitmap = bitmap
             )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(.9f),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Box(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .background(Color.Black.copy(.25f), RoundedCornerShape(2.dp))
+                        .padding(horizontal = 9.dp, vertical = 3.dp)
+                ) {
+                    Row {
+                        Text(
+                            text = "Detected: ",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontFamily = fontFamily
+                        )
+                        Text(
+                            text = "X-RAY",
+                            color = Color.White,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
         }
         Row(
             modifier = Modifier
@@ -424,7 +454,9 @@ fun ScanMainScreen() {
                 title = "GALLERY",
                 widthPercentage = 1f,
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 13.dp),
-                onClickAction = {}
+                onClickAction = {
+
+                }
             )
         }
     }
@@ -472,4 +504,8 @@ fun CameraControlsItem(
             )
         }
     }
+}
+
+private fun importFromGallery(){
+
 }
