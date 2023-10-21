@@ -48,7 +48,11 @@ fun bottomNavGraph(
                 }
             )
         ){
-            ScanResultScreen(padding = padding)
+            ScanResultScreen(
+                padding = padding,
+                group = it.arguments?.getInt("group", 404).toString(),
+                serial_number = it.arguments?.getInt("serial_no", 404).toString()
+            )
         }
     }
 }

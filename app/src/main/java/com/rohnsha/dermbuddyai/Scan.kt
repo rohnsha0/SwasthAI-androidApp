@@ -53,8 +53,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -84,6 +86,9 @@ import com.rohnsha.dermbuddyai.domain.classifier
 import com.rohnsha.dermbuddyai.ml.ModelPotato
 import com.rohnsha.dermbuddyai.ui.theme.BGMain
 import com.rohnsha.dermbuddyai.ui.theme.fontFamily
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -297,10 +302,11 @@ private fun takePhoto(
     controller: LifecycleCameraController,
     context: Context,
     onPhotoTaken: (Bitmap) -> Unit,
-    toCcamFeed: Boolean,
-): classification{
+    toCcamFeed: (classification) -> Unit,
+){
     Log.d("successIndexModelTF", "entered")
 
+    var classificationResult: classification= classification(indexNumber = 404, confident = 404f)
     controller.takePicture(
         ContextCompat.getMainExecutor(ContextUtill.ContextUtils.getApplicationContext()),
         object : OnImageCapturedCallback(){
@@ -323,19 +329,20 @@ private fun takePhoto(
                 )
                 onPhotoTaken(rotatedBitmap)
 
-                    val classificationResult= classifier.classifyIndex(context, rotatedBitmap)
-                    val potatoDisease= listOf<String>(
-                        "Early Blight",
-                        "Healthy",
-                        "Late Blight"
-                    )
+                classificationResult= classifier.classifyIndex(context, rotatedBitmap)
+                val potatoDisease= listOf<String>(
+                    "Early Blight",
+                    "Healthy",
+                    "Late Blight"
+                )
 
-                    Log.d("successIndexModelTF", "Found: ${potatoDisease[classificationResult.indexNumber]} with ${
-                        String.format(
-                            "%.2f",
-                            classificationResult.confident
-                        )
-                    }% confidence!\"")
+                Log.d("successIndexModelTF", "Found: ${potatoDisease[classificationResult.indexNumber]} with ${
+                    String.format(
+                        "%.2f",
+                        classificationResult.confident
+                    )
+                }% confidence!\"")
+                toCcamFeed(classificationResult)
             }
 
             override fun onError(exception: ImageCaptureException) {
@@ -441,9 +448,6 @@ fun ScanMainScreen(
                 .fillMaxSize()
                 .background(BGMain),
         ) {
-            val predictedClassification= remember {
-                mutableStateOf("")
-            }
             CameraControlsItem(
                 title = "FLIP",
                 widthPercentage = if (!isPredictingBool.value) 0.3f else 0.25f,
@@ -462,12 +466,12 @@ fun ScanMainScreen(
                         controller = controller,
                         context = conttext,
                         onPhotoTaken = photoViewModel::take_photo,
-                        toCcamFeed = isPredictingBool.value
+                        toCcamFeed = {
+                            navController.navigate(bottomNavItems.ScanResult.passGrpAndSerialNumber(
+                            grp = detecteddClassification.value, serial_number = it.indexNumber
+                        ))
+                        }
                     )
-                    Log.d("successIndexModelTF", isPredictingBool.value.toString())
-                    navController.navigate(bottomNavItems.ScanResult.passGrpAndSerialNumber(
-                        1, 5
-                    ))
                 },
                 isPredicting = isPredictingBool.value
             )
