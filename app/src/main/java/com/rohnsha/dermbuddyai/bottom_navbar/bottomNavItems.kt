@@ -43,8 +43,15 @@ sealed class bottomNavItems(
     )
     object ScanResult: bottomNavItems(
         title = "ScanResults",
-        route = "scan_result/{bitmap}",
+        route = "scan_result/{group}/{serial_no}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
-    )
+    ){
+        fun passGrpAndSerialNumber(
+            grp: Int,
+            serial_number: Int
+        ) : String{
+            return "scan_result/$grp/$serial_number"
+        }
+    }
 }

@@ -35,12 +35,15 @@ fun bottomNavGraph(
             MoreScreen(padding = padding)
         }
         composable(route = bottomNavItems.Scan.route){
-            ScanScreen(padding = padding)
+            ScanScreen(padding = padding, navController = navController)
         }
         composable(
             route = bottomNavItems.ScanResult.route,
             arguments = listOf(
-                navArgument("bitmap"){
+                navArgument("group"){
+                    type= NavType.IntType
+                },
+                navArgument("serial_no"){
                     type= NavType.IntType
                 }
             )

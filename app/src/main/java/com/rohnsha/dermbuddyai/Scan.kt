@@ -1,7 +1,6 @@
 package com.rohnsha.dermbuddyai
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
@@ -50,7 +49,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
@@ -74,10 +72,15 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.rohnsha.dermbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.dermbuddyai.domain.analyzer
+import com.rohnsha.dermbuddyai.domain.classification
+import com.rohnsha.dermbuddyai.domain.classifier
 import com.rohnsha.dermbuddyai.ml.ModelPotato
 import com.rohnsha.dermbuddyai.ui.theme.BGMain
 import com.rohnsha.dermbuddyai.ui.theme.fontFamily
@@ -90,7 +93,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavHostController
 ) {
     var cameraPermissionState: PermissionState= rememberPermissionState(permission = Manifest.permission.CAMERA)
 
@@ -133,7 +137,9 @@ fun ScanScreen(
                 .fillMaxSize()
         ) {
             ScanOptions()
-            ScanMainScreen()
+            ScanMainScreen(
+                navController
+            )
         }
     }
 }
@@ -264,7 +270,7 @@ fun ScanOptionsItem(
 fun CameraPreview(
     controller: LifecycleCameraController,
     modifier: Modifier= Modifier,
-    imgBitmap: Bitmap? = null
+    imgBitmap: Bitmap? = null,
 ) {
     val lifecycleOwner= LocalLifecycleOwner.current
     if (imgBitmap!=null){
@@ -290,15 +296,18 @@ fun CameraPreview(
 private fun takePhoto(
     controller: LifecycleCameraController,
     context: Context,
-    onPhotoTaken: (Bitmap) -> Unit
-){
+    onPhotoTaken: (Bitmap) -> Unit,
+    toCcamFeed: Boolean,
+): classification{
+    Log.d("successIndexModelTF", "entered")
+
     controller.takePicture(
         ContextCompat.getMainExecutor(ContextUtill.ContextUtils.getApplicationContext()),
         object : OnImageCapturedCallback(){
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
 
-                val model = ModelPotato.newInstance(context)
+                Log.d("successIndexModelTF", "entered1")
 
                 val matrix = Matrix().apply {
                     postRotate(image.imageInfo.rotationDegrees.toFloat())
@@ -312,70 +321,71 @@ private fun takePhoto(
                     matrix,
                     true
                 )
-
                 onPhotoTaken(rotatedBitmap)
 
-                var imageProcessor= ImageProcessor.Builder()
-                    .add(ResizeOp(256, 256, ResizeOp.ResizeMethod.BILINEAR))
-                    .build()
-
-                var tensorImage= TensorImage(DataType.FLOAT32)
-                tensorImage.load(rotatedBitmap)
-
-                tensorImage= imageProcessor.process(tensorImage)
-
-                val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
-                inputFeature0.loadBuffer(tensorImage.buffer)
-
-                val outputs = model.process(inputFeature0)
-                val outputFeature0 = outputs.outputFeature0AsTensorBuffer
-                Log.d("successIndexModelTF", getMaxIndex(outputFeature0.floatArray).toString())
-                Log.d("successIndexModelTF", outputFeature0.floatArray[getMaxIndex(outputFeature0.floatArray)].toString())
-
-                val potatoDisease= listOf<String>(
-                    "Early Blight",
-                    "Healthy",
-                    "Late Blight"
-                )
-
-                Log.d("successIndexModelTF", "Found: ${potatoDisease[getMaxIndex(outputFeature0.floatArray)]} with ${
-                    String.format(
-                        "%.2f",
-                        outputFeature0.floatArray[getMaxIndex(outputFeature0.floatArray)] * 100
+                    val classificationResult= classifier.classifyIndex(context, rotatedBitmap)
+                    val potatoDisease= listOf<String>(
+                        "Early Blight",
+                        "Healthy",
+                        "Late Blight"
                     )
-                }% confidence!\"")
 
+                    Log.d("successIndexModelTF", "Found: ${potatoDisease[classificationResult.indexNumber]} with ${
+                        String.format(
+                            "%.2f",
+                            classificationResult.confident
+                        )
+                    }% confidence!\"")
             }
 
             override fun onError(exception: ImageCaptureException) {
                 super.onError(exception)
+
+                Log.d("successIndexModelTF", "jii $exception", )
             }
         }
     )
 }
 
-private fun getMaxIndex(floatArray: FloatArray): Int {
-    var max = 0
-    for (i in floatArray.indices) {
-        if (floatArray[i] > floatArray[max]) {
-            max = i
-        }
-    }
-    return max
-}
-
 @Composable
-fun ScanMainScreen() {
+fun ScanMainScreen(
+    navController: NavHostController
+) {
+    val conttext= LocalContext.current
+    var itt= classification(0, 6f)
+    val detecteddClassification= remember {
+        mutableStateOf(itt.indexNumber)
+    }
+    val analyzer= remember {
+        analyzer(
+            context = conttext,
+            onResults = {
+                detecteddClassification.value= it.indexNumber
+            }
+        )
+    }
     val controller= remember {
         LifecycleCameraController(ContextUtill.ContextUtils.getApplicationContext()).apply {
             setEnabledUseCases(
-                CameraController.IMAGE_CAPTURE
+                CameraController.IMAGE_CAPTURE or
+                CameraController.IMAGE_ANALYSIS
+            )
+            setImageAnalysisAnalyzer(
+                ContextCompat.getMainExecutor(ContextUtill.ContextUtils.getApplicationContext()),
+                analyzer
             )
         }
     }
+    val listTest= listOf(
+        "Early Blight",
+        "Healthy",
+        "Late Blight"
+    )
     val photoViewModel = viewModel<photoVM>()
     val bitmap by photoViewModel.bitmaps.collectAsState()
-    val conttext= LocalContext.current
+    val isPredictingBool= remember {
+        mutableStateOf(false)
+    }
 
     Column(
         modifier = Modifier
@@ -392,7 +402,7 @@ fun ScanMainScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(.9f),
-                imgBitmap = bitmap
+                imgBitmap = bitmap,
             )
             Row(
                 modifier = Modifier
@@ -415,7 +425,7 @@ fun ScanMainScreen() {
                             fontFamily = fontFamily
                         )
                         Text(
-                            text = "X-RAY",
+                            text = listTest[detecteddClassification.value],
                             color = Color.White,
                             fontFamily = fontFamily,
                             fontWeight = FontWeight(600),
@@ -431,14 +441,16 @@ fun ScanMainScreen() {
                 .fillMaxSize()
                 .background(BGMain),
         ) {
-            val isPredictingBool= remember {
-                mutableStateOf(false)
+            val predictedClassification= remember {
+                mutableStateOf("")
             }
             CameraControlsItem(
                 title = "FLIP",
                 widthPercentage = if (!isPredictingBool.value) 0.3f else 0.25f,
                 paddingVal = PaddingValues(start = 13.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
-                onClickAction = {}
+                onClickAction = {
+
+                }
             )
             CameraControlsItem(
                 title = "CAPTURE",
@@ -446,7 +458,16 @@ fun ScanMainScreen() {
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
                     isPredictingBool.value=true
-                    takePhoto(controller = controller, context = conttext, onPhotoTaken = photoViewModel::take_photo)
+                    takePhoto(
+                        controller = controller,
+                        context = conttext,
+                        onPhotoTaken = photoViewModel::take_photo,
+                        toCcamFeed = isPredictingBool.value
+                    )
+                    Log.d("successIndexModelTF", isPredictingBool.value.toString())
+                    navController.navigate(bottomNavItems.ScanResult.passGrpAndSerialNumber(
+                        1, 5
+                    ))
                 },
                 isPredicting = isPredictingBool.value
             )
