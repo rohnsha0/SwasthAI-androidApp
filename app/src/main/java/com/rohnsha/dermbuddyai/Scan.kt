@@ -331,9 +331,8 @@ private fun takePhoto(
 
                 classificationResult= classifier.classifyIndex(context, rotatedBitmap)
                 val potatoDisease= listOf<String>(
-                    "Early Blight",
-                    "Healthy",
-                    "Late Blight"
+                    "nrml",
+                    "Tuberculosis",
                 )
 
                 Log.d("successIndexModelTF", "Found: ${potatoDisease[classificationResult.indexNumber]} with ${
@@ -384,9 +383,8 @@ fun ScanMainScreen(
         }
     }
     val listTest= listOf(
-        "Early Blight",
-        "Healthy",
-        "Late Blight"
+        "nrml",
+        "tuberculosis",
     )
     val photoViewModel = viewModel<photoVM>()
     val bitmap by photoViewModel.bitmaps.collectAsState()

@@ -215,7 +215,8 @@ fun explore_tabs(
                 modifier = Modifier
                     .padding(start = 13.dp, end = 18.dp),
                 text = title,
-                fontWeight = FontWeight(600)
+                fontWeight = FontWeight(600),
+                fontSize = 15.sp
             )
         }
     }
@@ -297,12 +298,14 @@ fun ScanCard() {
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily,
                     text = "Medical Condition: ",
-                    letterSpacing = 0.1.sp
+                    letterSpacing = 0.1.sp,
+                    fontSize = 15.sp
                 )
                 Text(
                     text = "Fit",
                     fontFamily = fontFamily,
-                    letterSpacing = 0.1.sp
+                    letterSpacing = 0.1.sp,
+                    fontSize = 15.sp
                     )
             }
             Row(
@@ -316,12 +319,14 @@ fun ScanCard() {
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily,
                     text = "Last Scan: ",
-                    letterSpacing = 0.1.sp
+                    letterSpacing = 0.1.sp,
+                    fontSize = 15.sp
                 )
                 Text(
                     fontFamily = fontFamily,
                     text = "10 Aug, 2023 at 21:36",
-                    letterSpacing = 0.1.sp
+                    letterSpacing = 0.1.sp,
+                    fontSize = 15.sp
                 )
             }
             /*

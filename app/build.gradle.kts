@@ -84,4 +84,5 @@ dependencies {
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
+    implementation("io.coil-kt:coil-compose:2.4.0")
 }

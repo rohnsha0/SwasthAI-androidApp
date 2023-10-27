@@ -3,6 +3,7 @@ package com.rohnsha.dermbuddyai.domain
 import android.content.Context
 import android.graphics.Bitmap
 import com.rohnsha.dermbuddyai.ml.ModelPotato
+import com.rohnsha.dermbuddyai.ml.ModelTC
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -16,7 +17,7 @@ class classifier {
             context: Context,
             bitmap: Bitmap,
         ): classification {
-            val model = ModelPotato.newInstance(context)
+            val model = ModelTC.newInstance(context)
             var tensorImage= TensorImage(DataType.FLOAT32)
             tensorImage.load(bitmap)
 
