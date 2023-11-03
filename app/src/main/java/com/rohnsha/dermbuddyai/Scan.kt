@@ -53,10 +53,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,7 +65,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -83,17 +80,8 @@ import com.rohnsha.dermbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.dermbuddyai.domain.analyzer
 import com.rohnsha.dermbuddyai.domain.classification
 import com.rohnsha.dermbuddyai.domain.classifier
-import com.rohnsha.dermbuddyai.ml.ModelPotato
 import com.rohnsha.dermbuddyai.ui.theme.BGMain
 import com.rohnsha.dermbuddyai.ui.theme.fontFamily
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import org.tensorflow.lite.DataType
-import org.tensorflow.lite.support.image.ImageProcessor
-import org.tensorflow.lite.support.image.TensorImage
-import org.tensorflow.lite.support.image.ops.ResizeOp
-import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
@@ -329,13 +317,12 @@ private fun takePhoto(
                 )
                 onPhotoTaken(rotatedBitmap)
 
-                classificationResult= classifier.classifyIndex(context, rotatedBitmap)
-                val potatoDisease= listOf<String>(
-                    "nrml",
-                    "Tuberculosis",
+                classificationResult= classifier.classifyIndex(context, rotatedBitmap, scanOption = "lung")
+                val chestDiseases= listOf(
+                    "normal", "pneumonia", "tuberculosis"
                 )
 
-                Log.d("successIndexModelTF", "Found: ${potatoDisease[classificationResult.indexNumber]} with ${
+                Log.d("successIndexModelTF", "Found: ${chestDiseases[classificationResult.indexNumber]} with ${
                     String.format(
                         "%.2f",
                         classificationResult.confident
@@ -383,8 +370,9 @@ fun ScanMainScreen(
         }
     }
     val listTest= listOf(
-        "nrml",
-        "tuberculosis",
+        "MRI",
+        "XRAY",
+        "Skin Manifestion"
     )
     val photoViewModel = viewModel<photoVM>()
     val bitmap by photoViewModel.bitmaps.collectAsState()
@@ -413,32 +401,19 @@ fun ScanMainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(.9f),
-                horizontalArrangement = Arrangement.Center,
+                horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.Bottom
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(8.dp)
-                        .background(Color.Black.copy(.25f), RoundedCornerShape(2.dp))
-                        .padding(horizontal = 9.dp, vertical = 3.dp)
-                ) {
-                    Row {
-                        Text(
-                            text = "Detected: ",
-                            color = Color.White,
-                            fontSize = 12.sp,
-                            fontFamily = fontFamily
-                        )
-                        Text(
-                            text = listTest[detecteddClassification.value],
-                            color = Color.White,
-                            fontFamily = fontFamily,
-                            fontWeight = FontWeight(600),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
+                CameraPreviewSegmentOp(
+                    title = "Detected: ",
+                    weight = 0.5f,
+                    dataItem = listTest[detecteddClassification.value]
+                )
+                CameraPreviewSegmentOp(
+                    title = "Detected: ",
+                    weight = 0.5f,
+                    dataItem = listTest[detecteddClassification.value]
+                )
             }
         }
         Row(
@@ -466,7 +441,8 @@ fun ScanMainScreen(
                         onPhotoTaken = photoViewModel::take_photo,
                         toCcamFeed = {
                             navController.navigate(bottomNavItems.ScanResult.passGrpAndSerialNumber(
-                            grp = detecteddClassification.value, serial_number = it.indexNumber
+                                grp = 0,//detecteddClassification.value,
+                                serial_number = it.indexNumber
                         ))
                         }
                     )
@@ -482,6 +458,34 @@ fun ScanMainScreen(
                 }
             )
         }
+    }
+}
+
+@Composable
+fun CameraPreviewSegmentOp(
+    title: String,
+    weight: Float,
+    dataItem: String
+) {
+    Row(
+        modifier = Modifier
+            .padding(bottom = 6.dp)
+            .height(30.dp)
+            .background(Color.White, RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            fontSize = 12.sp,
+            fontFamily = fontFamily
+        )
+        Text(
+            text = dataItem,//listTest[detecteddClassification.value],
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 14.sp
+        )
     }
 }
 

@@ -2,6 +2,7 @@ package com.rohnsha.dermbuddyai
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -35,6 +36,10 @@ import com.rohnsha.dermbuddyai.ui.theme.DermBuddyAITheme
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        var isLoadingCompleted= false
+        installSplashScreen().setKeepOnScreenCondition{
+            !isLoadingCompleted
+        }
         ContextUtill.ContextUtils.initialize(this)
         setContent {
             DermBuddyAITheme {
@@ -87,6 +92,7 @@ class MainActivity : ComponentActivity() {
                         navController = navcontroller,
                         padding = paddingValues
                     )
+                    isLoadingCompleted=true
                 }
             }
         }

@@ -28,7 +28,7 @@ class analyzer(
                 matrix,
                 true
             )
-            val results= classifier.classifyIndex(context, bitmap = rotatedBitmap)
+            val results= classifier.classifyIndex(context, bitmap = rotatedBitmap, scanOption = "master")
             onResults(results)
             Log.d("analyzerSuccess", results.indexNumber.toString())
         }
