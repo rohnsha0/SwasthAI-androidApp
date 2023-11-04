@@ -7,5 +7,6 @@ data class disease_data_dataClass(
     val domain: String,
     val introduction: String,
     val symptoms: String,
-    val thresholds: String
+    val thresholds: String,
+    val cover_link: String
 )

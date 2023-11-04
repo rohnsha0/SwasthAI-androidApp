@@ -187,9 +187,8 @@ fun ScanResultsSuccess(
             Box(
                 modifier = Modifier
             ){
-                val imgURL= "https://uc9dd619a7914cc058a868562105.previews.dropboxusercontent.com/p/thumb/ACEegjVf-EgagMTAovx7WQLoxcf_o8Uuc__EWjvLNq5XCAFoiH4ataXZjSeNN9NTwPQfgIGMMJni8KrHTd68Uldd4RmI8OZmQM3nivwYPrA14tDmeolknp9xlW5xU69mhjzyxF45Ow5EKwLFx2KpqU9-43TT6ovsZt7NpJF99ooqlv0tVz_UV74ufFgqA8S6JWeDwOC1akn2JogklE3zOdg1cSVFtJP-uAxA5u6YRbWAx4kLlDk_zGOan5i_IUokL9CgIjEQRaFXLc5Anqy6c2GEmpDh-lPLp-afVsRUGZOD3rwC8K_ZkiB_1DlxOaZz5lujR528ovHlogZ9GysDxwacwZzNTXVcCJpTEGFaebArL9LQ2gPwgccJXayDM78LhBA/p.jpeg"
                 AsyncImage(
-                    model = imgURL,
+                    model = disease_results.cover_link,
                     contentScale = ContentScale.Crop,
                     contentDescription = "null",
                     modifier = Modifier
@@ -215,39 +214,22 @@ fun ScanResultsSuccess(
             )
             DataBox(
                 title = "Know About Disease",
-                data = "Pneumonia is an infection that inflames the air sacs in one or both lungs. The air sacs may fill with fluid or pus (purulent material), causing cough with phlegm or pus, fever, chills, and difficulty breathing. A variety of organisms, including bacteria, viruses and fungi, can cause pneumonia. Pneumonia can range in seriousness from mild to life-threatening. It is most serious for infants and young children, people older than age 65, and people with health problems or weakened immune systems."
+                data = disease_results.introduction
             )
             Spacer(
                 modifier = Modifier.height(20.dp)
             )
             DataBox(
                 title = "Symptoms",
-                data = "The signs and symptoms of pneumonia vary from mild to severe, depending on factors such as the type of germ causing the infection, and your age and overall health. Mild signs and symptoms often are similar to those of a cold or flu, but they last longer.\n" +
-                        "Signs and symptoms of pneumonia may include:" +
-                        "\n" +
-                        "1. Chest pain when you breathe or cough\n" +
-                        "2. Confusion or changes in mental awareness (in adults age 65 and older)\n" +
-                        "3. Cough, which may produce phlegm\n" +
-                        "4. Fatigue\n" +
-                        "5. Fever, sweating and shaking chills\n" +
-                        "6. Lower than normal body temperature (in adults older than age 65 and people with weak immune systems)\n" +
-                        "7. Nausea, vomiting or diarrhea\n" +
-                        "8. Shortness of breath\n" +
-                        "Newborns and infants may not show any sign of the infection. Or they may vomit, have a fever and cough, appear restless or tired and without energy, or have difficulty breathing and eating."
+                data = disease_results.symptoms
             )
             Spacer(
                 modifier = Modifier.height(20.dp)
             )
             DataBox(
                 title = "When to see doctor",
-                data = "See your doctor if you have difficulty breathing, chest pain, persistent fever of 102 F (39 C) or higher, or persistent cough, especially if you're coughing up pus.\n" +
-                        "It's especially important that people in these high-risk groups see a doctor:\n" +
-                        "Adults older than age 65\n" +
-                        "Children younger than age 2 with signs and symptoms\n" +
-                        "People with an underlying health condition or weakened immune system\n" +
-                        "People receiving chemotherapy or taking medication that suppresses the immune system\n" +
-                        "For some older adults and people with heart failure or chronic lung problems, pneumonia can quickly become a life-threatening condition."
-            )
+                data = disease_results.thresholds
+                )
             Spacer(modifier = Modifier.height(18.dp))
         }
     }
