@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.bottom_navbar
+package com.rohnsha.medbuddyai.bottom_navbar
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -7,11 +7,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.rohnsha.dermbuddyai.CommunityScreen
-import com.rohnsha.dermbuddyai.HomeScreen
-import com.rohnsha.dermbuddyai.MoreScreen
-import com.rohnsha.dermbuddyai.ScanResultScreen
-import com.rohnsha.dermbuddyai.ScanScreen
+import com.rohnsha.medbuddyai.CommunityScreen
+import com.rohnsha.medbuddyai.HomeScreen
+import com.rohnsha.medbuddyai.MoreScreen
+import com.rohnsha.medbuddyai.ScanResultScreen
+import com.rohnsha.medbuddyai.ScanScreen
 
 @Composable
 fun bottomNavGraph(

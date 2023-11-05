@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.ui.theme
+package com.rohnsha.medbuddyai.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

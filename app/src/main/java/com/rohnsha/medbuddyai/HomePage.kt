@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,10 +41,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.rohnsha.dermbuddyai.bottom_navbar.bottomNavItems
-import com.rohnsha.dermbuddyai.ui.theme.BGMain
-import com.rohnsha.dermbuddyai.ui.theme.ViewDash
-import com.rohnsha.dermbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

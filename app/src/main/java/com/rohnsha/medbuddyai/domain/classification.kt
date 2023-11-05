@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.domain
+package com.rohnsha.medbuddyai.domain
 
 data class classification(
     val indexNumber: Int,

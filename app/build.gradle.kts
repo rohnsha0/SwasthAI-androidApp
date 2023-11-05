@@ -4,15 +4,15 @@ plugins {
 }
 
 android {
-    namespace = "com.rohnsha.dermbuddyai"
+    namespace = "com.rohnsha.medbuddyai"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.rohnsha.dermbuddyai"
+        applicationId = "com.rohnsha.medbuddyai"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "1.0"
+        versionName = "2024.0.07.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

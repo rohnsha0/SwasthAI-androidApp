@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.ui.theme
+package com.rohnsha.medbuddyai.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.googlefonts.Font
 import androidx.compose.ui.text.googlefonts.GoogleFont
 import androidx.compose.ui.unit.sp
-import com.rohnsha.dermbuddyai.R
+import com.rohnsha.medbuddyai.R
 
 val provider = GoogleFont.Provider(
     providerAuthority = "com.google.android.gms.fonts",

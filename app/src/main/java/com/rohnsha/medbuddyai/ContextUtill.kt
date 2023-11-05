@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import android.content.Context
 

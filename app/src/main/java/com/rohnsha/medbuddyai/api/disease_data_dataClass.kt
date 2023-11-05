@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.api
+package com.rohnsha.medbuddyai.api
 
 data class disease_data_dataClass(
     val cure: String,

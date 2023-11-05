@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -41,22 +41,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import com.rohnsha.dermbuddyai.api.disease_data_dataClass
-import com.rohnsha.dermbuddyai.api.results_obj.resultsAPIService
-import com.rohnsha.dermbuddyai.ui.theme.BGMain
-import com.rohnsha.dermbuddyai.ui.theme.ViewDash
-import com.rohnsha.dermbuddyai.ui.theme.fontFamily
-import com.rohnsha.dermbuddyai.ui.theme.formAccent
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import coil.compose.rememberAsyncImagePainter
+import com.rohnsha.medbuddyai.api.disease_data_dataClass
+import com.rohnsha.medbuddyai.api.results_obj.resultsAPIService
+import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
 import kotlin.random.Random
 
 private lateinit var disease_results: disease_data_dataClass
@@ -67,7 +62,6 @@ fun ScanResultScreen(
     group: String,
     serial_number: String,
 ) {
-
     val dynamicURL= "https://quuicqg435fkhjzpkawkhg4exi0vjslb.lambda-url.ap-south-1.on.aws/disease_data/$group/$serial_number"
     var isAPIcalling= remember {
         mutableStateOf(true)
@@ -187,8 +181,14 @@ fun ScanResultsSuccess(
             Box(
                 modifier = Modifier
             ){
-                AsyncImage(
+                val painter= rememberAsyncImagePainter(
                     model = disease_results.cover_link,
+                    onError = {
+                        Log.e("coil", "error response: ${it.painter}, ${it.result}")
+                    }
+                )
+                Image(
+                    painter = painter,
                     contentScale = ContentScale.Crop,
                     contentDescription = "null",
                     modifier = Modifier
@@ -241,7 +241,7 @@ fun OptionScanResults() {
         modifier = Modifier
             .padding(horizontal = 24.dp)
             .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly,
+        horizontalArrangement = Arrangement.SpaceAround,
         verticalAlignment = Alignment.CenterVertically
     ) {
         OptionsScanResultUNI(

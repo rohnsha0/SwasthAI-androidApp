@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

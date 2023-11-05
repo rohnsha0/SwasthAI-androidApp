@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -17,8 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rohnsha.dermbuddyai.ui.theme.BGMain
-import com.rohnsha.dermbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

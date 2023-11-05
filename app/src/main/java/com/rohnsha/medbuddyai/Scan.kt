@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai
+package com.rohnsha.medbuddyai
 
 import android.Manifest
 import android.app.Activity
@@ -76,12 +76,12 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.rohnsha.dermbuddyai.bottom_navbar.bottomNavItems
-import com.rohnsha.dermbuddyai.domain.analyzer
-import com.rohnsha.dermbuddyai.domain.classification
-import com.rohnsha.dermbuddyai.domain.classifier
-import com.rohnsha.dermbuddyai.ui.theme.BGMain
-import com.rohnsha.dermbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.domain.analyzer
+import com.rohnsha.medbuddyai.domain.classification
+import com.rohnsha.medbuddyai.domain.classifier
+import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable

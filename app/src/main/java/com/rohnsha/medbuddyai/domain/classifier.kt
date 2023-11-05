@@ -1,10 +1,10 @@
-package com.rohnsha.dermbuddyai.domain
+package com.rohnsha.medbuddyai.domain
 
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.rohnsha.dermbuddyai.ml.ImgSegv066
-import com.rohnsha.dermbuddyai.ml.LungsV1
+import com.rohnsha.medbuddyai.ml.ImgSegv066
+import com.rohnsha.medbuddyai.ml.LungsV1
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage

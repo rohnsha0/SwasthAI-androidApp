@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.api
+package com.rohnsha.medbuddyai.api
 
 import retrofit2.http.GET
 import retrofit2.http.Url

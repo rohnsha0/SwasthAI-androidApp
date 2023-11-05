@@ -1,4 +1,4 @@
-package com.rohnsha.dermbuddyai.ui.theme
+package com.rohnsha.medbuddyai.ui.theme
 
 import android.app.Activity
 import android.os.Build
