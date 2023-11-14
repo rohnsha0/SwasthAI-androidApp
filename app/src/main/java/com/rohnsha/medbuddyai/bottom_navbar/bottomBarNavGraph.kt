@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.rohnsha.medbuddyai.CommunityScreen
 import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
+import com.rohnsha.medbuddyai.ScanCatogoryScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
 
@@ -33,6 +34,9 @@ fun bottomNavGraph(
         }
         composable(route = bottomNavItems.Settings.route){
             MoreScreen(padding = padding)
+        }
+        composable(route = bottomNavItems.ScanCatogoricals.route){
+            ScanCatogoryScreen(padding = padding, navController = navController)
         }
         composable(route = bottomNavItems.Scan.route){
             ScanScreen(padding = padding, navController = navController)

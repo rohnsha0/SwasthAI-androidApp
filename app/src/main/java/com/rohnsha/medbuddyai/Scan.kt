@@ -440,10 +440,7 @@ fun ScanMainScreen(
                         context = conttext,
                         onPhotoTaken = photoViewModel::take_photo,
                         toCcamFeed = {
-                            navController.navigate(bottomNavItems.ScanResult.passGrpAndSerialNumber(
-                                grp = 0,//detecteddClassification.value,
-                                serial_number = it.indexNumber
-                        ))
+                            navController.navigate(bottomNavItems.ScanCatogoricals.route)
                         }
                     )
                 },

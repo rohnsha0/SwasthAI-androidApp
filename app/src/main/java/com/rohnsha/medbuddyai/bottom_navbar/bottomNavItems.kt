@@ -33,6 +33,14 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
+
+    object ScanCatogoricals: bottomNavItems(
+        title = "scan_category",
+        route = "scan_category",
+        unselectedIcon = Icons.Outlined.AdminPanelSettings,
+        selectedIcon = Icons.Filled.AdminPanelSettings
+    )
+
     object Scan: bottomNavItems(
         title = "scan",
         route = "scan",
