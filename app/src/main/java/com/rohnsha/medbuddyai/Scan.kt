@@ -52,9 +52,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -70,7 +70,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
@@ -79,10 +78,10 @@ import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.classification
-import com.rohnsha.medbuddyai.domain.classifier
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import kotlinx.coroutines.launch
 
 private lateinit var viewModelPhotoSave: photoCaptureViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
@@ -319,6 +318,7 @@ private fun takePhoto(
                     matrix,
                     true
                 )
+
                 onPhotoTaken(rotatedBitmap)
 /*
                 classificationResult= classifier.classifyIndex(context, rotatedBitmap, scanOption = "lung")
@@ -353,6 +353,7 @@ fun ScanMainScreen(
     val detecteddClassification= remember {
         mutableStateOf(itt.indexNumber)
     }
+    val scope= rememberCoroutineScope()
     val analyzer= remember {
         analyzer(
             context = conttext,
@@ -437,14 +438,16 @@ fun ScanMainScreen(
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
                     isPredictingBool.value=true
-                    takePhoto(
-                        controller = controller,
-                        context = conttext,
-                        onPhotoTaken = viewModelPhotoSave::onTakePhoto,
-                        toCcamFeed = {
-                            navController.navigate(bottomNavItems.ScanCatogoricals.route)
-                        }
-                    )
+                    scope.launch {
+                        takePhoto(
+                            controller = controller,
+                            context = conttext,
+                            onPhotoTaken = viewModelPhotoSave::onTakePhoto,
+                            toCcamFeed = {
+                                navController.navigate(bottomNavItems.ScanCatogoricals.route)
+                            }
+                        )
+                    }
                 },
                 isPredicting = isPredictingBool.value
             )

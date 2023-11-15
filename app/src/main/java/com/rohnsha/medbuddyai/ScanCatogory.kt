@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,9 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.outlined.SensorOccupied
@@ -36,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,7 +83,6 @@ fun ScanCatogoryScreen(
             "Skin",
             "Limbs"
         )
-        val scrollState= rememberScrollState()
         Column(
             modifier = Modifier
                 .padding(values)
@@ -104,7 +101,7 @@ fun ScanCatogoryScreen(
             )*/
             LazyColumn(
                 modifier = Modifier
-                    .padding(top = 40.dp, start = 24.dp, end = 24.dp)
+                    .padding(top = 20.dp, start = 24.dp, end = 24.dp)
             ){
                 item {
                     bitmaps.value?.let {
@@ -114,11 +111,22 @@ fun ScanCatogoryScreen(
                             modifier = Modifier
                                 .padding(bottom = 30.dp)
                                 .fillMaxWidth()
+                                .aspectRatio(16f / 9f)
                                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
                                 .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
+                }
+                item {
+                    Text(
+                        text = "Select model cluster to continue:-",
+                        fontFamily = fontFamily,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight(600),
+                        modifier = Modifier
+                            .padding(bottom = 20.dp)
+                    )
                 }
                 items(optionsData){items ->
                     OptionsItem(data = items, navController = navController)
@@ -141,7 +149,7 @@ fun OptionsItem(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate(bottomNavItems.Scan.route)
+                navController.navigate(bottomNavItems.ScanInter.route)
             },
         verticalAlignment = Alignment.CenterVertically
     ){

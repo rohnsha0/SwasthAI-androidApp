@@ -47,6 +47,12 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
+    object ScanInter: bottomNavItems(
+        title = "scanInter",
+        route = "scanInter",
+        unselectedIcon = Icons.Outlined.AdminPanelSettings,
+        selectedIcon = Icons.Filled.AdminPanelSettings
+    )
     object ScanResult: bottomNavItems(
         title = "ScanResults",
         route = "scan_result/{group}/{serial_no}",

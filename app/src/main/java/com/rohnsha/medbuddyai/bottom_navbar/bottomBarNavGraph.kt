@@ -12,6 +12,7 @@ import com.rohnsha.medbuddyai.CommunityScreen
 import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanCatogoryScreen
+import com.rohnsha.medbuddyai.ScanInterResultScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
@@ -51,6 +52,16 @@ fun bottomNavGraph(
                 photoCaptureVM = savePhotoViewModel
             )
         }
+
+        composable(
+            route = bottomNavItems.ScanInter.route
+        ){
+            ScanInterResultScreen(
+                padding = padding,
+                photoVM = savePhotoViewModel
+            )
+        }
+
         composable(
             route = bottomNavItems.ScanResult.route,
             arguments = listOf(
