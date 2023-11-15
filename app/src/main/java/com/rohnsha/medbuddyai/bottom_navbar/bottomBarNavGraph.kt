@@ -2,6 +2,7 @@ package com.rohnsha.medbuddyai.bottom_navbar
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,12 +14,14 @@ import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanCatogoryScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
+import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 
 @Composable
 fun bottomNavGraph(
     navController: NavHostController,
     padding: PaddingValues
 ) {
+    val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     NavHost(
         navController = navController,
         startDestination = bottomNavItems.Home.route
@@ -36,10 +39,17 @@ fun bottomNavGraph(
             MoreScreen(padding = padding)
         }
         composable(route = bottomNavItems.ScanCatogoricals.route){
-            ScanCatogoryScreen(padding = padding, navController = navController)
+            ScanCatogoryScreen(
+                padding = padding,
+                navController = navController,
+                photoCaptureVM = savePhotoViewModel)
         }
         composable(route = bottomNavItems.Scan.route){
-            ScanScreen(padding = padding, navController = navController)
+            ScanScreen(
+                padding = padding,
+                navController = navController,
+                photoCaptureVM = savePhotoViewModel
+            )
         }
         composable(
             route = bottomNavItems.ScanResult.route,

@@ -80,15 +80,19 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.classification
 import com.rohnsha.medbuddyai.domain.classifier
+import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 
+private lateinit var viewModelPhotoSave: photoCaptureViewModel
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    photoCaptureVM: photoCaptureViewModel
 ) {
+    viewModelPhotoSave= photoCaptureVM
     var cameraPermissionState: PermissionState= rememberPermissionState(permission = Manifest.permission.CAMERA)
 
     if (cameraPermissionState.status.isGranted){
@@ -316,7 +320,7 @@ private fun takePhoto(
                     true
                 )
                 onPhotoTaken(rotatedBitmap)
-
+/*
                 classificationResult= classifier.classifyIndex(context, rotatedBitmap, scanOption = "lung")
                 val chestDiseases= listOf(
                     "normal", "pneumonia", "tuberculosis"
@@ -327,7 +331,7 @@ private fun takePhoto(
                         "%.2f",
                         classificationResult.confident
                     )
-                }% confidence!\"")
+                }% confidence!\"")*/
                 toCcamFeed(classificationResult)
             }
 
@@ -374,8 +378,6 @@ fun ScanMainScreen(
         "XRAY",
         "Skin Manifestion"
     )
-    val photoViewModel = viewModel<photoVM>()
-    val bitmap by photoViewModel.bitmaps.collectAsState()
     val isPredictingBool= remember {
         mutableStateOf(false)
     }
@@ -395,7 +397,7 @@ fun ScanMainScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(.9f),
-                imgBitmap = bitmap,
+                imgBitmap = viewModelPhotoSave.bitmaps.collectAsState().value,
             )
             Row(
                 modifier = Modifier
@@ -438,7 +440,7 @@ fun ScanMainScreen(
                     takePhoto(
                         controller = controller,
                         context = conttext,
-                        onPhotoTaken = photoViewModel::take_photo,
+                        onPhotoTaken = viewModelPhotoSave::onTakePhoto,
                         toCcamFeed = {
                             navController.navigate(bottomNavItems.ScanCatogoricals.route)
                         }
