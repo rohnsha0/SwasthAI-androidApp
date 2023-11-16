@@ -18,8 +18,11 @@ class classifier {
             context: Context,
             bitmap: Bitmap,
             scanOption: Int,
+            isNormal: (Boolean) -> Unit
         ): List<classification> {
             var predictedClasses:List<classification> = emptyList()
+            var isNormal= false
+
             var tensorImage= TensorImage(DataType.FLOAT32)
             tensorImage.load(bitmap)
 
@@ -37,17 +40,20 @@ class classifier {
             //val outputFeature0 = predictionLungs(context, inputFeature0)
             if (scanOption==0){
                 predictedClasses=predictionLungs(
-                    context, inputFeature = inputFeature0
+                    context, inputFeature = inputFeature0, isNormalBoolean = { isNormal=it }
                 )
             }
+            isNormal(isNormal)
             return predictedClasses
         }
 
         fun predictionLungs(
             context: Context,
             inputFeature: TensorBuffer,
+            isNormalBoolean: (Boolean) -> Unit
         ): List<classification> {
             val predictedClassesLungs= mutableListOf<classification>()
+            var isNormal= false
 
             val modelPneumonia= PneumoniaV1.newInstance(context)
             val outputPneumonia= modelPneumonia.process(inputFeature).outputFeature0AsTensorBuffer
@@ -75,11 +81,15 @@ class classifier {
                     )
                 )
             }
-            Log.d("successIndex", predictedClassesLungs.toString())
+            Log.d("successIndex", predictedClassesLungs.isEmpty().toString())
+            if (predictedClassesLungs.isEmpty()){
+                isNormal=true
+            }
+            isNormalBoolean(isNormal)
 
             Log.d("successIndexFInal", predictedClassesLungs.toString())
             modelPneumonia.close()
-            //modelTuberCulosis.close()
+            modelTuberCulosis.close()
             return predictedClassesLungs
         }
 
