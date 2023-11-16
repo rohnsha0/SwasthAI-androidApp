@@ -52,6 +52,7 @@ fun ScanInterResultScreen(
         mutableStateOf(true)
     }
     val isNormalCase= photoVM.isNormalBoolean.collectAsState().value
+    val isErrored= photoVM.isErroredBoolean.collectAsState().value
     val classifiedList= photoVM.classiedList.collectAsState().value
     val context= LocalContext.current
     LaunchedEffect(key1 = isClassifying.value){
@@ -62,7 +63,7 @@ fun ScanInterResultScreen(
     Log.d("successIndexValuee", classifiedList.toString())
     Scaffold(
         topBar = {
-            if (!isClassifying.value && !isNormalCase){
+            if (!isClassifying.value && !isNormalCase && !isErrored){
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
@@ -88,7 +89,6 @@ fun ScanInterResultScreen(
                 "Loading the Canvas of Your Health Journey", "Awaiting Your Arrival in the Health Universe",
                 "Elevating Your Health IQ One Byte at a Time", "Stepping into the Digital Library of Wellness",
                 "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
-
             ))
         }else{
             if (isNormalCase){
@@ -96,6 +96,11 @@ fun ScanInterResultScreen(
                 NormalCase(titleList = listOf(
                     "You are fit!",
                     "No need to get any treatment!"
+                ))
+            } else if (isErrored){
+                ErroredLayout(titleList = listOf(
+                    "errored",
+                    "something went wrong"
                 ))
             } else{
                 InterResultSuccess(values = values, padding = padding)
@@ -132,6 +137,42 @@ fun NormalCase(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Green)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(.95f)
+        ){
+
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            Alignment.BottomCenter
+        ){
+            Text(
+                modifier = Modifier.padding(bottom = 20.dp),
+                text = title,
+                fontWeight = FontWeight(600),
+                fontFamily = fontFamily,
+                color = formAccent,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun ErroredLayout(
+    titleList: List<String>
+) {
+    val random = Random(System.currentTimeMillis())
+    val title= titleList[random.nextInt(0, (titleList.size-1))]
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Red)
     ) {
         Box(
             modifier = Modifier
