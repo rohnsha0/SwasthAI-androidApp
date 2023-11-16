@@ -129,7 +129,7 @@ fun ScanCatogoryScreen(
                     )
                 }
                 items(optionsData){items ->
-                    OptionsItem(data = items, navController = navController)
+                    OptionsItem(data = items, navController = navController, index= optionsData.indexOf(items))
                 }
             }
         }
@@ -139,7 +139,8 @@ fun ScanCatogoryScreen(
 @Composable
 fun OptionsItem(
     data: String,
-    navController: NavHostController
+    navController: NavHostController,
+    index: Int
 ) {
     Row(
         modifier = Modifier
@@ -149,7 +150,7 @@ fun OptionsItem(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate(bottomNavItems.ScanInter.route)
+                navController.navigate(bottomNavItems.ScanInter.passGrp(index))
             },
         verticalAlignment = Alignment.CenterVertically
     ){

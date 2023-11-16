@@ -49,10 +49,14 @@ sealed class bottomNavItems(
     )
     object ScanInter: bottomNavItems(
         title = "scanInter",
-        route = "scanInter",
+        route = "scanInter/{grp_index}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
-    )
+    ){
+        fun passGrp(grp: Int): String{
+            return "scanInter/$grp"
+        }
+    }
     object ScanResult: bottomNavItems(
         title = "ScanResults",
         route = "scan_result/{group}/{serial_no}",

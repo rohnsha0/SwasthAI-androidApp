@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -36,11 +37,24 @@ private lateinit var isClassifying: MutableState<Boolean>
 @Composable
 fun ScanInterResultScreen(
     padding: PaddingValues,
-    photoVM: photoCaptureViewModel
+    photoVM: photoCaptureViewModel,
+    group_index: Int
 ) {
+    val index_grp= remember {
+        mutableIntStateOf(group_index)
+    }
+    Log.d("TAG", group_index.toString())
     isClassifying= remember {
         mutableStateOf(true)
     }
+    val classifiedList= photoVM.classiedList.collectAsState().value
+    val context= LocalContext.current
+    LaunchedEffect(key1 = isClassifying.value){
+        delay(500L)
+        photoVM.onClassify(context = context, index = index_grp.value)
+        isClassifying.value=false
+    }
+    Log.d("successIndexValuee", classifiedList.toString())
     Scaffold(
         topBar = {
             if (!isClassifying.value){
@@ -71,7 +85,6 @@ fun ScanInterResultScreen(
                 "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
 
             ))
-            PerformClassification(photoVM = photoVM)
         }else{
             Column(
                 modifier = Modifier
@@ -89,21 +102,17 @@ fun ScanInterResultScreen(
 
 @Composable
 fun PerformClassification(
-    photoVM: photoCaptureViewModel
-) : List<classification>{
+    photoVM: photoCaptureViewModel,
+    onListClassified: (List<classification>) -> Unit
+){
     val bitmap= photoVM.bitmaps.collectAsState().value
     val context= LocalContext.current
-    var classificationResults: List<classification> = emptyList()
-    LaunchedEffect(key1 = isClassifying.value){
+    LaunchedEffect(key1 = true){
         delay(500)
-        classificationResults=
-            bitmap?.let {
-                classifier.classifyIndex(context, it, 0)
-            }!!
-        Log.d("successIndexLI", classificationResults.toString())
+        val classificationn= classifier.classifyIndex(context, bitmap!!, 0)
+        onListClassified(classificationn)
+        //classifiedList.value= classificationn
         isClassifying.value=false
     }
-    Log.d("successIndexTAG", classificationResults.toString())
-    return classificationResults
 }
 

@@ -54,11 +54,17 @@ fun bottomNavGraph(
         }
 
         composable(
-            route = bottomNavItems.ScanInter.route
+            route = bottomNavItems.ScanInter.route,
+            arguments= listOf(
+                navArgument("grp_index"){
+                    type= NavType.IntType
+                }
+            )
         ){
             ScanInterResultScreen(
                 padding = padding,
-                photoVM = savePhotoViewModel
+                photoVM = savePhotoViewModel,
+                group_index = it.arguments!!.getInt("grp_index", 404)
             )
         }
 
