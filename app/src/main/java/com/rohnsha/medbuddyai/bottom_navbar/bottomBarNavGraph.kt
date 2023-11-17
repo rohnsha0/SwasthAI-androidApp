@@ -64,7 +64,8 @@ fun bottomNavGraph(
             ScanInterResultScreen(
                 padding = padding,
                 photoVM = savePhotoViewModel,
-                group_index = it.arguments!!.getInt("grp_index", 404)
+                group_index = it.arguments!!.getInt("grp_index", 404),
+                navController = navController
             )
         }
 

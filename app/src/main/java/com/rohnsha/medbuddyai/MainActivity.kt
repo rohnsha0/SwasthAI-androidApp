@@ -23,7 +23,9 @@ import androidx.navigation.compose.rememberNavController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavGraph
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.DermBuddyAITheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

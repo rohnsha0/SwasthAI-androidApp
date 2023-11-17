@@ -45,9 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.rohnsha.medbuddyai.api.APIViewModel
 import com.rohnsha.medbuddyai.api.disease_data_dataClass
-import com.rohnsha.medbuddyai.api.results_obj.resultsAPIService
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -66,9 +67,10 @@ fun ScanResultScreen(
     var isAPIcalling= remember {
         mutableStateOf(true)
     }
+    val apiViewModel= hiltViewModel<APIViewModel>()
     LaunchedEffect(key1 = isAPIcalling){
         try {
-            disease_results= resultsAPIService.getDiseaseData(dynamicURL)
+            disease_results= apiViewModel.getDiseaseResults(dynamicURL)
             isAPIcalling.value= false
             Log.d("notablesInner", disease_results.toString())
         } catch (e: Exception){

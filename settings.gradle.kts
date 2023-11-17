@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "DermBuddy AI"
+rootProject.name = "MedBuddy AI"
 include(":app")
  
