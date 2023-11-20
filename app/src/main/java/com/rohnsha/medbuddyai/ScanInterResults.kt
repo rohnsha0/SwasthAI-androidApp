@@ -38,8 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
-import com.rohnsha.medbuddyai.domain.classification
+import com.rohnsha.medbuddyai.api.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -66,7 +65,7 @@ fun ScanInterResultScreen(
     }
     val isNormalCase= photoVM.isNormalBoolean.collectAsState().value
     val isErrored= photoVM.isErroredBoolean.collectAsState().value
-    val classifiedList= photoVM.classiedList.collectAsState().value
+    val classifiedList= photoVM.classificationData.collectAsState().value
     val context= LocalContext.current
     LaunchedEffect(key1 = isClassifying.value){
         delay(500L)
@@ -133,7 +132,7 @@ fun InterResultSuccess(
     values: PaddingValues,
     padding: PaddingValues,
     navController: NavHostController,
-    classificationList: List<classification>,
+    classificationList: List<disease_data_dataClass>,
     group_index: Int
 ) {
     LazyColumn(
@@ -148,7 +147,7 @@ fun InterResultSuccess(
             InterResultElement(
                 navController = navController,
                 group_index = group_index,
-                disease_index = item.parentIndex!!
+                title = item.disease_name
             )
         }
     }
@@ -230,7 +229,8 @@ fun ErroredLayout(
 fun InterResultElement(
     navController: NavHostController,
     group_index: Int,
-    disease_index: Int
+    //disease_index: Int,
+    title: String
 ) {
     Row(
         modifier = Modifier
@@ -240,21 +240,16 @@ fun InterResultElement(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate(
-                    bottomNavItems.ScanResult.passGrpAndSerialNumber(
-                        group_index,
-                        disease_index
-                    )
-                )
+
             },
         verticalAlignment = Alignment.CenterVertically
     ){
-        
+        Text(text = title)
     }
 }
 
 @Preview(showBackground = true)
 @Composable
 fun PreviewInterRes() {
-    InterResultElement(navController = rememberNavController(), 0,1)
+    InterResultElement(navController = rememberNavController(), 0,"")
 }
