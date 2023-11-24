@@ -18,11 +18,12 @@ class photoCaptureViewModel: ViewModel() {
     val bitmaps = _bitmaps.asStateFlow()
 
     private val _listPrediction = MutableStateFlow<List<classification>>(emptyList())
-    private val _classificationData = MutableStateFlow<List<disease_data_dataClass>>(emptyList())
+    private val _classificationData = MutableStateFlow<disease_data_dataClass>(disease_data_dataClass())
     val classificationData = _classificationData.asStateFlow()
     private val _maxIndex= MutableStateFlow(
         classification(confident = 0f, indexNumber = 404, parentIndex = 404)
     )
+    val maxIndex= _maxIndex.asStateFlow()
     private val _notMaxElements= MutableStateFlow<List<classification>>(emptyList())
 
     private val _normalBoolean = MutableStateFlow(false)
@@ -67,14 +68,12 @@ class photoCaptureViewModel: ViewModel() {
         val dataInstance= Firebase.firestore.collection(collectionName)
         try {
             sortClassifiedList()
-            val listRetrieved= mutableListOf<disease_data_dataClass>()
             val querySnapshot=dataInstance.document(_maxIndex.value.parentIndex.toString()).get().await()
             val data=querySnapshot.toObject<disease_data_dataClass>()
             Log.d("classificationDataInit", querySnapshot.data.toString())
             if (data != null) {
-                listRetrieved.add(data)
+                _classificationData.value= data
             }
-            _classificationData.value=listRetrieved
         } catch (e: Exception){
             Log.e("classificationError", e.message.toString())
         }

@@ -32,6 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -41,6 +42,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -49,10 +51,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.api.APIViewModel
 import com.rohnsha.medbuddyai.api.disease_data_dataClass
+import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 
 private lateinit var disease_results: disease_data_dataClass
@@ -60,23 +64,19 @@ private lateinit var disease_results: disease_data_dataClass
 @Composable
 fun ScanResultScreen(
     padding: PaddingValues,
-    group: String,
-    serial_number: String,
+    photoCaptureViewModel: photoCaptureViewModel
 ) {
-    val dynamicURL= "https://quuicqg435fkhjzpkawkhg4exi0vjslb.lambda-url.ap-south-1.on.aws/disease_data/$group/$serial_number"
     var isAPIcalling= remember {
         mutableStateOf(true)
     }
     val apiViewModel= hiltViewModel<APIViewModel>()
+    val context= LocalContext.current
     LaunchedEffect(key1 = isAPIcalling){
-        try {
-            disease_results= apiViewModel.getDiseaseResults(dynamicURL)
-            isAPIcalling.value= false
-            Log.d("notablesInner", disease_results.toString())
-        } catch (e: Exception){
-            Log.e("error", e.printStackTrace().toString())
-        }
+        delay(500L)
+        photoCaptureViewModel.onClassify(context, 0)
+        isAPIcalling.value= false
     }
+    disease_results= photoCaptureViewModel.classificationData.collectAsState().value
     Scaffold(
         topBar = {
             if (!isAPIcalling.value){

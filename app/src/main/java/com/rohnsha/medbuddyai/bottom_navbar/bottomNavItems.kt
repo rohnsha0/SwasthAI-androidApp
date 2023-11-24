@@ -34,40 +34,17 @@ sealed class bottomNavItems(
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
 
-    object ScanCatogoricals: bottomNavItems(
-        title = "scan_category",
-        route = "scan_category",
-        unselectedIcon = Icons.Outlined.AdminPanelSettings,
-        selectedIcon = Icons.Filled.AdminPanelSettings
-    )
-
     object Scan: bottomNavItems(
         title = "scan",
         route = "scan",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
-    object ScanInter: bottomNavItems(
-        title = "scanInter",
-        route = "scanInter/{grp_index}",
-        unselectedIcon = Icons.Outlined.AdminPanelSettings,
-        selectedIcon = Icons.Filled.AdminPanelSettings
-    ){
-        fun passGrp(grp: Int): String{
-            return "scanInter/$grp"
-        }
-    }
+
     object ScanResult: bottomNavItems(
         title = "ScanResults",
-        route = "scan_result/{group}/{serial_no}",
+        route = "scan_result/",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
-    ){
-        fun passGrpAndSerialNumber(
-            grp: Int,
-            serial_number: Int
-        ) : String{
-            return "scan_result/$grp/$serial_number"
-        }
-    }
+    )
 }
