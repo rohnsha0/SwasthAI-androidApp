@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.EmojiPeople
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.ReadMore
 import androidx.compose.material.icons.filled.SelfImprovement
+import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -32,8 +33,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +51,7 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,7 +87,25 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
         ) {
-            ScanCard()
+            //ScanCard()
+            Text(
+                text = "Health Dashboard",
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600),
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .padding(top = 18.dp, start = 24.dp)
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            DataListFull(
+                title = "Air Quality Index",
+                subtitle = "in Kolkata",
+                data = "254 PM2.5",
+                additionData = "Severe",
+                imageVector = Icons.Outlined.Air,
+                colorLogo = Color.Red
+            )
+            AddMoreDashWidget()
             Text(
                 text = "Explore",
                 fontFamily = fontFamily,
@@ -108,6 +133,34 @@ fun HomeScreen(
                     .padding(top = 30.dp, start = 24.dp)
             )
         }
+    }
+}
+
+@Composable
+fun AddMoreDashWidget() {
+    Box(
+        modifier = Modifier
+            .padding(start = 24.dp, end = 24.dp, top = 14.dp)
+            .height(60.dp)
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+
+            }
+            .drawBehind {
+                drawRoundRect(color = formAccent, style = Stroke(width = 2f,
+                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f),
+                ), cornerRadius = CornerRadius(x = 16.dp.toPx(), y = 16.dp.toPx()))
+            },
+        contentAlignment = Alignment.Center
+    ){
+        Text(
+            text = "+ Add More",
+            fontWeight = FontWeight(600),
+            fontFamily = fontFamily,
+            fontSize = 19.sp,
+            color = formAccent
+        )
     }
 }
 
