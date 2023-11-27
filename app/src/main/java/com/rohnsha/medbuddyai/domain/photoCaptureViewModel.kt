@@ -7,7 +7,9 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
-import com.rohnsha.medbuddyai.api.disease_data_dataClass
+import com.rohnsha.medbuddyai.domain.dataclass.classification
+import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
+import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
@@ -18,13 +20,14 @@ class photoCaptureViewModel: ViewModel() {
     val bitmaps = _bitmaps.asStateFlow()
 
     private val _listPrediction = MutableStateFlow<List<classification>>(emptyList())
-    private val _classificationData = MutableStateFlow<disease_data_dataClass>(disease_data_dataClass())
+    val unsortedClassification= _listPrediction.asStateFlow()
+    private val _classificationData = MutableStateFlow(disease_data_dataClass())
     val classificationData = _classificationData.asStateFlow()
     private val _maxIndex= MutableStateFlow(
         classification(confident = 0f, indexNumber = 404, parentIndex = 404)
     )
-    val maxIndex= _maxIndex.asStateFlow()
     private val _notMaxElements= MutableStateFlow<List<classification>>(emptyList())
+    val minIndex= _notMaxElements.asStateFlow()
 
     private val _normalBoolean = MutableStateFlow(false)
     val isNormalBoolean = _normalBoolean.asStateFlow()
@@ -91,5 +94,26 @@ class photoCaptureViewModel: ViewModel() {
         _notMaxElements.value= notMaxElements
         Log.d("classificationDataHighest", _maxIndex.value.toString())
         Log.d("classificationDataSorted", _notMaxElements.value.toString())
+    }
+
+    fun getDiseaseVersionData(
+        group_number: Int,
+    ): List<disease_version> {
+        val reqList: MutableList<disease_version> = mutableListOf()
+        val lungs= listOf(
+            disease_version("Pneumonia", "V2023.04.30"),
+            disease_version("Tuberculosis", "V2023.11.14"),
+            disease_version("Testimonia", "V2023.08.21")
+        )
+        _notMaxElements.value.forEach { classification ->
+            when(group_number){
+                0-> {
+                    reqList.add(disease_version(
+                        lungs[classification.parentIndex!!].disease_name, lungs[classification.parentIndex].version, classification.confident
+                    ))
+                }
+            }
+        }
+        return reqList
     }
 }

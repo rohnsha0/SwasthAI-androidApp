@@ -38,8 +38,9 @@ class MainActivity : ComponentActivity() {
             DermBuddyAITheme {
                 val items= listOf(
                     bottomNavItems.Home,
+                    bottomNavItems.Explore,
                     bottomNavItems.Insights,
-                    bottomNavItems.Settings
+                    bottomNavItems.Settings,
                 )
                 var selectedItemIndex by rememberSaveable {
                     mutableStateOf(0)
@@ -75,7 +76,9 @@ class MainActivity : ComponentActivity() {
                                                 } else bottomNavItems.unselectedIcon,
                                                 contentDescription = bottomNavItems.title
                                             )
-                                        })
+                                        },
+                                        alwaysShowLabel = false,
+                                    )
                                 }
                             }
                         }

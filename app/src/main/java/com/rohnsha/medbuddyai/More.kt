@@ -53,7 +53,7 @@ fun MoreScreen(
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
         ) {
-
+            //MySnackbar(message = "Profile Verification failed!", Color.Red) {}
         }
     }
 }

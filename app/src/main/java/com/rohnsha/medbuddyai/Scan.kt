@@ -74,7 +74,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
-import com.rohnsha.medbuddyai.domain.classification
+import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -285,7 +285,7 @@ private fun takePhoto(
 ){
     Log.d("successIndexModelTF", "entered")
 
-    var classificationResult: classification= classification(indexNumber = 404, confident = 404f)
+    var classificationResult: classification = classification(indexNumber = 404, confident = 404f)
     controller.takePicture(
         ContextCompat.getMainExecutor(ContextUtill.ContextUtils.getApplicationContext()),
         object : OnImageCapturedCallback(){

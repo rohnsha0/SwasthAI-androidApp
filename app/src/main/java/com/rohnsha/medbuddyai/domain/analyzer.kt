@@ -6,6 +6,7 @@ import android.graphics.Matrix
 import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.ImgSegv066
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor

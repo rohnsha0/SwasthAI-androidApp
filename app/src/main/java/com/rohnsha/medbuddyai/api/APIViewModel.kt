@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.api
 
 import androidx.lifecycle.ViewModel
+import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

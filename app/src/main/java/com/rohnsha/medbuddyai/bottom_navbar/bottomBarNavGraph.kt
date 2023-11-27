@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.rohnsha.medbuddyai.CommunityScreen
+import com.rohnsha.medbuddyai.ExploreScreen
 import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
@@ -44,11 +45,17 @@ fun bottomNavGraph(
         }
 
         composable(
+            route = bottomNavItems.Explore.route
+        ){
+            ExploreScreen(padding = padding)
+        }
+
+        composable(
             route = bottomNavItems.ScanResult.route,
         ){
             ScanResultScreen(
                 padding = padding,
-                photoCaptureViewModel = savePhotoViewModel
+                viewModel = savePhotoViewModel
             )
         }
     }

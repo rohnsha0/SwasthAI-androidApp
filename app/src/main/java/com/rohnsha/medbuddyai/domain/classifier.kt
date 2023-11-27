@@ -3,6 +3,7 @@ package com.rohnsha.medbuddyai.domain
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.PneumoniaV1
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import org.tensorflow.lite.DataType
@@ -98,6 +99,13 @@ class classifier {
                     indexNumber = maxIndexTuberCulosis,
                     confident = outputTuberculosis.floatArray[getMaxIndex(outputTuberculosis.floatArray)]*100,
                     parentIndex = 1
+                )
+            )
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = 1,
+                    confident = outputTuberculosis.floatArray[getMaxIndex(outputTuberculosis.floatArray)]*100,
+                    parentIndex = 2
                 )
             )
             modelPneumonia.close()
