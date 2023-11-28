@@ -21,13 +21,18 @@ class photoCaptureViewModel: ViewModel() {
 
     private val _listPrediction = MutableStateFlow<List<classification>>(emptyList())
     val unsortedClassification= _listPrediction.asStateFlow()
+
     private val _classificationData = MutableStateFlow(disease_data_dataClass())
     val classificationData = _classificationData.asStateFlow()
+
     private val _maxIndex= MutableStateFlow(
         classification(confident = 0f, indexNumber = 404, parentIndex = 404)
     )
     private val _notMaxElements= MutableStateFlow<List<classification>>(emptyList())
     val minIndex= _notMaxElements.asStateFlow()
+
+    private val _loadingBoolean= MutableStateFlow(true)
+    val isLoadingBoolean= _loadingBoolean.asStateFlow()
 
     private val _normalBoolean = MutableStateFlow(false)
     val isNormalBoolean = _normalBoolean.asStateFlow()
@@ -50,10 +55,12 @@ class photoCaptureViewModel: ViewModel() {
         }
         if (rawClassification.isEmpty()){
             _erroredBoolean.value=true
+            _loadingBoolean.value=false
         } else {
             _listPrediction.value= rawClassification.filter { it.indexNumber == 1 }
             if (_listPrediction.value.isEmpty()){
                 _normalBoolean.value=true
+                _loadingBoolean.value=false
             } else {
                 classificationData(group_number = index)
             }
@@ -76,9 +83,12 @@ class photoCaptureViewModel: ViewModel() {
             Log.d("classificationDataInit", querySnapshot.data.toString())
             if (data != null) {
                 _classificationData.value= data
+                _loadingBoolean.value=false
             }
         } catch (e: Exception){
             Log.e("classificationError", e.message.toString())
+            _erroredBoolean.value= true
+            _loadingBoolean.value=false
         }
     }
 

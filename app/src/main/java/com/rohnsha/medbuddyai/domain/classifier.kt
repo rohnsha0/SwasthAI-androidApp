@@ -101,13 +101,6 @@ class classifier {
                     parentIndex = 1
                 )
             )
-            predictedClassesLungs.add(
-                classification(
-                    indexNumber = 1,
-                    confident = outputTuberculosis.floatArray[getMaxIndex(outputTuberculosis.floatArray)]*100,
-                    parentIndex = 2
-                )
-            )
             modelPneumonia.close()
             modelTuberCulosis.close()
             return predictedClassesLungs

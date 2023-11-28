@@ -45,8 +45,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,9 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.rememberAsyncImagePainter
-import com.rohnsha.medbuddyai.api.APIViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
@@ -85,15 +81,13 @@ fun ScanResultScreen(
     viewModel: photoCaptureViewModel
 ) {
     photoCaptureViewModel= viewModel
-    var isAPIcalling= remember {
-        mutableStateOf(true)
-    }
-    val apiViewModel= hiltViewModel<APIViewModel>()
+    var isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
+    val isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
+    val isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
     val context= LocalContext.current
-    LaunchedEffect(key1 = isAPIcalling){
+    LaunchedEffect(key1 = isStillLoading){
         delay(500L)
         photoCaptureViewModel.onClassify(context, 0)
-        isAPIcalling.value= false
     }
     disease_results= photoCaptureViewModel.classificationData.collectAsState().value
     otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0)
@@ -102,7 +96,7 @@ fun ScanResultScreen(
     )
     Scaffold(
         topBar = {
-            if (!isAPIcalling.value){
+            if (!isStillLoading && !isErrored && !isNormal){
                 CenterAlignedTopAppBar(
                     title = {
                         Row(
@@ -141,7 +135,15 @@ fun ScanResultScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
-        if (isAPIcalling.value){
+        if (!isStillLoading){
+            if (isNormal){
+                Log.d("loggingStatus", "normal")
+            } else if (isErrored){
+                Log.d("loggingStatus", "errored")
+            } else {
+                ScanResultsSuccess(padding = padding, values = values)
+            }
+        } else {
             LoadingLayout(
                 titleList = listOf(
                     "Charting a Course to Health Discovery", "Preparing to Enlighten and Empower",
@@ -149,9 +151,7 @@ fun ScanResultScreen(
                     "Elevating Your Health IQ One Byte at a Time", "Stepping into the Digital Library of Wellness",
                     "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
 
-                ))
-        }else{
-            ScanResultsSuccess(padding = padding, values = values)
+            ))
         }
     }
 }
