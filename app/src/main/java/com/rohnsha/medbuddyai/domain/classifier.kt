@@ -70,6 +70,15 @@ class classifier {
         fun predictionHeart(
         ): List<classification>{
             val predictedClassesLungs= mutableListOf<classification>()
+
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = 1,
+                    confident = 0.98f*100,
+                    parentIndex = 1
+                ),
+            )
+
             return predictedClassesLungs
         }
 

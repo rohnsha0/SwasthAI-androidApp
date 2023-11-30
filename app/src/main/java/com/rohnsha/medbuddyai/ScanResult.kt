@@ -25,17 +25,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.outlined.Chat
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.JoinLeft
-import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.SwitchAccessShortcut
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -44,7 +45,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +69,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
+import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -69,11 +78,13 @@ import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
-private lateinit var disease_results: disease_data_dataClass
+private lateinit var disease_results: MutableState<disease_data_dataClass>
 private lateinit var photoCaptureViewModel: photoCaptureViewModel
 private lateinit var otherDiseaseData: List<disease_version>
+private lateinit var modalState : MutableState<Boolean>
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanResultScreen(
@@ -85,15 +96,23 @@ fun ScanResultScreen(
     val isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
     val isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
     val context= LocalContext.current
-    LaunchedEffect(key1 = isStillLoading){
+    LaunchedEffect(key1 = true){
         delay(500L)
         photoCaptureViewModel.onClassify(context, 0)
     }
-    disease_results= photoCaptureViewModel.classificationData.collectAsState().value
+    disease_results= remember {
+        mutableStateOf(disease_data_dataClass())
+    }
+    disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
+    Log.d("dataSwitch", photoCaptureViewModel.classificationData.collectAsState().value.toString())
+    Log.d("dataSwitchVariable", photoCaptureViewModel.classificationData.collectAsState().value.toString())
     otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0)
     Log.d("confidenceMax",
         otherDiseaseData.toString()
     )
+    modalState= rememberSaveable {
+        mutableStateOf(false)
+    }
     Scaffold(
         topBar = {
             if (!isStillLoading && !isErrored && !isNormal){
@@ -103,14 +122,16 @@ fun ScanResultScreen(
                             verticalAlignment = Alignment.Bottom
                         ) {
                             Text(
-                                text = disease_results.disease_name,
+                                text = viewModel.classificationData.collectAsState().value.disease_name,
                                 fontFamily = fontFamily,
                                 fontWeight = FontWeight(600),
                                 fontSize = 26.sp,
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = disease_results.domain,
+                                text = remember {
+                                    disease_results.value.domain
+                                },
                                 fontFamily = fontFamily,
                                 color = Color.Black.copy(.75f),
                                 fontSize = 13.sp,
@@ -120,14 +141,6 @@ fun ScanResultScreen(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = BGMain
                     ),
-                    actions = {
-                        IconButton(onClick = { /*TODO*/ }) {
-                            Icon(
-                                imageVector = Icons.Default.Tune,
-                                contentDescription = "Tune Results"
-                            )
-                        }
-                    }
                 )
             }
         },
@@ -135,6 +148,23 @@ fun ScanResultScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
+        val rbList= remember {
+            mutableStateListOf(
+                rbStructure(
+                    isChecked = true,
+                    title = "Item 1"
+                ),
+                rbStructure(
+                    isChecked = false,
+                    title = "Item 2"
+                ),
+                rbStructure(
+                    isChecked = false,
+                    title = "Item 3"
+                ),
+            )
+        }
+        val scope= rememberCoroutineScope()
         if (!isStillLoading){
             if (isNormal){
                 Log.d("loggingStatus", "normal")
@@ -142,6 +172,47 @@ fun ScanResultScreen(
                 Log.d("loggingStatus", "errored")
             } else {
                 ScanResultsSuccess(padding = padding, values = values)
+                if (modalState.value){
+                    ModalBottomSheet(
+                        onDismissRequest = {
+                            modalState.value=false
+                        },
+                        containerColor = Color.White
+                    ) {
+                        BOMContent(
+                            rbList = rbList,
+                            rbSnapFunc = { rbStructures ->
+                                rbList.replaceAll {
+                                    it.copy(
+                                        isChecked = (it.title==rbStructures.title)
+                                    )
+                                }
+                            },
+                            buttonClicked = {
+                                if (rbList[0].isChecked){
+                                    scope.launch {
+                                        photoCaptureViewModel.resetReloadBoolean()
+                                        delay(500L)
+                                        photoCaptureViewModel.onClassify(context, 0)
+                                        modalState.value= false
+                                    }
+                                    Log.d("checkedState", "lungs checked")
+                                } else if (rbList[1].isChecked){
+                                    scope.launch {
+                                        photoCaptureViewModel.resetReloadBoolean()
+                                        delay(500L)
+                                        photoCaptureViewModel.onClassify(context, 1)
+                                        modalState.value= false
+                                    }
+                                    Log.d("checkedState", "brain checked")
+                                } else if (rbList[2].isChecked){
+                                    Log.d("checkedState", "skin checked")
+                                    modalState.value= false
+                                }
+                            }
+                        )
+                    }
+                }
             }
         } else {
             LoadingLayout(
@@ -215,7 +286,7 @@ fun ScanResultsSuccess(
                     modifier = Modifier
                 ){
                     val painter= rememberAsyncImagePainter(
-                        model = disease_results.cover_link,
+                        model = disease_results.value.cover_link,
                         onError = {
                             Log.e("coil", "error response: ${it.painter}, ${it.result}")
                         }
@@ -249,21 +320,21 @@ fun ScanResultsSuccess(
                 )
                 DataBox(
                     title = "Know About Disease",
-                    data = disease_results.introduction
+                    data = disease_results.value.introduction
                 )
                 Spacer(
                     modifier = Modifier.height(20.dp)
                 )
                 DataBox(
                     title = "Symptoms",
-                    data = disease_results.symptoms
+                    data = disease_results.value.symptoms
                 )
                 Spacer(
                     modifier = Modifier.height(20.dp)
                 )
                 DataBox(
                     title = "When to see doctor",
-                    data = disease_results.thresholds
+                    data = disease_results.value.thresholds
                 )
             }
         }
@@ -411,20 +482,45 @@ fun DataListFull(
     }
 }
 
-/*
+
 @Composable
 fun BOMContent(
-
+    rbList: SnapshotStateList<rbStructure>,
+    rbSnapFunc: (rbStructure) -> Unit,
+    buttonClicked: () -> Unit,
 ) {
-    RadioButton(
+    Column {
+        rbList.forEachIndexed { index, data ->
+            Row(
+                modifier = Modifier
+                    .clickable { rbSnapFunc(data) }
+            ) {
+                Text(
+                    text = data.title
+                )
+                RadioButton(
+                    selected = data.isChecked,
+                    onClick = { rbSnapFunc(data) })
+
+            }
+        }
+        if (photoCaptureViewModel.isReLoadingBoolean.collectAsState().value){
+            CircularProgressIndicator()
+        } else {
+            Button(onClick = { buttonClicked() }) {
+                Text(text = "classify")
+            }
+        }
+    }
+    /*RadioButton(
         selected = {  },
         onClick = { /*TODO*/ },
         colors = RadioButtonDefaults.colors(
             selectedColor = ,
             unselectedColor =
         )
-    )
-}*/
+    )*/
+}
 
 @Composable
 fun MySnackbar(
@@ -524,9 +620,9 @@ fun OptionScanResults() {
             )
         }
         OptionsScanResultUNI(
-            title = "Rescan",
-            icon = Icons.Outlined.RestartAlt,
-            onClickListener = {}
+            title = "Options",
+            icon = Icons.Outlined.SwitchAccessShortcut,
+            onClickListener = { modalState.value= true }
         )
         OptionsScanResultUNI(
             title = "Share",

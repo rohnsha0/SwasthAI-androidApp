@@ -34,6 +34,9 @@ class photoCaptureViewModel: ViewModel() {
     private val _loadingBoolean= MutableStateFlow(true)
     val isLoadingBoolean= _loadingBoolean.asStateFlow()
 
+    private val _reloadingBoolean= MutableStateFlow(false)
+    val isReLoadingBoolean= _reloadingBoolean.asStateFlow()
+
     private val _normalBoolean = MutableStateFlow(false)
     val isNormalBoolean = _normalBoolean.asStateFlow()
 
@@ -43,10 +46,14 @@ class photoCaptureViewModel: ViewModel() {
     fun onTakePhoto(bitmap: Bitmap) {
         _bitmaps.value = bitmap
     }
+    fun resetReloadBoolean(){
+        _reloadingBoolean.value= true
+    }
 
     suspend fun onClassify(context: Context, index: Int){
         _listPrediction.value= emptyList()
         _normalBoolean.value=false
+        _reloadingBoolean.value= true
         val rawClassification= try {
             classifier.classifyIndex(context, _bitmaps.value!!, index)
         } catch (e: Exception){
@@ -56,11 +63,13 @@ class photoCaptureViewModel: ViewModel() {
         if (rawClassification.isEmpty()){
             _erroredBoolean.value=true
             _loadingBoolean.value=false
+            _reloadingBoolean.value=false
         } else {
             _listPrediction.value= rawClassification.filter { it.indexNumber == 1 }
             if (_listPrediction.value.isEmpty()){
                 _normalBoolean.value=true
                 _loadingBoolean.value=false
+                _reloadingBoolean.value=false
             } else {
                 classificationData(group_number = index)
             }
@@ -73,6 +82,7 @@ class photoCaptureViewModel: ViewModel() {
     private suspend fun classificationData(group_number: Int){
         val collectionName= when(group_number){
             0 -> "lung"
+            1 -> "lung"
             else -> "null"
         }
         val dataInstance= Firebase.firestore.collection(collectionName)
@@ -84,11 +94,13 @@ class photoCaptureViewModel: ViewModel() {
             if (data != null) {
                 _classificationData.value= data
                 _loadingBoolean.value=false
+                _reloadingBoolean.value=false
             }
         } catch (e: Exception){
             Log.e("classificationError", e.message.toString())
             _erroredBoolean.value= true
             _loadingBoolean.value=false
+            _reloadingBoolean.value=false
         }
     }
 
