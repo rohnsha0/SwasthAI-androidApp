@@ -369,7 +369,7 @@ fun ScanResultsSuccess(
                         data ="${String.format(" % .2f", data.confidence)}%",
                         imageVector = Icons.Outlined.JoinLeft,
                         colorLogo = dashBG
-                    )
+                    ) {}
                 }
             }
         }
@@ -405,7 +405,10 @@ fun DataListFull(
     data: String,
     additionData: String? =null,
     imageVector: ImageVector,
-    colorLogo: Color
+    colorLogo: Color,
+    additionalDataColor: Color?= null,
+    colorLogoTint: Color? = null,
+    onClickListener: (() -> Unit)? =null
 ) {
     Box(
         modifier = Modifier
@@ -414,9 +417,9 @@ fun DataListFull(
             .fillMaxWidth()
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
-            .clickable {
-
-            },
+            .then(
+                if (onClickListener!=null) Modifier.clickable { onClickListener() } else Modifier
+            ),
         contentAlignment = Alignment.CenterStart
     ) {
         Row(
@@ -431,7 +434,7 @@ fun DataListFull(
                     .padding(6.dp),
                 imageVector = imageVector,
                 contentDescription = "$imageVector icon",
-                colorFilter = ColorFilter.tint(Color.White)
+                colorFilter = ColorFilter.tint(colorLogoTint ?: Color.White)
             )
             Column(
                 modifier = Modifier
@@ -473,7 +476,7 @@ fun DataListFull(
                         text = it,
                         fontSize = 14.sp,
                         fontFamily = fontFamily,
-                        color = colorLogo,
+                        color = additionalDataColor ?: colorLogo,
                         fontWeight = FontWeight(600)
                     )
                 }
@@ -512,14 +515,6 @@ fun BOMContent(
             }
         }
     }
-    /*RadioButton(
-        selected = {  },
-        onClick = { /*TODO*/ },
-        colors = RadioButtonDefaults.colors(
-            selectedColor = ,
-            unselectedColor =
-        )
-    )*/
 }
 
 @Composable
@@ -528,7 +523,6 @@ fun MySnackbar(
     message: String,
     indicator_color: Color,
     padding: PaddingValues,
-    action: () -> Unit
 ) {
     SnackbarHost(
         hostState = snackbarHostState

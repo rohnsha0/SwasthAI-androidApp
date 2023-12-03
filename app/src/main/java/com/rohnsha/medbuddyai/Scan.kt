@@ -2,7 +2,6 @@ package com.rohnsha.medbuddyai
 
 import android.Manifest
 import android.app.Activity
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.util.Log
@@ -279,7 +278,6 @@ fun CameraPreview(
 
 private fun takePhoto(
     controller: LifecycleCameraController,
-    context: Context,
     onPhotoTaken: (Bitmap) -> Unit,
     toCcamFeed: (classification) -> Unit,
 ){
@@ -308,18 +306,6 @@ private fun takePhoto(
                 )
 
                 onPhotoTaken(rotatedBitmap)
-/*
-                classificationResult= classifier.classifyIndex(context, rotatedBitmap, scanOption = "lung")
-                val chestDiseases= listOf(
-                    "normal", "pneumonia", "tuberculosis"
-                )
-
-                Log.d("successIndexModelTF", "Found: ${chestDiseases[classificationResult.indexNumber]} with ${
-                    String.format(
-                        "%.2f",
-                        classificationResult.confident
-                    )
-                }% confidence!\"")*/
                 toCcamFeed(classificationResult)
             }
 
@@ -429,7 +415,6 @@ fun ScanMainScreen(
                     scope.launch {
                         takePhoto(
                             controller = controller,
-                            context = conttext,
                             onPhotoTaken = viewModelPhotoSave::onTakePhoto,
                             toCcamFeed = {
                                 navController.navigate(bottomNavItems.ScanResult.route)

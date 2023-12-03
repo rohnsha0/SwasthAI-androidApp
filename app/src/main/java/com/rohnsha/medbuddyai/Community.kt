@@ -51,7 +51,7 @@ fun CommunityScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
-        MySnackbar(snackbarHostState = snackbarHostState, message = "Profile Verification failed!", Color.Red, values) {}
+        MySnackbar(snackbarHostState = snackbarHostState, message = "Profile Verification failed!", Color.Red, values)
         Column(
             modifier = Modifier
                 .padding(values)

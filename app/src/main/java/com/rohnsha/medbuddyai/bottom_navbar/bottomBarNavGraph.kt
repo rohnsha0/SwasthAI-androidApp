@@ -47,7 +47,10 @@ fun bottomNavGraph(
         composable(
             route = bottomNavItems.Explore.route
         ){
-            ExploreScreen(padding = padding)
+            ExploreScreen(
+                padding = padding,
+                navController = navController
+            )
         }
 
         composable(
