@@ -23,7 +23,7 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home
     )
-    object Insights: bottomNavItems(
+    object Community: bottomNavItems(
         title = "Community",
         route = "community",
         unselectedIcon = Icons.Outlined.Forum,

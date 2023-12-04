@@ -125,7 +125,6 @@ fun ExploreScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExploreSelfAware(
     navController: NavHostController

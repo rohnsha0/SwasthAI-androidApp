@@ -10,6 +10,8 @@ val ViewDash= Color(0xFFEDF1F9)
 val dashBG= Color(0xFF111D30)
 val formAccent= Color(0xFFB5BBC9)
 val lightTextAccent= Color(0xFF485068)
+val customRed= Color(0xFFDF5060)
+val customGreen= Color(0xFF75BF72)
 
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)

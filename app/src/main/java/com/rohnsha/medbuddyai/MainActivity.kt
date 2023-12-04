@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
                 val items= listOf(
                     bottomNavItems.Home,
                     bottomNavItems.Explore,
-                    bottomNavItems.Insights,
+                    bottomNavItems.Community,
                     bottomNavItems.Settings,
                 )
                 var selectedItemIndex by rememberSaveable {

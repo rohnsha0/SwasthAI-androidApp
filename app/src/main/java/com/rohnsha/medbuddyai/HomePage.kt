@@ -50,6 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 
@@ -103,7 +104,7 @@ fun HomeScreen(
                 data = "254 PM2.5",
                 additionData = "Severe",
                 imageVector = Icons.Outlined.Air,
-                colorLogo = Color.Red
+                colorLogo = customRed
             )
             AddMoreDashWidget()
             Text(
@@ -229,8 +230,9 @@ fun explore_tabs(
     title: String,
     icon: ImageVector,
     weight: Float,
-    navController: NavHostController,
-    route: String= bottomNavItems.Insights.route
+    navController: NavHostController? = null,
+    route: String= bottomNavItems.Community.route,
+    onClickListener: (() -> Unit)? =null
 ) {
     Box(
         modifier = Modifier
@@ -239,7 +241,13 @@ fun explore_tabs(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .clickable {
-                navController.navigate(route)
+                if (navController != null) {
+                    navController.navigate(route)
+                } else {
+                    if (onClickListener != null) {
+                        onClickListener()
+                    }
+                }
             },
         contentAlignment = Alignment.CenterStart
     ){
@@ -269,7 +277,7 @@ fun explore_tabs(
                     .padding(start = 13.dp, end = 18.dp),
                 text = title,
                 fontWeight = FontWeight(600),
-                fontSize = 15.sp
+                fontSize = 14.sp
             )
         }
     }
