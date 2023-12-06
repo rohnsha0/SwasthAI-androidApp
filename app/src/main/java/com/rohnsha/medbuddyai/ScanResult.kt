@@ -1,9 +1,14 @@
 package com.rohnsha.medbuddyai
 
 import android.util.Log
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,17 +31,17 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.JoinLeft
+import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material.icons.outlined.SwitchAccessShortcut
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -60,6 +65,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -152,15 +158,15 @@ fun ScanResultScreen(
             mutableStateListOf(
                 rbStructure(
                     isChecked = true,
-                    title = "Item 1"
+                    title = "Lungs"
                 ),
                 rbStructure(
                     isChecked = false,
-                    title = "Item 2"
+                    title = "Brain"
                 ),
                 rbStructure(
                     isChecked = false,
-                    title = "Item 3"
+                    title = "Skin Manifestions"
                 ),
             )
         }
@@ -177,7 +183,8 @@ fun ScanResultScreen(
                         onDismissRequest = {
                             modalState.value=false
                         },
-                        containerColor = Color.White
+                        containerColor = Color.White,
+                        dragHandle = {}
                     ) {
                         BOMContent(
                             rbList = rbList,
@@ -418,7 +425,7 @@ fun DataListFull(
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
             .then(
-                if (onClickListener!=null) Modifier.clickable { onClickListener() } else Modifier
+                if (onClickListener != null) Modifier.clickable { onClickListener() } else Modifier
             ),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -485,33 +492,101 @@ fun DataListFull(
     }
 }
 
-
 @Composable
 fun BOMContent(
     rbList: SnapshotStateList<rbStructure>,
     rbSnapFunc: (rbStructure) -> Unit,
     buttonClicked: () -> Unit,
 ) {
-    Column {
-        rbList.forEachIndexed { index, data ->
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 30.dp, vertical = 30.dp)
+    ) {
+        Row {
+            Text(
+                text = "Choose other models",
+                fontSize = 18.sp,
+                fontWeight = FontWeight(600),
+                fontFamily = fontFamily
+            )
+            Spacer(modifier = Modifier.weight(1f))
             Row(
                 modifier = Modifier
-                    .clickable { rbSnapFunc(data) }
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearOutSlowInEasing
+                        )
+                    ),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = data.title
+                    text = "Done",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily,
+                    color = lightTextAccent,
+                    modifier = Modifier.clickable { buttonClicked() }
                 )
-                RadioButton(
-                    selected = data.isChecked,
-                    onClick = { rbSnapFunc(data) })
-
+                if (photoCaptureViewModel.isReLoadingBoolean.collectAsState().value){
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .size(16.dp),
+                        color = lightTextAccent,
+                        strokeWidth = 1.5.dp
+                    )
+                }
             }
         }
-        if (photoCaptureViewModel.isReLoadingBoolean.collectAsState().value){
-            CircularProgressIndicator()
-        } else {
-            Button(onClick = { buttonClicked() }) {
-                Text(text = "classify")
+        Spacer(modifier = Modifier.height(18.dp))
+        rbList.forEachIndexed { index, data ->
+            Column {
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier
+                        .pointerInput(key1 = true) { detectTapGestures { rbSnapFunc(data) } },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        imageVector = Icons.Outlined.MedicalInformation,
+                        contentDescription = "options pre",
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(ViewDash, RoundedCornerShape(16.dp))
+                            .padding(10.dp)
+                    )
+                    Spacer(modifier = Modifier.width(18.dp))
+                    Text(
+                        text = data.title,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Box(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .then(
+                                if (!data.isChecked) Modifier.border(
+                                    width = 1.dp,
+                                    color = Color(0xFFD4D4D4),
+                                    shape = CircleShape
+                                ) else Modifier
+                            )
+                    ){
+                        if (data.isChecked){
+                            Image(
+                                imageVector = Icons.Outlined.Check,
+                                contentDescription = "options",
+                                modifier = Modifier
+                                    .background(Color.Black, CircleShape)
+                                    .padding(3.dp),
+                                colorFilter = ColorFilter.tint(color = Color.White)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(12.dp))
             }
         }
     }
