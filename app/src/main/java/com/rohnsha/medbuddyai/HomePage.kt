@@ -95,7 +95,7 @@ fun HomeScreen(
                 fontWeight = FontWeight(600),
                 fontSize = 15.sp,
                 modifier = Modifier
-                    .padding(top = 18.dp, start = 24.dp)
+                    .padding(top = 30.dp, start = 24.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             DataListFull(

@@ -29,9 +29,9 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Forum,
         selectedIcon = Icons.Filled.Forum
     )
-    object Settings: bottomNavItems(
-        title = "More",
-        route = "more",
+    object Preferences: bottomNavItems(
+        title = "Preferences",
+        route = "Preferences",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )

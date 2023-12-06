@@ -30,10 +30,10 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.Community.route){
             CommunityScreen(padding = padding, navController = navController)
         }
-        composable(route = bottomNavItems.Settings.route){
+        composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding)
         }
-        composable(route = bottomNavItems.Settings.route){
+        composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding)
         }
         composable(route = bottomNavItems.Scan.route){

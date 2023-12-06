@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                     bottomNavItems.Home,
                     bottomNavItems.Explore,
                     bottomNavItems.Community,
-                    bottomNavItems.Settings,
+                    bottomNavItems.Preferences,
                 )
                 var selectedItemIndex by rememberSaveable {
                     mutableStateOf(0)

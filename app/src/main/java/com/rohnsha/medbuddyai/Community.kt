@@ -75,16 +75,16 @@ fun CommunityScreen(
         val list= listOf(
             communityFields(
                 "Rohan Shaw",
-                "I am having this weird issue",
+                "Related Cough",
                 "12:00 AM",
-                "Blah Blah Blah",
+                "I am having this weird issue with blah glah",
                 "Heart"
                 ),
             communityFields(
                 "Imaginary Shaw",
-                "I am having this unknown rashes on the any organ",
+                "Related Disease",
                 "02:00 AM",
-                "Blah Blah Blah",
+                "I am having this unknown rashes on the any organ to blahg lah",
                 "Lungs"
             )
         )
@@ -95,7 +95,7 @@ fun CommunityScreen(
                 .padding(top = 20.dp)
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
-                .padding(top = 18.dp, start = 24.dp, end = 24.dp)
+                .padding(top = 30.dp, start = 24.dp, end = 24.dp)
         ) {
             item {
                 Row(
