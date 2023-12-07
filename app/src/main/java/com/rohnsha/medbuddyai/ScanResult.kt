@@ -58,6 +58,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -83,6 +84,7 @@ import com.rohnsha.medbuddyai.ui.theme.dashBG
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.random.Random
@@ -184,17 +186,14 @@ fun ScanResultScreen(
                             modalState.value=false
                         },
                         containerColor = Color.White,
-                        dragHandle = {}
                     ) {
                         BOMContent(
                             rbList = rbList,
-                            rbSnapFunc = { rbStructures ->
-                                rbList.replaceAll {
-                                    it.copy(
-                                        isChecked = (it.title==rbStructures.title)
-                                    )
-                                }
+                            rbSnapFunc = {
+                                rbList.clear()
+                                rbList.addAll(it)
                             },
+                            coroutineScope=scope,
                             buttonClicked = {
                                 if (rbList[0].isChecked){
                                     scope.launch {
@@ -495,12 +494,18 @@ fun DataListFull(
 @Composable
 fun BOMContent(
     rbList: SnapshotStateList<rbStructure>,
-    rbSnapFunc: (rbStructure) -> Unit,
+    rbSnapFunc: (SnapshotStateList<rbStructure>) -> Unit,
+    coroutineScope: CoroutineScope,
     buttonClicked: () -> Unit,
 ) {
+
+    val list= remember {
+        rbList.toList().toMutableStateList()
+    }
+
     Column(
         modifier = Modifier
-            .padding(horizontal = 30.dp, vertical = 30.dp)
+            .padding(horizontal = 24.dp, vertical = 30.dp)
     ) {
         Row {
             Text(
@@ -526,7 +531,10 @@ fun BOMContent(
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily,
                     color = lightTextAccent,
-                    modifier = Modifier.clickable { buttonClicked() }
+                    modifier = Modifier.clickable {
+                        rbSnapFunc(list)
+                        buttonClicked()
+                    }
                 )
                 if (photoCaptureViewModel.isReLoadingBoolean.collectAsState().value){
                     CircularProgressIndicator(
@@ -540,12 +548,19 @@ fun BOMContent(
             }
         }
         Spacer(modifier = Modifier.height(18.dp))
-        rbList.forEachIndexed { index, data ->
+        list.forEachIndexed { _, data ->
             Column {
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier
-                        .pointerInput(key1 = true) { detectTapGestures { rbSnapFunc(data) } },
+                        .pointerInput(key1 = true) {
+                            detectTapGestures {
+                                list.replaceAll {
+                                    it.copy(
+                                        isChecked = (it.title==data.title)
+                                    )
+                                }
+                            }},
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Image(
@@ -560,6 +575,7 @@ fun BOMContent(
                     Text(
                         text = data.title,
                         fontFamily = fontFamily,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight(600)
                     )
                     Spacer(modifier = Modifier.weight(1f))
