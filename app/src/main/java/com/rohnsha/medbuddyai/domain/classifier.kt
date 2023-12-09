@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.ml.PneumoniaV1
+import com.rohnsha.medbuddyai.ml.PneumoniaV3
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -33,7 +33,7 @@ class classifier {
 
             when(scanOption){
                 0 -> {
-                    predictedClasses=predictionLungs(context, inputFeature = inputFeature0)}
+                    predictedClasses=predictionLungs(context, inputFeature = inputFeature0, bitmap)}
                 1 -> {
                     predictedClasses=predictionHeart()
                 }
@@ -85,11 +85,20 @@ class classifier {
         fun predictionLungs(
             context: Context,
             inputFeature: TensorBuffer,
+            bitmap: Bitmap
         ): List<classification> {
             val predictedClassesLungs= mutableListOf<classification>()
 
-            val modelPneumonia= PneumoniaV1.newInstance(context)
-            val outputPneumonia= modelPneumonia.process(inputFeature).outputFeature0AsTensorBuffer
+            val modelPneumonia= PneumoniaV3.newInstance(context)
+            var tensorImage= TensorImage(DataType.FLOAT32)
+            tensorImage.load(bitmap)
+            var imageProcessor= ImageProcessor.Builder()
+                .add(ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR))
+                .build()
+            tensorImage= imageProcessor.process(tensorImage)
+            val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 224, 224, 3), DataType.FLOAT32)
+            inputFeature0.loadBuffer(tensorImage.buffer)
+            val outputPneumonia= modelPneumonia.process(inputFeature0).outputFeature0AsTensorBuffer
             val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)
             predictedClassesLungs.add(
                 classification(
