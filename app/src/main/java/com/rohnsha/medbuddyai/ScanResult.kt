@@ -30,14 +30,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Chat
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.BlurOff
+import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Forum
+import androidx.compose.material.icons.outlined.ConnectWithoutContact
 import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material.icons.outlined.MedicalInformation
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwitchAccessShortcut
+import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -121,6 +124,9 @@ fun ScanResultScreen(
     modalState= rememberSaveable {
         mutableStateOf(false)
     }
+    val infoStateOpen = remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         topBar = {
             if (!isStillLoading && !isErrored && !isNormal){
@@ -141,10 +147,35 @@ fun ScanResultScreen(
                                     disease_results.value.domain
                                 },
                                 fontFamily = fontFamily,
-                                color = Color.Black.copy(.75f),
+                                color = lightTextAccent,
                                 fontSize = 13.sp,
                             )
                         }
+                    },
+                    actions = {
+                        Image(
+                            imageVector = if (infoStateOpen.value) Icons.Outlined.BlurOff else Icons.Outlined.BlurOn,
+                            contentDescription = "Show accuracy button",
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .size(24.dp)
+                                .clickable {
+                                    infoStateOpen.value = !infoStateOpen.value
+                                }
+                        )
+                    },
+                    navigationIcon = {
+                        Image(
+                            imageVector = Icons.Outlined.ArrowBackIosNew,
+                            contentDescription = "Show accuracy button",
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .size(24.dp)
+                                .padding(2.dp)
+                                .clickable {
+
+                                }
+                        )
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = BGMain
@@ -227,7 +258,6 @@ fun ScanResultScreen(
                     "Loading the Canvas of Your Health Journey", "Awaiting Your Arrival in the Health Universe",
                     "Elevating Your Health IQ One Byte at a Time", "Stepping into the Digital Library of Wellness",
                     "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
-
             ))
         }
     }
@@ -308,6 +338,7 @@ fun ScanResultsSuccess(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+                ClassificationConf()
             }
         }
         item {
@@ -392,7 +423,7 @@ fun ScanResultsSuccess(
                     Spacer(modifier = Modifier.height(20.dp))
                 }
                 Text(
-                    text = "View All Results",
+                    text = "View Model Parameters",
                     fontFamily = fontFamily,
                     fontSize = 15.sp,
                     fontWeight = FontWeight(600),
@@ -400,6 +431,84 @@ fun ScanResultsSuccess(
                         .padding(start = 25.dp, bottom = 18.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ClassificationConf() {
+    Row(
+        modifier = Modifier
+            .height(60.dp)
+            .fillMaxWidth()
+            .background(Color.White, RoundedCornerShape(8.dp))
+            .padding(horizontal = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(start = 13.dp)
+        ) {
+            Text(
+                modifier = Modifier,
+                text = "98.25%",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600)
+            )
+            Text(
+                modifier = Modifier
+                    .offset(y = (-2).dp),
+                text = "Accuracy",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                color = lightTextAccent
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                modifier = Modifier,
+                text = "V2023.8.21",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600)
+            )
+            Text(
+                modifier = Modifier
+                    .offset(y = (-2).dp),
+                text = "Version",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                color = lightTextAccent
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier
+                .padding(end = 18.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                modifier = Modifier,
+                text = "${String.format("%.2f", photoCaptureViewModel.maxIndex.collectAsState().value.confident)}%",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600)
+            )
+            Text(
+                modifier = Modifier
+                    .offset(y = (-2).dp),
+                text = "Matched",
+                fontSize = 14.sp,
+                fontFamily = fontFamily,
+                color = lightTextAccent,
+                //fontWeight = FontWeight(600)
+            )
         }
     }
 }
@@ -682,37 +791,24 @@ fun OptionScanResults() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         OptionsScanResultUNI(
-            title = "Chatbot",
-            icon = Icons.Outlined.Chat,
+            title = "Ask mAI",
+            icon = Icons.Outlined.QuestionAnswer,
+            onClickListener = {  }
+        )
+        OptionsScanResultUNI(
+            title = "Compose",
+            icon = Icons.Outlined.ConnectWithoutContact,
             onClickListener = {}
         )
         OptionsScanResultUNI(
-            title = "Post",
-            icon = Icons.Outlined.Forum,
+            title = "Doctors",
+            icon = Icons.Outlined.VolunteerActivism,
             onClickListener = {}
         )
-        Box(
-            modifier = Modifier
-                .height(49.dp)
-                .align(Alignment.Top),
-            contentAlignment = Alignment.Center
-        ){
-            Box(
-                modifier = Modifier
-                    .width(2.dp)
-                    .height(15.dp)
-                    .background(ViewDash, RoundedCornerShape(4.dp))
-            )
-        }
         OptionsScanResultUNI(
-            title = "Options",
+            title = "Domains",
             icon = Icons.Outlined.SwitchAccessShortcut,
             onClickListener = { modalState.value= true }
-        )
-        OptionsScanResultUNI(
-            title = "Share",
-            icon = Icons.Outlined.Share,
-            onClickListener = {}
         )
     }
 }
@@ -765,7 +861,7 @@ fun DataBox(
         Text(
             text = title,
             fontFamily = fontFamily,
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight(600),
             modifier = Modifier
                 .padding(start = 25.dp)

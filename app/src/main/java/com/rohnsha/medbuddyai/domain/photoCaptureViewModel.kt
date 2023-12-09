@@ -28,6 +28,8 @@ class photoCaptureViewModel: ViewModel() {
     private val _maxIndex= MutableStateFlow(
         classification(confident = 0f, indexNumber = 404, parentIndex = 404)
     )
+    val maxIndex= _maxIndex.asStateFlow()
+
     private val _notMaxElements= MutableStateFlow<List<classification>>(emptyList())
     val minIndex= _notMaxElements.asStateFlow()
 
@@ -82,12 +84,13 @@ class photoCaptureViewModel: ViewModel() {
     private suspend fun classificationData(group_number: Int){
         val collectionName= when(group_number){
             0 -> "lung"
-            1 -> "lung"
+            1 -> "brain"
             else -> "null"
         }
         val dataInstance= Firebase.firestore.collection(collectionName)
         try {
             sortClassifiedList()
+            Log.d("maxIndex", _maxIndex.value.toString())
             val querySnapshot=dataInstance.document(_maxIndex.value.parentIndex.toString()).get().await()
             val data=querySnapshot.toObject<disease_data_dataClass>()
             Log.d("classificationDataInit", querySnapshot.data.toString())
