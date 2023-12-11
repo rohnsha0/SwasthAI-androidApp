@@ -7,7 +7,7 @@ import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.ml.ImgSegv066
+import com.rohnsha.medbuddyai.ml.ModelImgClf
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -35,7 +35,7 @@ class analyzer(
                 matrix,
                 true
             )
-            val model= ImgSegv066.newInstance(context)
+            val model= ModelImgClf.newInstance(context)
             var tensorImage= TensorImage(DataType.FLOAT32)
             tensorImage.load(rotatedBitmap)
             var imageProcessor= ImageProcessor.Builder()

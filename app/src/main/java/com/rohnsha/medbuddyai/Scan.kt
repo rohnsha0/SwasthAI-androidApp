@@ -349,9 +349,8 @@ fun ScanMainScreen(
         }
     }
     val listTest= listOf(
-        "MRI",
-        "XRAY",
-        "Skin Manifestion"
+        "Works best with XRAY/MRI Images",
+        "Perfect!",
     )
     val isPredictingBool= remember {
         mutableStateOf(false)
@@ -381,11 +380,6 @@ fun ScanMainScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 verticalAlignment = Alignment.Bottom
             ) {
-                CameraPreviewSegmentOp(
-                    title = "Detected: ",
-                    weight = 0.5f,
-                    dataItem = listTest[detecteddClassification.value]
-                )
                 CameraPreviewSegmentOp(
                     title = "Detected: ",
                     weight = 0.5f,
