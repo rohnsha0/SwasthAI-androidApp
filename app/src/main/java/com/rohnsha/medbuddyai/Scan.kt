@@ -43,6 +43,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -53,6 +54,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -138,16 +140,16 @@ fun ScanScreen(
 
 @Composable
 fun ScanOptions() {
-    var autoBool= remember {
+    val autoBool= remember {
         mutableStateOf(true)
     }
-    var xRayBool= remember {
+    val xRayBool= remember {
         mutableStateOf(false)
     }
-    var mriBool= remember {
+    val mriBool= remember {
         mutableStateOf(false)
     }
-    var skinBool = remember {
+    val skinBool = remember {
         mutableStateOf(false)
     }
 
@@ -318,6 +320,7 @@ private fun takePhoto(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanMainScreen(
     navController: NavHostController
@@ -356,6 +359,10 @@ fun ScanMainScreen(
         mutableStateOf(false)
     }
 
+    val bomError= rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .padding(top = 20.dp)
@@ -381,8 +388,7 @@ fun ScanMainScreen(
                 verticalAlignment = Alignment.Bottom
             ) {
                 CameraPreviewSegmentOp(
-                    title = "Detected: ",
-                    weight = 0.5f,
+                    title = "C1: ",
                     dataItem = listTest[detecteddClassification.value]
                 )
             }
@@ -405,15 +411,19 @@ fun ScanMainScreen(
                 widthPercentage = if(!isPredictingBool.value) 0.5f else 0.6f,
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
-                    isPredictingBool.value=true
-                    scope.launch {
-                        takePhoto(
-                            controller = controller,
-                            onPhotoTaken = viewModelPhotoSave::onTakePhoto,
-                            toCcamFeed = {
-                                navController.navigate(bottomNavItems.ScanResult.route)
-                            }
-                        )
+                    if (detecteddClassification.value==1){
+                        isPredictingBool.value=true
+                        scope.launch {
+                            takePhoto(
+                                controller = controller,
+                                onPhotoTaken = viewModelPhotoSave::onTakePhoto,
+                                toCcamFeed = {
+                                    navController.navigate(bottomNavItems.ScanResult.route)
+                                }
+                            )
+                        }
+                    } else {
+                        bomError.value=true
                     }
                 },
                 isPredicting = isPredictingBool.value
@@ -426,6 +436,49 @@ fun ScanMainScreen(
 
                 }
             )
+            if (bomError.value){
+                ModalBottomSheet(onDismissRequest = {
+                    bomError.value= false
+                }) {
+                    Row {
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 30.dp),
+                            text = "Type Error",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            modifier = Modifier
+                                .clickable {
+                                    bomError.value= false
+                                }
+                                .padding(end = 30.dp),
+                            text = "Rescan",
+                            fontSize = 17.sp,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 30.dp),
+                        fontFamily = fontFamily,
+                        fontSize = 14.sp,
+                        text = "The image you uploaded didn't matched to any of the currently supported image types."
+                    )
+                    Text(
+                        modifier = Modifier
+                            .padding(start = 30.dp, top = 14.dp, end = 30.dp, bottom = 45.dp),
+                        fontFamily = fontFamily,
+                        fontSize = 14.sp,
+                        text = "Please upload correct image type to proceed or rescan?"
+                    )
+                }
+            }
         }
     }
 }
@@ -433,7 +486,6 @@ fun ScanMainScreen(
 @Composable
 fun CameraPreviewSegmentOp(
     title: String,
-    weight: Float,
     dataItem: String
 ) {
     Row(
