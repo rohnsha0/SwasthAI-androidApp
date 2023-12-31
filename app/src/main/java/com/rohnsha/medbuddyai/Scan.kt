@@ -14,6 +14,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,11 +23,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,7 +37,12 @@ import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.MotionPhotosAuto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.CenterFocusWeak
+import androidx.compose.material.icons.outlined.Collections
+import androidx.compose.material.icons.outlined.FlashAuto
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
@@ -58,6 +66,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -78,6 +87,7 @@ import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.launch
 
@@ -116,7 +126,32 @@ fun ScanScreen(
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = BGMain
-                )
+                ),
+                actions = {
+                    Image(
+                        imageVector = Icons.Outlined.BlurOn,
+                        contentDescription = "Show accuracy button",
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .size(24.dp)
+                            .clickable {
+
+                            }
+                    )
+                },
+                navigationIcon = {
+                    Image(
+                        imageVector = Icons.Outlined.ArrowBackIosNew,
+                        contentDescription = "Show accuracy button",
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(24.dp)
+                            .padding(2.dp)
+                            .clickable {
+
+                            }
+                    )
+                }
             )
         },
         modifier = Modifier
@@ -130,7 +165,7 @@ fun ScanScreen(
                 .padding(top = 20.dp)
                 .fillMaxSize()
         ) {
-            ScanOptions()
+            //ScanOptions()
             ScanMainScreen(
                 navController
             )
@@ -367,47 +402,50 @@ fun ScanMainScreen(
         modifier = Modifier
             .padding(top = 20.dp)
             .fillMaxSize()
-            .background(color = Color.White, shape = RoundedCornerShape(8.dp))
+            .background(color = BGMain, shape = RoundedCornerShape(8.dp))
     ) {
-        Surface(
+        Column(
             modifier = Modifier
                 .clip(RoundedCornerShape(topEnd = 8.dp, topStart = 8.dp))
+                .fillMaxHeight(.85f)
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ){
             CameraPreview(
                 controller = controller,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(.9f),
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(16.dp)),
                 imgBitmap = viewModelPhotoSave.bitmaps.collectAsState().value,
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(.9f),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                CameraPreviewSegmentOp(
-                    title = "C1: ",
-                    dataItem = listTest[detecteddClassification.value]
-                )
-            }
+            CameraPreviewSegmentOp(
+                title = "C1: ",
+                dataItem = listTest[detecteddClassification.value]
+            )
         }
+        Spacer(modifier = Modifier.weight(1f))
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .background(BGMain),
+                .fillMaxWidth()
+                .background(Color.White, RoundedCornerShape(16.dp))
+                .padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            CameraControlsItem(
-                title = "FLIP",
-                widthPercentage = if (!isPredictingBool.value) 0.3f else 0.25f,
-                paddingVal = PaddingValues(start = 13.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
-                onClickAction = {
+            Image(
+                imageVector = Icons.Outlined.FlashAuto,
+                contentDescription = "Show accuracy button",
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(2.dp)
+                    .clickable {
 
-                }
+                    }
             )
             CameraControlsItem(
-                title = "CAPTURE",
+                title = "Capture",
                 widthPercentage = if(!isPredictingBool.value) 0.5f else 0.6f,
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
@@ -428,13 +466,15 @@ fun ScanMainScreen(
                 },
                 isPredicting = isPredictingBool.value
             )
-            CameraControlsItem(
-                title = "GALLERY",
-                widthPercentage = 1f,
-                paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 13.dp),
-                onClickAction = {
+            Image(
+                imageVector = Icons.Outlined.Collections,
+                contentDescription = "Import from Gallery button",
+                modifier = Modifier
+                    .size(24.dp)
+                    .padding(2.dp)
+                    .clickable {
 
-                }
+                    }
             )
             if (bomError.value){
                 ModalBottomSheet(onDismissRequest = {
@@ -453,7 +493,7 @@ fun ScanMainScreen(
                         Text(
                             modifier = Modifier
                                 .clickable {
-                                    bomError.value= false
+                                    bomError.value = false
                                 }
                                 .padding(end = 30.dp),
                             text = "Rescan",
@@ -490,9 +530,9 @@ fun CameraPreviewSegmentOp(
 ) {
     Row(
         modifier = Modifier
-            .padding(bottom = 6.dp)
+            .padding(bottom = 6.dp, top = 20.dp)
             .height(30.dp)
-            .background(Color.White, RoundedCornerShape(8.dp))
+            //.background(Color.White, RoundedCornerShape(8.dp))
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -518,37 +558,53 @@ fun CameraControlsItem(
     onClickAction: () -> Unit,
     isPredicting: Boolean= false
 ) {
-    Row(
+    Box(
         modifier = Modifier
-            .padding(paddingVal)
-            .fillMaxHeight()
-            .fillMaxWidth(widthPercentage)
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = 500,
-                    easing = LinearOutSlowInEasing
-                )
-            )
-            .clickable(
-                onClick = onClickAction
-            ),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = title,
-            fontWeight = FontWeight(600),
-            fontFamily = fontFamily
-        )
-        if (isPredicting){
-            Spacer(modifier = Modifier.width(9.dp))
-            CircularProgressIndicator(
+            .padding(vertical = 13.dp)
+            //.fillMaxWidth(.4f)
+            .height(60.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+            .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
+            .clickable {
+                onClickAction()
+            }
+            .padding(vertical = 13.dp),
+        contentAlignment = Alignment.CenterStart
+    ){
+        Row(
+            modifier = Modifier,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
                 modifier = Modifier
-                    .height(16.dp)
-                    .width(16.dp),
-                strokeWidth = 2.dp,
-                color = Color.Black.copy(0.5f)
+                    .padding(start = 13.dp)
+                    .height(34.dp)
+                    .width(34.dp)
+                    .background(color = Color.White, shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ){
+                if (isPredicting){
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        strokeWidth = 1.dp
+                    )
+                }
+                Icon(
+                    modifier = Modifier
+                        .height(24.dp)
+                        .width(24.dp)
+                        .padding(2.dp),
+                    imageVector = Icons.Outlined.Camera,
+                    contentDescription = "cam_icon"
+                )
+            }
+            Text(
+                modifier = Modifier
+                    .padding(start = 13.dp, end = 18.dp),
+                text = title,
+                fontWeight = FontWeight(600),
+                fontSize = 14.sp,
             )
         }
     }
