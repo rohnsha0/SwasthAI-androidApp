@@ -452,7 +452,7 @@ fun ClassificationConf() {
         ) {
             Text(
                 modifier = Modifier,
-                text = "98.25%",
+                text = "${disease_results.value.model_accuracy}%",
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 fontWeight = FontWeight(600)
@@ -473,7 +473,7 @@ fun ClassificationConf() {
         ) {
             Text(
                 modifier = Modifier,
-                text = "V2023.8.21",
+                text = disease_results.value.model_version,
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 fontWeight = FontWeight(600)

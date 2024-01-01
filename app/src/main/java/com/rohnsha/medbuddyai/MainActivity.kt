@@ -15,10 +15,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -26,6 +25,9 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavGraph
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.DermBuddyAITheme
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customGrey
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,7 +53,12 @@ class MainActivity : ComponentActivity() {
                 val navcontroller= rememberNavController()
                 val navBackStackEntry by navcontroller.currentBackStackEntryAsState()
                 val currentDestination= navBackStackEntry?.destination
+                val currentItemIndex = items.indexOfFirst { it.route == currentDestination?.route }
                 val bottomDestination= items.any { it.route== currentDestination?.route }
+
+                if (currentItemIndex != -1 && currentItemIndex != selectedItemIndex){
+                    selectedItemIndex= currentItemIndex
+                }
 
                 Scaffold(
                     bottomBar = {
@@ -61,9 +68,7 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 items.forEachIndexed { index, bottomNavItems ->
                                     NavigationBarItem(
-                                        selected = currentDestination?.hierarchy?.any {
-                                            it.route == bottomNavItems.route
-                                        } == true,
+                                        selected = selectedItemIndex==index,
                                         onClick = {
                                             selectedItemIndex= index
                                             navcontroller.navigate(bottomNavItems.route){
@@ -72,10 +77,17 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         label = {
-                                            Text(text = bottomNavItems.title)
+                                            Text(
+                                                text = bottomNavItems.title,
+                                                fontSize = 12.sp,
+                                                fontFamily = fontFamily,
+                                                color = customGrey
+                                            )
                                         },
                                         colors = NavigationBarItemDefaults.colors(
-                                            indicatorColor = Color.White.copy(alpha = .25f)
+                                            indicatorColor = ViewDash,
+                                            selectedIconColor = formAccent,
+                                            unselectedIconColor = formAccent
                                         ),
                                         icon = {
                                             Icon(
@@ -85,7 +97,7 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = bottomNavItems.title
                                             )
                                         },
-                                        alwaysShowLabel = false,
+                                        alwaysShowLabel = true,
                                     )
                                 }
 
