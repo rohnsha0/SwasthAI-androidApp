@@ -48,6 +48,10 @@ MedBuddyAI is an Android app designed to empower users to take control of their 
 
 We welcome contributions! If you would like to contribute to MedBuddyAI, please follow our [Contribution Guidelines](CONTRIBUTING.md).
 
+## Screenshots
+
+![Screenshot 1](https://i.postimg.cc/RFT6fSSM/image1.png)
+
 ## License
 
 This project is licensed under the [GNU GPLv2](LICENSE).
