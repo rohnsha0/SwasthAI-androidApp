@@ -97,7 +97,7 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = bottomNavItems.title
                                             )
                                         },
-                                        alwaysShowLabel = true,
+                                        alwaysShowLabel = false,
                                     )
                                 }
 

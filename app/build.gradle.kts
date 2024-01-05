@@ -60,6 +60,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.compose.material:material-icons-extended:1.5.1")
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")

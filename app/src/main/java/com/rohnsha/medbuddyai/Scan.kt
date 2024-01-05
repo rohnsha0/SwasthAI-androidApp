@@ -46,6 +46,7 @@ import androidx.compose.material.icons.outlined.FlashAuto
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
+import androidx.compose.material.icons.outlined.WrongLocation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -68,7 +69,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
@@ -92,6 +95,7 @@ import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.launch
 
 private lateinit var viewModelPhotoSave: photoCaptureViewModel
+private lateinit var isConfirming: MutableState<Boolean>
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
@@ -302,15 +306,26 @@ fun CameraPreview(
     imgBitmap: Bitmap? = null,
 ) {
     val lifecycleOwner= LocalLifecycleOwner.current
-    AndroidView(
-        factory = {
-            PreviewView(it).apply {
-                this.controller= controller
-                controller.bindToLifecycle(lifecycleOwner)
-            }
-        },
-        modifier = modifier
-    )
+    if (isConfirming.value){
+        if (imgBitmap!=null){
+            Image(
+                bitmap = imgBitmap.asImageBitmap(),
+                contentDescription = "Captured Image",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+            )
+        }
+    } else{
+        AndroidView(
+            factory = {
+                PreviewView(it).apply {
+                    this.controller= controller
+                    controller.bindToLifecycle(lifecycleOwner)
+                }
+            },
+            modifier = modifier
+        )
+    }
 }
 
 private fun takePhoto(
@@ -394,6 +409,10 @@ fun ScanMainScreen(
         mutableStateOf(false)
     }
 
+    isConfirming= remember {
+        mutableStateOf(false)
+    }
+
     val bomError= rememberSaveable {
         mutableStateOf(false)
     }
@@ -435,8 +454,8 @@ fun ScanMainScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                imageVector = Icons.Outlined.FlashAuto,
-                contentDescription = "Show accuracy button",
+                imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.WrongLocation,
+                contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan",
                 modifier = Modifier
                     .size(24.dp)
                     .padding(2.dp)
@@ -445,11 +464,29 @@ fun ScanMainScreen(
                     }
             )
             CameraControlsItem(
-                title = "Capture",
+                title = if (!isConfirming.value) "Capture" else "Proceed",
                 widthPercentage = if(!isPredictingBool.value) 0.5f else 0.6f,
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
-                    if (detecteddClassification.value==1){
+                    if (!isConfirming.value){
+                        scope.launch {
+                            takePhoto(
+                                controller = controller,
+                                onPhotoTaken = viewModelPhotoSave::onTakePhoto,
+                                toCcamFeed = {
+                                    Log.d("checkConfirmation", "clicked")
+                                    isConfirming.value= true
+                                }
+                            )
+                        }
+                    } else {
+                        if (detecteddClassification.value==1){
+                            navController.navigate(bottomNavItems.ScanResult.route)
+                        } else {
+                            bomError.value=true
+                        }
+                    }
+                    /*if (detecteddClassification.value==1){
                         isPredictingBool.value=true
                         scope.launch {
                             takePhoto(
@@ -462,20 +499,24 @@ fun ScanMainScreen(
                         }
                     } else {
                         bomError.value=true
-                    }
+                    }*/
                 },
                 isPredicting = isPredictingBool.value
             )
-            Image(
-                imageVector = Icons.Outlined.Collections,
-                contentDescription = "Import from Gallery button",
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(2.dp)
-                    .clickable {
-
-                    }
-            )
+            if (!isConfirming.value){
+                Image(
+                    imageVector = Icons.Outlined.Collections,
+                    contentDescription = "Import from Gallery icon",
+                    modifier = Modifier
+                        .size(24.dp)
+                        .padding(2.dp)
+                        .clickable {
+                            //getImageFromGallery.launch("image/*")
+                        }
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
             if (bomError.value){
                 ModalBottomSheet(onDismissRequest = {
                     bomError.value= false
@@ -542,7 +583,7 @@ fun CameraPreviewSegmentOp(
             fontFamily = fontFamily
         )
         Text(
-            text = dataItem,//listTest[detecteddClassification.value],
+            text = if (!isConfirming.value) dataItem else "COnfirm and proceed",//listTest[detecteddClassification.value],
             fontFamily = fontFamily,
             fontWeight = FontWeight(600),
             fontSize = 14.sp
