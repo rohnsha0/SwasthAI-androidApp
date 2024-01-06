@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import com.rohnsha.medbuddyai.domain.dataclass.classification
+import com.rohnsha.medbuddyai.ml.ModelImgClf
 import com.rohnsha.medbuddyai.ml.PneumoniaV3
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import org.tensorflow.lite.DataType
@@ -32,22 +33,34 @@ class classifier {
             inputFeature0.loadBuffer(tensorImage.buffer)
 
             when(scanOption){
-                0 -> {
-                    predictedClasses=predictionLungs(context, inputFeature = inputFeature0, bitmap)}
-                1 -> {
-                    predictedClasses=predictionHeart()
-                }
-                2 -> {
-                    predictedClasses= predictionBrain()
-                }
-                3 -> {
-                    predictionSkin()
-                }
-                4 -> {
-                    predictionLimbs()
-                }
+                0 -> { predictedClasses=predictionLungs(context, inputFeature = inputFeature0, bitmap) }
+                1 -> { predictedClasses=predictionHeart() }
+                2 -> { predictedClasses= predictionBrain() }
+                3 -> { predictionSkin() }
+                4 -> { predictionLimbs() }
+                5 -> { predictedClasses=predictionMaster(context = context, inputFeature0 = inputFeature0, bitmap = bitmap) }
             }
             return predictedClasses
+        }
+
+        fun predictionMaster(
+            bitmap: Bitmap,
+            inputFeature0: TensorBuffer,
+            context: Context
+        ): List<classification>{
+            val predictedClassesLungs= mutableListOf<classification>()
+
+            val modelPneumonia= ModelImgClf.newInstance(context)
+            val outputPneumonia= modelPneumonia.process(inputFeature0).outputFeature0AsTensorBuffer
+            val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = maxIndexPneumonia,
+                    confident = outputPneumonia.floatArray[getMaxIndex(outputPneumonia.floatArray)]*100,
+                    parentIndex = 0
+                ),
+            )
+            return predictedClassesLungs
         }
 
         fun predictionLimbs(

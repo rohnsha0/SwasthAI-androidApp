@@ -3,8 +3,14 @@ package com.rohnsha.medbuddyai
 import android.Manifest
 import android.app.Activity
 import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.graphics.Matrix
+import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.ImageCapture.OnImageCapturedCallback
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
@@ -87,11 +93,13 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
+import com.rohnsha.medbuddyai.domain.classifier
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private lateinit var viewModelPhotoSave: photoCaptureViewModel
@@ -463,12 +471,14 @@ fun ScanMainScreen(
 
                     }
             )
+            val bitmapImg= viewModelPhotoSave.bitmaps.collectAsState().value
             CameraControlsItem(
                 title = if (!isConfirming.value) "Capture" else "Proceed",
                 widthPercentage = if(!isPredictingBool.value) 0.5f else 0.6f,
                 paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
                 onClickAction = {
                     if (!isConfirming.value){
+                        isPredictingBool.value= true
                         scope.launch {
                             takePhoto(
                                 controller = controller,
@@ -479,11 +489,20 @@ fun ScanMainScreen(
                                 }
                             )
                         }
+                        isPredictingBool.value= false
                     } else {
-                        if (detecteddClassification.value==1){
-                            navController.navigate(bottomNavItems.ScanResult.route)
-                        } else {
-                            bomError.value=true
+                        scope.launch {
+                            if (bitmapImg != null) {
+                                isPredictingBool.value= true
+                                delay(600L)
+                                val branchClassification= classifier.classifyIndex(conttext, bitmapImg, 5)[0]
+                                Log.d("bitmapResults", branchClassification.toString())
+                                if (branchClassification.indexNumber==0){
+                                    bomError.value=true
+                                } else {
+                                    navController.navigate(bottomNavItems.ScanResult.route)
+                                }
+                            }
                         }
                     }
                     /*if (detecteddClassification.value==1){
@@ -504,6 +523,35 @@ fun ScanMainScreen(
                 isPredicting = isPredictingBool.value
             )
             if (!isConfirming.value){
+                val imageURI = remember {
+                    mutableStateOf<Uri?>(null)
+                }
+                val bitmap = remember {
+                    mutableStateOf<Bitmap?>(null)
+                }
+                val getImageFromGallery = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.GetContent()){
+                    imageURI.value=it
+                }
+                imageURI.value.let {
+                    if (Build.VERSION.SDK_INT < 28){
+                        bitmap.value = MediaStore.Images
+                            .Media.getBitmap(conttext.contentResolver, it)
+                    } else {
+                        val source=
+                            it?.let { it1 ->
+                                ImageDecoder.createSource(conttext.contentResolver,
+                                    it1
+                                )
+                            }
+                        bitmap.value= source?.let { it1 -> ImageDecoder.decodeBitmap(it1) }
+                    }
+                    val convertedBitmap= bitmap.value?.copy(Bitmap.Config.ARGB_8888, false)
+                    convertedBitmap?.let {
+                        it1 -> viewModelPhotoSave.onTakePhoto(it1)
+                        isConfirming.value= true
+                    }
+                }
                 Image(
                     imageVector = Icons.Outlined.Collections,
                     contentDescription = "Import from Gallery icon",
@@ -511,15 +559,16 @@ fun ScanMainScreen(
                         .size(24.dp)
                         .padding(2.dp)
                         .clickable {
-                            //getImageFromGallery.launch("image/*")
+                            getImageFromGallery.launch("image/*")
                         }
                 )
             } else {
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.width(24.dp))
             }
             if (bomError.value){
                 ModalBottomSheet(onDismissRequest = {
                     bomError.value= false
+                    isPredictingBool.value= false
                 }) {
                     Row {
                         Text(
@@ -535,6 +584,7 @@ fun ScanMainScreen(
                             modifier = Modifier
                                 .clickable {
                                     bomError.value = false
+                                    isPredictingBool.value= false
                                 }
                                 .padding(end = 30.dp),
                             text = "Rescan",
