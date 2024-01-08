@@ -93,9 +93,9 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
-import com.rohnsha.medbuddyai.domain.classifier
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
+import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -103,15 +103,18 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private lateinit var viewModelPhotoSave: photoCaptureViewModel
+private lateinit var viewModelClassification: classificationVM
 private lateinit var isConfirming: MutableState<Boolean>
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ScanScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    photoCaptureVM: photoCaptureViewModel
+    photoCaptureVM: photoCaptureViewModel,
+    classifierVM: classificationVM
 ) {
     viewModelPhotoSave= photoCaptureVM
+    viewModelClassification= classifierVM
     var cameraPermissionState: PermissionState= rememberPermissionState(permission = Manifest.permission.CAMERA)
 
     if (cameraPermissionState.status.isGranted){
@@ -495,7 +498,7 @@ fun ScanMainScreen(
                             if (bitmapImg != null) {
                                 isPredictingBool.value= true
                                 delay(600L)
-                                val branchClassification= classifier.classifyIndex(conttext, bitmapImg, 5)[0]
+                                val branchClassification = viewModelClassification.classify(conttext, bitmapImg, 5)[0]
                                 Log.d("bitmapResults", branchClassification.toString())
                                 if (branchClassification.indexNumber==0){
                                     bomError.value=true
@@ -505,20 +508,6 @@ fun ScanMainScreen(
                             }
                         }
                     }
-                    /*if (detecteddClassification.value==1){
-                        isPredictingBool.value=true
-                        scope.launch {
-                            takePhoto(
-                                controller = controller,
-                                onPhotoTaken = viewModelPhotoSave::onTakePhoto,
-                                toCcamFeed = {
-                                    navController.navigate(bottomNavItems.ScanResult.route)
-                                }
-                            )
-                        }
-                    } else {
-                        bomError.value=true
-                    }*/
                 },
                 isPredicting = isPredictingBool.value
             )

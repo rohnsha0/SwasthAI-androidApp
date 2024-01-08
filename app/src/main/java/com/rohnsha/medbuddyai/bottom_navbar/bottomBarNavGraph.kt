@@ -12,7 +12,8 @@ import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
-import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
+import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 
 @Composable
 fun bottomNavGraph(
@@ -20,6 +21,8 @@ fun bottomNavGraph(
     padding: PaddingValues
 ) {
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
+    val classifierVM= viewModel<classificationVM>()
+
     NavHost(
         navController = navController,
         startDestination = bottomNavItems.Home.route
@@ -40,7 +43,8 @@ fun bottomNavGraph(
             ScanScreen(
                 padding = padding,
                 navController = navController,
-                photoCaptureVM = savePhotoViewModel
+                photoCaptureVM = savePhotoViewModel,
+                classifierVM = classifierVM
             )
         }
 

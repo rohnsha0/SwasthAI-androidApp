@@ -16,7 +16,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 
 class analyzer(
     private val context: Context,
-    private val onResults: (classification) -> Unit
+    private val onResults: (classification) -> Unit,
 ): ImageAnalysis.Analyzer {
 
     private var frameSkipCounter= 0
@@ -47,7 +47,7 @@ class analyzer(
             val outputs= model.process(inputFeature0)
             val outputFeature0 =outputs.outputFeature0AsTensorBuffer
             val results= classification(
-                classifier.getMaxIndex(outputFeature0.floatArray), outputFeature0.floatArray[classifier.getMaxIndex(
+                getMaxIndex(outputFeature0.floatArray), outputFeature0.floatArray[getMaxIndex(
                 outputFeature0.floatArray
             )] * 100)
             onResults(results)
@@ -55,6 +55,10 @@ class analyzer(
         }
         frameSkipCounter++
         image.close()
+    }
+
+    private fun getMaxIndex(floatArray: FloatArray?): Int {
+        return floatArray?.withIndex()?.maxByOrNull { it.value }?.index ?: -1
     }
 
 

@@ -1,12 +1,15 @@
-package com.rohnsha.medbuddyai.domain
+package com.rohnsha.medbuddyai.domain.viewmodels
 
+import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
+import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
@@ -15,6 +18,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
 
 class photoCaptureViewModel: ViewModel() {
+
+    val viewModelClassifier: classificationVM=ViewModelProvider.AndroidViewModelFactory
+        .getInstance(ContextUtill.ContextUtils.getApplicationContext() as Application)
+        .create(
+            classificationVM::class.java
+        )
 
     private val _bitmaps = MutableStateFlow<Bitmap?>(null)
     val bitmaps = _bitmaps.asStateFlow()
@@ -57,7 +66,7 @@ class photoCaptureViewModel: ViewModel() {
         _normalBoolean.value=false
         _reloadingBoolean.value= true
         val rawClassification= try {
-            classifier.classifyIndex(context, _bitmaps.value!!, index)
+            viewModelClassifier.classify(context, _bitmaps.value!!, index)
         } catch (e: Exception){
             Log.d("successIndex", e.printStackTrace().toString())
             emptyList()

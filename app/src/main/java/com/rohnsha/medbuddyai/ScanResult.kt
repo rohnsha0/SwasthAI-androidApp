@@ -80,7 +80,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
-import com.rohnsha.medbuddyai.domain.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.dashBG
