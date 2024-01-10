@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.domain.dataclass.communityFields
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
@@ -50,7 +51,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @Composable
 fun CommunityScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    snackBarViewModel: snackBarToggleVM
 ) {
     Scaffold(
         topBar = {
@@ -113,7 +115,12 @@ fun CommunityScreen(
                         title = "From Records",
                         icon = Icons.Filled.EditNote,
                         weight = 1f,
-                        navController = navController,
+                        onClickListener = {
+                            snackBarViewModel.SendToast(
+                                message = "Hello, This is Test!",
+                                indicator_color = Color.Red,
+                                padding = PaddingValues(2.dp)
+                        ) }
                     )
                 }
                 Spacer(modifier = Modifier.height(6.dp))

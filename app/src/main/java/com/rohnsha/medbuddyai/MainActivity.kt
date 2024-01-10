@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.Icon
@@ -10,19 +11,22 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavGraph
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.DermBuddyAITheme
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customGrey
@@ -32,6 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    lateinit var snackBarToggle: snackBarToggleVM
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         var isLoadingCompleted= false
@@ -48,7 +53,7 @@ class MainActivity : ComponentActivity() {
                     bottomNavItems.Preferences,
                 )
                 var selectedItemIndex by rememberSaveable {
-                    mutableStateOf(0)
+                    mutableIntStateOf(0)
                 }
                 val navcontroller= rememberNavController()
                 val navBackStackEntry by navcontroller.currentBackStackEntryAsState()
@@ -59,6 +64,8 @@ class MainActivity : ComponentActivity() {
                 if (currentItemIndex != -1 && currentItemIndex != selectedItemIndex){
                     selectedItemIndex= currentItemIndex
                 }
+
+                snackBarToggle= viewModel<snackBarToggleVM>()
 
                 Scaffold(
                     bottomBar = {
@@ -100,16 +107,20 @@ class MainActivity : ComponentActivity() {
                                         alwaysShowLabel = false,
                                     )
                                 }
-
                             }
                         }
                     }
                 ) { paddingValues ->
                     bottomNavGraph(
                         navController = navcontroller,
-                        padding = paddingValues
+                        padding = paddingValues,
+                        snackBarVM = snackBarToggle
                     )
+                    Log.d("snackbarState", snackBarToggle.readyToSendToast.collectAsState().value.toString())
                     isLoadingCompleted=true
+                    if (snackBarToggle.readyToSendToast.collectAsState().value){
+                        snackBarToggle.MySnackbar()
+                    }
                 }
             }
         }

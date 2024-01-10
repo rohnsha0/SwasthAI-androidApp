@@ -34,7 +34,6 @@ import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOff
 import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.ConnectWithoutContact
 import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material.icons.outlined.MedicalInformation
@@ -46,9 +45,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -716,70 +712,6 @@ fun BOMContent(
         }
     }
 }
-
-@Composable
-fun MySnackbar(
-    snackbarHostState: SnackbarHostState,
-    message: String,
-    indicator_color: Color,
-    padding: PaddingValues,
-) {
-    SnackbarHost(
-        hostState = snackbarHostState
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(padding)
-                .padding(horizontal = 25.dp, vertical = 16.dp)
-                .height(56.dp)
-                .background(color = dashBG, shape = RoundedCornerShape(size = 28.dp))
-                .shadow(elevation = 5.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Image(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .size(24.dp)
-                    .background(indicator_color, CircleShape)
-                    .padding(4.dp),
-                imageVector = Icons.Outlined.Close,
-                contentDescription = "snackbar image"
-            )
-            Text(
-                modifier = Modifier
-                    .padding(start = 12.dp),
-                text = message,
-                color = Color.White,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                fontFamily = fontFamily
-            )
-            Box(modifier = Modifier.fillMaxWidth()){
-                Image(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clickable {
-                            snackbarHostState.currentSnackbarData?.dismiss()
-                        },
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = "snackbar image",
-                    colorFilter = ColorFilter.tint(color = Color.White)
-                )
-            }
-        }
-    }
-
-    LaunchedEffect(key1 = true) {
-        delay(500L)
-        snackbarHostState.showSnackbar(
-            message = message,
-            actionLabel = null,
-            duration = SnackbarDuration.Short
-        )
-    }
-}
-
-
 
 @Composable
 fun OptionScanResults() {
