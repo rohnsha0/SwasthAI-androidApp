@@ -330,8 +330,8 @@ fun explore_tools(
             }
         )
         Log.d("logStatus", isDoctorExpanded.value.toString())
-        Spacer(modifier = Modifier.height(12.dp))
         if (isDoctorExpanded.value){
+            Spacer(modifier = Modifier.height(12.dp))
             AnimatedVisibility(
                 visible = isDoctorExpanded.value,
                 enter = slideInVertically(initialOffsetY = { -it }),

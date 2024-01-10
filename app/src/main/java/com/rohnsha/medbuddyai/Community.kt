@@ -100,6 +100,14 @@ fun CommunityScreen(
                 .padding(top = 30.dp, start = 24.dp, end = 24.dp)
         ) {
             item {
+                Text(
+                    text = "Create",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(bottom = 12.dp)
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,7 +131,14 @@ fun CommunityScreen(
                         ) }
                     )
                 }
-                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = "Recent Posts",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(bottom = 6.dp, top = 18.dp)
+                )
             }
             items(list) { data ->
                 CommunityPostItem(
