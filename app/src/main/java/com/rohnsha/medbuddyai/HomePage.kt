@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
@@ -58,7 +59,8 @@ import com.rohnsha.medbuddyai.ui.theme.formAccent
 @Composable
 fun HomeScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    communityViewModel: communityVM
 ) {
     Scaffold(
         topBar = {
@@ -88,7 +90,7 @@ fun HomeScreen(
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
         ) {
-            //ScanCard()
+            communityViewModel.loginUser()
             Text(
                 text = "Health Dashboard",
                 fontFamily = fontFamily,
@@ -436,5 +438,5 @@ fun ScanCard() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
-    HomeScreen(padding = PaddingValues(all = 0.dp), navController = rememberNavController())
+    HomeScreen(padding = PaddingValues(all = 0.dp), navController = rememberNavController(), communityVM())
 }

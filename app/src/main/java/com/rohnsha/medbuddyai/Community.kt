@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.domain.dataclass.communityFields
+import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -52,7 +53,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun CommunityScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    snackBarViewModel: snackBarToggleVM
+    snackBarViewModel: snackBarToggleVM,
+    communityViewModel: communityVM
 ) {
     Scaffold(
         topBar = {
@@ -116,7 +118,7 @@ fun CommunityScreen(
                         title = "Write",
                         icon = Icons.Filled.Create,
                         weight = .49f,
-                        onClickListener = {}
+                        onClickListener = { communityViewModel.post() }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     explore_tabs(
