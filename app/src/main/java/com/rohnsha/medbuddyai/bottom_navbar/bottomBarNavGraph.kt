@@ -6,6 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.rohnsha.medbuddyai.BMIScreen
 import com.rohnsha.medbuddyai.CommunityScreen
 import com.rohnsha.medbuddyai.ExploreScreen
 import com.rohnsha.medbuddyai.HomeScreen
@@ -58,6 +59,15 @@ fun bottomNavGraph(
             route = bottomNavItems.Explore.route
         ){
             ExploreScreen(
+                padding = padding,
+                navController = navController
+            )
+        }
+
+        composable(
+            route = bottomNavItems.BMI.route
+        ){
+            BMIScreen(
                 padding = padding,
                 navController = navController
             )

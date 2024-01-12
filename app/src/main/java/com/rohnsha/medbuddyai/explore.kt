@@ -254,7 +254,7 @@ fun ExploreWellbeing(
                 icon = Icons.Filled.AccessibilityNew,
                 weight = .49f,
                 navController = navController,
-                route = bottomNavItems.Scan.route
+                route = bottomNavItems.BMI.route
             )
             Spacer(modifier = Modifier.width(12.dp))
             explore_tabs(

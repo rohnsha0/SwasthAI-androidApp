@@ -56,4 +56,11 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Explore,
         selectedIcon = Icons.Filled.Explore
     )
+
+    object BMI: bottomNavItems(
+        title = "Bmi",
+        route = "bmi",
+        unselectedIcon = Icons.Outlined.Explore,
+        selectedIcon = Icons.Filled.Explore
+    )
 }

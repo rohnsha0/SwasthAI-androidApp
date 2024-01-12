@@ -512,7 +512,7 @@ fun ClassificationConf() {
 @Composable
 fun DataListFull(
     title: String,
-    subtitle: String,
+    subtitle: String?=null,
     data: String,
     additionData: String? =null,
     imageVector: ImageVector,
@@ -558,14 +558,16 @@ fun DataListFull(
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600)
                 )
-                Text(
-                    modifier = Modifier
-                        .offset(y = (-2).dp),
-                    text = subtitle,
-                    fontSize = 14.sp,
-                    fontFamily = fontFamily,
-                    color = lightTextAccent
-                )
+                if (subtitle!=null){
+                    Text(
+                        modifier = Modifier
+                            .offset(y = (-2).dp),
+                        text = subtitle,
+                        fontSize = 14.sp,
+                        fontFamily = fontFamily,
+                        color = lightTextAccent
+                    )
+                }
             }
             Column(
                 modifier = Modifier
