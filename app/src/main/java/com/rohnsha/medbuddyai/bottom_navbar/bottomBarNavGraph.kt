@@ -85,6 +85,7 @@ fun bottomNavGraph(
         ){
             ScanResultScreen(
                 padding = padding,
+                navController = navController,
                 viewModel = savePhotoViewModel
             )
         }

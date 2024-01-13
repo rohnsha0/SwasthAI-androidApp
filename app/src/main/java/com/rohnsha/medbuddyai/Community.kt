@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -76,6 +78,9 @@ fun CommunityScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
+        communityViewModel.readDB()
+        val postData= communityViewModel.feedContents.collectAsState().value
+        Log.d("dataSnapCOmm", postData.toString())
         val list= listOf(
             communityFields(
                 "Rohan Shaw",
@@ -151,6 +156,18 @@ fun CommunityScreen(
                     colorLogo = customRed,
                     postData = data.data
                 )
+            }
+            if (!postData.isEmpty()){
+                items(postData){ data ->
+                    CommunityPostItem(
+                        title = data.title?: "Unknown",
+                        subtitle = "by ${data.author}",
+                        data = data.domain?: "Unknown",
+                        additionData = "on ${data.timestamp}",
+                        colorLogo = customRed,
+                        postData = data.content?: "Unknown"
+                    )
+                }
             }
         }
     }

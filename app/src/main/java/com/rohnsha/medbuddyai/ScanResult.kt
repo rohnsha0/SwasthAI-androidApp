@@ -72,6 +72,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
@@ -96,7 +97,9 @@ private lateinit var modalState : MutableState<Boolean>
 @Composable
 fun ScanResultScreen(
     padding: PaddingValues,
-    viewModel: photoCaptureViewModel
+    viewModel: photoCaptureViewModel,
+    navController: NavController,
+    resultsLevel: Int=0 // 0-> Scan, 1-> Scan History, 2-> Read Only
 ) {
     photoCaptureViewModel= viewModel
     var isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
@@ -163,14 +166,15 @@ fun ScanResultScreen(
                     navigationIcon = {
                         Image(
                             imageVector = Icons.Outlined.ArrowBackIosNew,
-                            contentDescription = "Show accuracy button",
+                            contentDescription = "back button",
                             modifier = Modifier
                                 .padding(start = 16.dp)
                                 .size(24.dp)
-                                .padding(2.dp)
+                                .clip(CircleShape)
                                 .clickable {
-
+                                    navController.popBackStack()
                                 }
+                                .padding(5.dp)
                         )
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
