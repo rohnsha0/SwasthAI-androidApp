@@ -23,7 +23,9 @@ class communityVM: ViewModel() {
     val feedContents= _postFeed.asStateFlow()
 
     fun post(
-
+        title: String,
+        content: String,
+        onCompleteLambda: () -> Unit
     ){
         viewModelScope.launch {
             Log.d("authUserAction", "post invoked")
@@ -31,14 +33,16 @@ class communityVM: ViewModel() {
                 val username= _auth.currentUser!!.email!!.substringBefore("@")
                 Log.d("authUsername", username)
                 val newPost= Post(
-                    author = "username",
-                    content = "This is a test2"
+                    author = username,
+                    title = title,
+                    content = content
                 )
                 Log.d("authUserAction", newPost.toString())
-                _postRef.child("posts").child("username").setValue(newPost)
+                _postRef.child("posts").child("$username: $title").setValue(newPost)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("authUserAction", "Post successful")
+                            onCompleteLambda()
                         } else {
                             Log.e("authUserAction", "Post unsuccessful", task.exception)
                         }
@@ -47,7 +51,7 @@ class communityVM: ViewModel() {
         }
     }
 
-    fun readDB(){
+    fun getFeed(){
         viewModelScope.launch {
             _postRef.child("posts").get()
                 .addOnSuccessListener {

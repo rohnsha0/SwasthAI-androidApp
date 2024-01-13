@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -49,9 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.ui.theme.BGMain
-import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
+import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +86,7 @@ fun BMIScreen(
                 .padding(top = 20.dp)
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
-                .padding(top = 30.dp)
+                .padding(top = 30.dp, start = 24.dp, end = 24.dp)
         ){
             val height= remember {
                 mutableStateOf("")
@@ -110,7 +110,6 @@ fun BMIScreen(
                 fontWeight = FontWeight(600),
                 fontSize = 15.sp,
                 modifier = Modifier
-                    .padding(start = 24.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextInputThemed(value = height.value, onValueChanged = { height.value= it },
@@ -130,7 +129,6 @@ fun BMIScreen(
                 fontWeight = FontWeight(600),
                 fontSize = 15.sp,
                 modifier = Modifier
-                    .padding(start = 24.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextInputThemed(
@@ -146,7 +144,6 @@ fun BMIScreen(
             ExposedDropdownMenuBox(
                 expanded = genderColExpanded.value,
                 onExpandedChange = { genderColExpanded.value = it },
-                modifier = Modifier.padding(horizontal = 24.dp)
             ) {
                 TextInputThemed(
                     value = when(gender.intValue){
@@ -214,6 +211,7 @@ fun TextInputThemed(
     suffix: String? = null,
     isNumKey: Boolean,
     readOnly: Boolean= false,
+    label: String= placeholder,
     modifier: Modifier= Modifier
 ) {
     val errorState= remember {
@@ -224,15 +222,7 @@ fun TextInputThemed(
     }
     TextField(
         modifier = Modifier
-            .then(
-                if (readOnly) {
-                    Modifier
-                } else {
-                    Modifier.padding(horizontal = 24.dp)
-                }
-            )
             .fillMaxWidth()
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .then(
                 if (readOnly) {
                     modifier
@@ -247,7 +237,7 @@ fun TextInputThemed(
             Image(
                 modifier = Modifier
                     .size(34.dp)
-                    .background(Color.White, CircleShape)
+                    .background(BGMain, CircleShape)
                     .padding(5.dp),
                 imageVector = icon,
                 contentDescription = null
@@ -270,14 +260,22 @@ fun TextInputThemed(
                 )
             }
         },
-        placeholder = { Text(text = placeholder) },
+        //placeholder = { Text(text = placeholder) },
+        label = {
+            Text(
+                text = placeholder,
+                fontFamily = fontFamily,
+                fontSize = 14.sp,
+                fontWeight = FontWeight(600),
+                color = formAccent
+            )
+        },
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = ViewDash,
-            unfocusedContainerColor = ViewDash,
-            focusedIndicatorColor = BGMain,
-            unfocusedIndicatorColor = BGMain,
-            cursorColor = Color.Black,
-            errorContainerColor = ViewDash,
+            unfocusedContainerColor = Color.White,
+            focusedContainerColor = Color.White,
+            focusedIndicatorColor = lightTextAccent,
+            unfocusedIndicatorColor = formAccent,
+            errorContainerColor = Color.White,
             errorIndicatorColor = customRed,
             errorSupportingTextColor = customRed,
         ),

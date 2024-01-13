@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Quickreply
+import androidx.compose.material.icons.outlined.Height
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -31,6 +32,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -46,6 +49,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
@@ -78,7 +82,7 @@ fun CommunityScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
-        communityViewModel.readDB()
+        communityViewModel.getFeed()
         val postData= communityViewModel.feedContents.collectAsState().value
         Log.d("dataSnapCOmm", postData.toString())
         val list= listOf(
@@ -97,6 +101,15 @@ fun CommunityScreen(
                 "Lungs"
             )
         )
+        val isCreateExpanded= remember {
+            mutableStateOf(false)
+        }
+        val title= remember {
+            mutableStateOf("")
+        }
+        val content= remember {
+            mutableStateOf("")
+        }
         LazyColumn(
             modifier = Modifier
                 .padding(values)
@@ -120,10 +133,25 @@ fun CommunityScreen(
                         .fillMaxWidth()
                 ) {
                     explore_tabs(
-                        title = "Write",
+                        title = if (isCreateExpanded.value) "Post Now" else "Write",
                         icon = Icons.Filled.Create,
                         weight = .49f,
-                        onClickListener = { communityViewModel.post() }
+                        onClickListener = { 
+                            if (isCreateExpanded.value) communityViewModel.post(
+                                title = title.value,
+                                content= content.value,
+                                onCompleteLambda = {
+                                    isCreateExpanded.value= false
+                                    title.value= ""
+                                    content.value= ""
+                                    snackBarViewModel.SendToast(
+                                        message = "Post was uploaded successfully",
+                                        indicator_color = customGreen,
+                                        padding = PaddingValues(2.dp)
+                                    )
+                                }
+                            ) else isCreateExpanded.value= true
+                        }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     explore_tabs(
@@ -138,6 +166,27 @@ fun CommunityScreen(
                         ) }
                     )
                 }
+                if (isCreateExpanded.value){
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextInputThemed(
+                        value = title.value, 
+                        onValueChanged = { title.value= it },
+                        label = "Enter title",
+                        placeholder = "Robin Hood",
+                        icon = Icons.Outlined.Height,
+                        onClose = {},
+                        isNumKey = false
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    TextInputThemed(
+                        value = content.value,
+                        onValueChanged = { content.value= it },
+                        placeholder = "Enter contents",
+                        icon = Icons.Outlined.Height,
+                        isNumKey = false,
+                        onClose = {}
+                    )
+                }
                 Text(
                     text = "Recent Posts",
                     fontFamily = fontFamily,
@@ -145,16 +194,6 @@ fun CommunityScreen(
                     fontSize = 15.sp,
                     modifier = Modifier
                         .padding(bottom = 6.dp, top = 18.dp)
-                )
-            }
-            items(list) { data ->
-                CommunityPostItem(
-                    title = data.title,
-                    subtitle = "by ${data.user_name}",
-                    data = data.domain,
-                    additionData = "on ${data.timestamp}",
-                    colorLogo = customRed,
-                    postData = data.data
                 )
             }
             if (!postData.isEmpty()){
