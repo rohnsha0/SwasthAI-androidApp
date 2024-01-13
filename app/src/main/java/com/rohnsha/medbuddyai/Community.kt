@@ -21,17 +21,26 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Create
-import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Quickreply
-import androidx.compose.material.icons.outlined.Height
+import androidx.compose.material.icons.outlined.CloseFullscreen
+import androidx.compose.material.icons.outlined.FeaturedPlayList
+import androidx.compose.material.icons.outlined.Female
+import androidx.compose.material.icons.outlined.Male
+import androidx.compose.material.icons.outlined.PostAdd
+import androidx.compose.material.icons.outlined.ShortText
+import androidx.compose.material.icons.outlined.TaskAlt
+import androidx.compose.material.icons.outlined.Title
+import androidx.compose.material.icons.outlined.Transgender
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -110,6 +119,12 @@ fun CommunityScreen(
         val content= remember {
             mutableStateOf("")
         }
+        val domainExpanded= remember {
+            mutableStateOf(false)
+        }
+        val domain= remember {
+            mutableIntStateOf(0)
+        }
         LazyColumn(
             modifier = Modifier
                 .padding(values)
@@ -134,33 +149,43 @@ fun CommunityScreen(
                 ) {
                     explore_tabs(
                         title = if (isCreateExpanded.value) "Post Now" else "Write",
-                        icon = Icons.Filled.Create,
-                        weight = .49f,
+                        icon = if (isCreateExpanded.value) Icons.Outlined.TaskAlt else Icons.Outlined.PostAdd,
+                        weight = if (isCreateExpanded.value) .56f else .49f,
                         onClickListener = { 
-                            if (isCreateExpanded.value) communityViewModel.post(
-                                title = title.value,
-                                content= content.value,
-                                onCompleteLambda = {
-                                    isCreateExpanded.value= false
-                                    title.value= ""
-                                    content.value= ""
-                                    snackBarViewModel.SendToast(
-                                        message = "Post was uploaded successfully",
-                                        indicator_color = customGreen,
-                                        padding = PaddingValues(2.dp)
+                            if (isCreateExpanded.value) {
+                                if (title.value!="" && content.value!="" && domain.intValue!=0){
+                                    communityViewModel.post(
+                                        title = title.value,
+                                        content= content.value,
+                                        domainIndex = domain.intValue,
+                                        onCompleteLambda = {
+                                            isCreateExpanded.value= false
+                                            title.value= ""
+                                            content.value= ""
+                                            snackBarViewModel.SendToast(
+                                                message = "Post was uploaded successfully",
+                                                indicator_color = customGreen,
+                                                padding = PaddingValues(2.dp)
+                                            )
+                                        }
                                     )
-                                }
-                            ) else isCreateExpanded.value= true
+                                } else snackBarViewModel.SendToast(
+                                    "One of more field is empty!",
+                                    customRed,
+                                    PaddingValues(0.dp)
+                                )
+                            } else isCreateExpanded.value= true
+
                         }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     explore_tabs(
-                        title = "From Records",
-                        icon = Icons.Filled.EditNote,
+                        title = if (isCreateExpanded.value) "Close" else "From Records",
+                        icon = if (isCreateExpanded.value) Icons.Outlined.CloseFullscreen else Icons.Outlined.FeaturedPlayList,
                         weight = 1f,
                         onClickListener = {
-                            snackBarViewModel.SendToast(
-                                message = "Hello, This is Test!",
+                            if (isCreateExpanded.value) isCreateExpanded.value= false else snackBarViewModel.SendToast(
+                                message = "The feature is still under making!",
                                 indicator_color = Color.Red,
                                 padding = PaddingValues(2.dp)
                         ) }
@@ -172,20 +197,54 @@ fun CommunityScreen(
                         value = title.value, 
                         onValueChanged = { title.value= it },
                         label = "Enter title",
-                        placeholder = "Robin Hood",
-                        icon = Icons.Outlined.Height,
-                        onClose = {},
+                        icon = Icons.Outlined.Title,
+                        onClose = { title.value = "" },
                         isNumKey = false
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     TextInputThemed(
                         value = content.value,
                         onValueChanged = { content.value= it },
-                        placeholder = "Enter contents",
-                        icon = Icons.Outlined.Height,
+                        label = "Enter contents",
+                        icon = Icons.Outlined.ShortText,
                         isNumKey = false,
-                        onClose = {}
+                        onClose = { content.value = "" },
+                        singleLine = false
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    ExposedDropdownMenuBox(
+                        expanded = domainExpanded.value,
+                        onExpandedChange = { domainExpanded.value = it },
+                    ) {
+                        TextInputThemed(
+                            value = communityViewModel.returnDomain(domain.intValue),
+                            onValueChanged = {  },
+                            icon = when(domain.intValue){
+                                1 -> Icons.Outlined.Male
+                                2 -> Icons.Outlined.Female
+                                else -> Icons.Outlined.Transgender
+                            },
+                            label = "Select Domain",
+                            onClose = {  },
+                            isNumKey = true,
+                            readOnly = true,
+                            modifier = Modifier.menuAnchor()
+                        )
+
+                        ExposedDropdownMenu(
+                            expanded = domainExpanded.value,
+                            onDismissRequest = { domainExpanded.value = false },
+                        ) {
+                            DropdownMenuItem(text = { Text(text = "Lungs") }, onClick = {
+                                domain.intValue= 1
+                                domainExpanded.value = false
+                            })
+                            DropdownMenuItem(text = { Text(text = "Brain") }, onClick = {
+                                domain.intValue= 2
+                                domainExpanded.value = false
+                            })
+                        }
+                    }
                 }
                 Text(
                     text = "Recent Posts",
@@ -202,7 +261,11 @@ fun CommunityScreen(
                         title = data.title?: "Unknown",
                         subtitle = "by ${data.author}",
                         data = data.domain?: "Unknown",
-                        additionData = "on ${data.timestamp}",
+                        additionData = data.timestamp?.let {
+                            communityViewModel.calculateTimeDifference(
+                                it.toLong())
+                        }
+                            ?: "Unspecified",
                         colorLogo = customRed,
                         postData = data.content?: "Unknown"
                     )

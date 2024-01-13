@@ -113,13 +113,13 @@ fun BMIScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             TextInputThemed(value = height.value, onValueChanged = { height.value= it },
-                icon = Icons.Outlined.Height, placeholder = "Enter your height",
+                icon = Icons.Outlined.Height, label = "Enter your height",
                 onClose = { height.value= "" }, regex = "^(?:5[6-9]|[6-9]\\d|1\\d\\d|22[0-5])\$\n", suffix = "cm",
                 isNumKey = true
             )
             Spacer(modifier = Modifier.height(12.dp))
             TextInputThemed(value = weight.value, onValueChanged = { weight.value= it },
-                icon = Icons.Outlined.Scale, placeholder = "Enter your weight",
+                icon = Icons.Outlined.Scale, label = "Enter your weight",
                 onClose = { weight.value= "" }, suffix = "kg", isNumKey = true, regex = "\\b(?:[2-9]|[1-9][0-9]|110)\\b\n"
             )
             Spacer(modifier = Modifier.height(18.dp))
@@ -135,7 +135,7 @@ fun BMIScreen(
                 value = age.value,
                 onValueChanged = { age.value= it },
                 icon = Icons.Outlined.Add,
-                placeholder = "Enter your age",
+                label = "Enter your age",
                 onClose = { /*TODO*/ },
                 isNumKey = true,
                 suffix = "years"
@@ -157,7 +157,7 @@ fun BMIScreen(
                         2 -> Icons.Outlined.Female
                         else -> Icons.Outlined.Transgender
                         },
-                    placeholder = "Select Gender",
+                    label = "Select Gender",
                     onClose = {  },
                     isNumKey = true,
                     readOnly = true,
@@ -205,14 +205,14 @@ fun TextInputThemed(
     value: String,
     onValueChanged: (String) -> Unit,
     icon: ImageVector,
-    placeholder: String,
+    label: String,
     onClose: () -> Unit,
     regex: String?=null,
     suffix: String? = null,
     isNumKey: Boolean,
     readOnly: Boolean= false,
-    label: String= placeholder,
-    modifier: Modifier= Modifier
+    modifier: Modifier= Modifier,
+    singleLine: Boolean= true
 ) {
     val errorState= remember {
         mutableStateOf(false)
@@ -263,7 +263,7 @@ fun TextInputThemed(
         //placeholder = { Text(text = placeholder) },
         label = {
             Text(
-                text = placeholder,
+                text = label,
                 fontFamily = fontFamily,
                 fontSize = 14.sp,
                 fontWeight = FontWeight(600),
@@ -280,7 +280,7 @@ fun TextInputThemed(
             errorSupportingTextColor = customRed,
         ),
         isError = errorState.value,
-        singleLine = true
+        singleLine = singleLine
     )
 }
 

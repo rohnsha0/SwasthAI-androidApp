@@ -1,5 +1,8 @@
 package com.rohnsha.medbuddyai
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -234,7 +237,8 @@ fun explore_tabs(
     weight: Float,
     navController: NavHostController? = null,
     route: String= bottomNavItems.Community.route,
-    onClickListener: (() -> Unit)? =null
+    onClickListener: (() -> Unit)? =null,
+
 ) {
     Box(
         modifier = Modifier
@@ -250,7 +254,8 @@ fun explore_tabs(
                         onClickListener()
                     }
                 }
-            },
+            }
+            .animateContentSize(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)),
         contentAlignment = Alignment.CenterStart
     ){
         Row(
