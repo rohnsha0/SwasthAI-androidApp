@@ -63,4 +63,11 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Explore,
         selectedIcon = Icons.Filled.Explore
     )
+
+    object Doctors: bottomNavItems(
+        title = "doctors",
+        route = "doctors",
+        unselectedIcon = Icons.Outlined.Explore,
+        selectedIcon = Icons.Filled.Explore
+    )
 }

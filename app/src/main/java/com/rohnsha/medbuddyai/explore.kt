@@ -1,9 +1,6 @@
 package com.rohnsha.medbuddyai
 
 import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -22,9 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.Biotech
 import androidx.compose.material.icons.filled.BrunchDining
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.MedicalInformation
@@ -108,7 +103,7 @@ fun ExploreScreen(
                 fontWeight = FontWeight(600),
                 fontSize = 15.sp,
                 modifier = Modifier
-                    .padding(top = 18.dp, start = 24.dp)
+                    .padding(top = 12.dp, start = 24.dp)
             )
             ExploreWellbeing(navController = navController)
             Text(
@@ -117,7 +112,7 @@ fun ExploreScreen(
                 fontWeight = FontWeight(600),
                 fontSize = 15.sp,
                 modifier = Modifier
-                    .padding(top = 18.dp, start = 24.dp)
+                    .padding(top = 12.dp, start = 24.dp)
             )
             ExploreSelfAware(navController = navController)
             Spacer(modifier = Modifier.height(16.dp))
@@ -216,7 +211,7 @@ fun ExploreSelfAware(
                                        .width(24.dp)
                                        .padding(2.dp)
                                        .clickable {
-                                                  query.value= ""
+                                           query.value = ""
                                        },
                                    imageVector = Icons.Filled.Clear,
                                    contentDescription = "search icon"
@@ -285,7 +280,7 @@ fun ExploreWellbeing(
                 navController = navController,
             )
         }
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         DataListFull(
             title = "Diet Plan",
             subtitle = "that suits you best",
@@ -314,7 +309,7 @@ fun explore_tools(
             .fillMaxWidth()
     ){
         explore_home(navController = navController)
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         DataListFull(
             title = "Find Doctors",
             subtitle = "from Practo",
@@ -326,38 +321,9 @@ fun explore_tools(
             colorLogoTint = Color.Black,
             onClickListener = {
                 Log.d("logStatus", "clicked")
-                isDoctorExpanded.value=!isDoctorExpanded.value
+                navController.navigate(bottomNavItems.Doctors.route)
             }
         )
         Log.d("logStatus", isDoctorExpanded.value.toString())
-        if (isDoctorExpanded.value){
-            Spacer(modifier = Modifier.height(12.dp))
-            AnimatedVisibility(
-                visible = isDoctorExpanded.value,
-                enter = slideInVertically(initialOffsetY = { -it }),
-                exit = slideOutVertically(targetOffsetY = { -it })
-            ){
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 24.dp)
-                        .fillMaxWidth()
-                ) {
-                    explore_tabs(
-                        title = "By Location",
-                        icon = Icons.Filled.CameraAlt,
-                        weight = .49f,
-                        navController = navController,
-                        route = bottomNavItems.Scan.route
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    explore_tabs(
-                        title = "By Domain",
-                        icon = Icons.Filled.Biotech,
-                        weight = 1f,
-                        navController = navController,
-                    )
-                }
-            }
-        }
     }
 }

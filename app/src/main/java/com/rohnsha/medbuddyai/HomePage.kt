@@ -102,7 +102,7 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(top = 30.dp, start = 24.dp)
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             DataListFull(
                 title = "Air Quality Index",
                 subtitle = "in Kolkata",
@@ -146,7 +146,7 @@ fun HomeScreen(
 fun AddMoreDashWidget() {
     Box(
         modifier = Modifier
-            .padding(start = 24.dp, end = 24.dp, top = 14.dp)
+            .padding(start = 24.dp, end = 24.dp, top = 8.dp)
             .height(60.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))

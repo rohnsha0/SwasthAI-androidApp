@@ -8,11 +8,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.rohnsha.medbuddyai.BMIScreen
 import com.rohnsha.medbuddyai.CommunityScreen
+import com.rohnsha.medbuddyai.DoctorScreen
 import com.rohnsha.medbuddyai.ExploreScreen
 import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
+import com.rohnsha.medbuddyai.api.APIViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
@@ -27,6 +29,7 @@ fun bottomNavGraph(
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
+    val doctorsAPI= viewModel<APIViewModel>()
 
     NavHost(
         navController = navController,
@@ -78,6 +81,10 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController
             )
+        }
+
+        composable(route = bottomNavItems.Doctors.route){
+            DoctorScreen(apiViewModel = doctorsAPI)
         }
 
         composable(

@@ -527,6 +527,7 @@ fun DataListFull(
 ) {
     Box(
         modifier = Modifier
+            .padding(vertical = 6.dp)
             .height(60.dp)
             .padding(horizontal = 24.dp)
             .fillMaxWidth()
