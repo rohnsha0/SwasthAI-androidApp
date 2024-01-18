@@ -319,7 +319,7 @@ fun CommunityPostItem(
                 ) {
                     Text(
                         modifier = Modifier,
-                        text = title.clip(16),
+                        text = title.clip(25),
                         fontSize = 14.sp,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),

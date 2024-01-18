@@ -26,12 +26,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Biotech
+import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.EmojiPeople
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material.icons.outlined.SmartToy
+import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -61,6 +63,7 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
@@ -128,15 +131,15 @@ fun HomeScreen(
                     subtitle = "Body Mass Index",
                     data = "18.34",
                     additionData = "Normal",
-                    imageVector = Icons.Outlined.Air,
-                    colorLogo = customRed
+                    imageVector = Icons.Outlined.Calculate,
+                    colorLogo = customGreen
                 )
                 DataListFull(
                     title = "mPoints",
                     subtitle = "Fit Score",
                     data = "54",
                     additionData = "Imbalanced",
-                    imageVector = Icons.Outlined.Air,
+                    imageVector = Icons.Outlined.Speed,
                     colorLogo = customRed
                 )
                 AddMoreDashWidget()
@@ -241,6 +244,7 @@ fun AddMoreDashWidget() {
 fun explore_diseases(
     navController: NavHostController
 ) {
+    val scope= rememberCoroutineScope()
     Column(
         modifier = Modifier
             .padding(top = 16.dp, start = 24.dp, end = 24.dp)
@@ -263,6 +267,18 @@ fun explore_diseases(
             Spacer(modifier = Modifier.width(12.dp))
             explore_tabs(title = "More", icon = Icons.Outlined.ReadMore, weight = 1f, navController = navController)
         }
+        Text(
+            text = "View More",
+            fontFamily = fontFamily,
+            fontWeight = FontWeight(600),
+            fontSize = 15.sp,
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .align(Alignment.CenterHorizontally)
+                .clickable {
+                    scope.launch { navController.navigate(bottomNavItems.Explore.route) }
+                }
+        )
     }
 }
 
