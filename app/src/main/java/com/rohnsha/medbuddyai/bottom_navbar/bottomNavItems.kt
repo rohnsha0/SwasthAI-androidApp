@@ -2,10 +2,12 @@ package com.rohnsha.medbuddyai.bottom_navbar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.Assistant
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.Assistant
 import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Home
@@ -64,10 +66,10 @@ sealed class bottomNavItems(
         selectedIcon = Icons.Filled.Explore
     )
 
-    object Doctors: bottomNavItems(
-        title = "doctors",
-        route = "doctors",
-        unselectedIcon = Icons.Outlined.Explore,
-        selectedIcon = Icons.Filled.Explore
+    object mAI: bottomNavItems(
+        title = "mAI",
+        route = "m_ai",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
     )
 }

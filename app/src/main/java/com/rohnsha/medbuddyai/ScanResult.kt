@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.BlurOff
 import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Check
@@ -517,9 +518,10 @@ fun ClassificationConf() {
 fun DataListFull(
     title: String,
     subtitle: String?=null,
-    data: String,
+    data: String? = null,
     additionData: String? =null,
-    imageVector: ImageVector,
+    imageVector: ImageVector ?= null,
+    iconText: String?= null,
     colorLogo: Color,
     additionalDataColor: Color?= null,
     colorLogoTint: Color? = null,
@@ -542,16 +544,37 @@ fun DataListFull(
             modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                modifier = Modifier
-                    .padding(start = 13.dp)
-                    .size(34.dp)
-                    .background(colorLogo, CircleShape)
-                    .padding(6.dp),
-                imageVector = imageVector,
-                contentDescription = "$imageVector icon",
-                colorFilter = ColorFilter.tint(colorLogoTint ?: Color.White)
-            )
+            if (imageVector != null) {
+                Image(
+                    modifier = Modifier
+                        .padding(start = 13.dp)
+                        .size(34.dp)
+                        .background(colorLogo, CircleShape)
+                        .padding(6.dp),
+                    imageVector = imageVector,
+                    contentDescription = "$imageVector icon",
+                    colorFilter = ColorFilter.tint(colorLogoTint ?: Color.White)
+                )
+            } else {
+                Box(
+                    modifier = Modifier
+                        .padding(start = 13.dp)
+                        .size(34.dp)
+                        .background(colorLogo, CircleShape)
+                        .padding(6.dp),
+                    contentAlignment = Alignment.Center
+                ){
+                    if (iconText != null) {
+                        Text(
+                            text = iconText,
+                            fontSize = 12.sp,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            color = colorLogoTint?: Color.White,
+                        )
+                    }
+                }
+            }
             Column(
                 modifier = Modifier
                     .padding(start = 13.dp)
@@ -580,13 +603,15 @@ fun DataListFull(
                     .padding(end = 18.dp),
                 horizontalAlignment = Alignment.End
             ) {
-                Text(
-                    modifier = Modifier,
-                    text = data,
-                    fontSize = 14.sp,
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight(600)
-                )
+                if (data != null) {
+                    Text(
+                        modifier = Modifier,
+                        text = data,
+                        fontSize = 14.sp,
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600)
+                    )
+                }
                 additionData?.let {
                     Text(
                         modifier = Modifier
@@ -596,6 +621,14 @@ fun DataListFull(
                         fontFamily = fontFamily,
                         color = additionalDataColor ?: colorLogo,
                         fontWeight = FontWeight(600)
+                    )
+                }
+                if (additionData==null && data==null){
+                    Image(
+                        imageVector = Icons.Outlined.ArrowForward,
+                        contentDescription = "front icon",
+                        colorFilter = ColorFilter.tint(additionalDataColor ?: lightTextAccent),
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -819,10 +852,3 @@ fun DataBox(
         )
     }
 }
-
-/*
-@Preview(showBackground = true)
-@Composable
-fun PreviewScanResults() {
-    LoadingLayout(title = "Hold on! We are loading stuffs")
-}*/

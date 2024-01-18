@@ -19,7 +19,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessibilityNew
-import androidx.compose.material.icons.filled.BrunchDining
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.MedicalInformation
@@ -27,6 +26,9 @@ import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.WaterDrop
+import androidx.compose.material.icons.outlined.BrunchDining
+import androidx.compose.material.icons.outlined.Grain
+import androidx.compose.material.icons.outlined.SyncLock
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -115,6 +117,14 @@ fun ExploreScreen(
                     .padding(top = 12.dp, start = 24.dp)
             )
             ExploreSelfAware(navController = navController)
+            Text(
+                text = "Pending Rechecks",
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600),
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .padding(top = 18.dp, start = 24.dp)
+            )
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -282,11 +292,31 @@ fun ExploreWellbeing(
         }
         Spacer(modifier = Modifier.height(6.dp))
         DataListFull(
+            title = "Calorie Tracker",
+            subtitle = "snap & track",
+            imageVector = Icons.Outlined.Grain,
+            colorLogo = Color.White,
+            additionalDataColor = lightTextAccent,
+            colorLogoTint = Color.Black,
+            onClickListener = {
+                Log.d("logStatus", "clicked")
+            }
+        )
+        DataListFull(
+            title = "Intermittent Fasting",
+            subtitle = "lose weight",
+            imageVector = Icons.Outlined.SyncLock,
+            colorLogo = Color.White,
+            additionalDataColor = lightTextAccent,
+            colorLogoTint = Color.Black,
+            onClickListener = {
+                Log.d("logStatus", "clicked")
+            }
+        )
+        DataListFull(
             title = "Diet Plan",
             subtitle = "that suits you best",
-            data = "Personalised",
-            additionData = "null",
-            imageVector = Icons.Filled.BrunchDining,
+            imageVector = Icons.Outlined.BrunchDining,
             colorLogo = Color.White,
             additionalDataColor = lightTextAccent,
             colorLogoTint = Color.Black,
@@ -321,7 +351,7 @@ fun explore_tools(
             colorLogoTint = Color.Black,
             onClickListener = {
                 Log.d("logStatus", "clicked")
-                navController.navigate(bottomNavItems.Doctors.route)
+                navController.navigate(bottomNavItems.mAI.route)
             }
         )
         Log.d("logStatus", isDoctorExpanded.value.toString())

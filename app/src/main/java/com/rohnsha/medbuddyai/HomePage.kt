@@ -1,10 +1,13 @@
 package com.rohnsha.medbuddyai
 
+import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,16 +19,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Biotech
-import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.EmojiPeople
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.ReadMore
 import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.outlined.Air
+import androidx.compose.material.icons.outlined.Biotech
+import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -57,6 +63,7 @@ import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
+import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,59 +92,113 @@ fun HomeScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
-        Column(
+        val scrollState= rememberScrollState()
+        communityViewModel.loginUser()
+        LazyColumn(
             modifier = Modifier
                 .padding(values)
                 .padding(padding)
                 .padding(top = 20.dp)
                 .fillMaxSize()
-                .background(color = Color.White, shape = RoundedCornerShape(8.dp))
+                .scrollable(state = scrollState, orientation = Orientation.Vertical)
+                .background(color = Color.White, shape = RoundedCornerShape(20.dp))
         ) {
-            communityViewModel.loginUser()
-            Text(
-                text = "Health Dashboard",
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .padding(top = 30.dp, start = 24.dp)
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            DataListFull(
-                title = "Air Quality Index",
-                subtitle = "in Kolkata",
-                data = "254 PM2.5",
-                additionData = "Severe",
-                imageVector = Icons.Outlined.Air,
-                colorLogo = customRed
-            )
-            AddMoreDashWidget()
-            Text(
-                text = "Explore",
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .padding(top = 18.dp, start = 24.dp)
-            )
-            explore_home(navController = navController)
-            Text(
-                text = "Read about Diseases",
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .padding(top = 30.dp, start = 24.dp)
-            )
-            explore_diseases(navController = navController)
-            Text(
-                text = "Current Medical Affairs",
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .padding(top = 30.dp, start = 24.dp)
-            )
+            item {
+                Text(
+                    text = "Health Dashboard",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 30.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                DataListFull(
+                    title = "Air Quality Index",
+                    subtitle = "in Kolkata",
+                    data = "254 PM2.5",
+                    additionData = "Severe",
+                    imageVector = Icons.Outlined.Air,
+                    colorLogo = customRed
+                )
+                DataListFull(
+                    title = "BMI",
+                    subtitle = "Body Mass Index",
+                    data = "18.34",
+                    additionData = "Normal",
+                    imageVector = Icons.Outlined.Air,
+                    colorLogo = customRed
+                )
+                DataListFull(
+                    title = "mPoints",
+                    subtitle = "Fit Score",
+                    data = "54",
+                    additionData = "Imbalanced",
+                    imageVector = Icons.Outlined.Air,
+                    colorLogo = customRed
+                )
+                AddMoreDashWidget()
+            }
+            item {
+                Text(
+                    text = "Explore",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                explore_home(navController = navController)
+                Spacer(modifier = Modifier.height(6.dp))
+                DataListFull(
+                    title = "AI Symptom Checker",
+                    subtitle = "check what's wrong",
+                    imageVector = Icons.Outlined.SmartToy,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        Log.d("logStatus", "clicked")
+                    }
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "View More",
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600),
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 14.dp)
+                            .clickable {
+                                navController.navigate(bottomNavItems.Explore.route)
+                            }
+                    )
+                }
+            }
+            item {
+                Text(
+                    text = "Read about Diseases",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                explore_diseases(navController = navController)
+            }
+            item {
+                Text(
+                    text = "Current Medical Affairs",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+            }
         }
     }
 }
@@ -154,9 +215,12 @@ fun AddMoreDashWidget() {
 
             }
             .drawBehind {
-                drawRoundRect(color = formAccent, style = Stroke(width = 2f,
-                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f),
-                ), cornerRadius = CornerRadius(x = 16.dp.toPx(), y = 16.dp.toPx()))
+                drawRoundRect(
+                    color = formAccent, style = Stroke(
+                        width = 2f,
+                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f),
+                    ), cornerRadius = CornerRadius(x = 16.dp.toPx(), y = 16.dp.toPx())
+                )
             },
         contentAlignment = Alignment.Center
     ){
@@ -214,15 +278,15 @@ fun explore_home(
         ) {
             explore_tabs(
                 title = "Scan",
-                icon = Icons.Filled.CameraAlt,
+                icon = Icons.Outlined.CameraAlt,
                 weight = .4f,
                 navController = navController,
                 route = bottomNavItems.Scan.route
             )
             Spacer(modifier = Modifier.width(12.dp))
             explore_tabs(
-                title = "Import Reports",
-                icon = Icons.Filled.Biotech,
+                title = "Decode Reports",
+                icon = Icons.Outlined.Biotech,
                 weight = 1f,
                 navController = navController,
             )
@@ -255,7 +319,12 @@ fun explore_tabs(
                     }
                 }
             }
-            .animateContentSize(animationSpec = tween(durationMillis = 500, easing = LinearOutSlowInEasing)),
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 500,
+                    easing = LinearOutSlowInEasing
+                )
+            ),
         contentAlignment = Alignment.CenterStart
     ){
         Row(

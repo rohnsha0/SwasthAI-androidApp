@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                     bottomNavItems.Home,
                     bottomNavItems.Explore,
                     bottomNavItems.Community,
-                    bottomNavItems.Preferences,
+                    bottomNavItems.mAI,
                 )
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = bottomNavItems.title
                                             )
                                         },
-                                        alwaysShowLabel = false,
+                                        alwaysShowLabel = true,
                                     )
                                 }
                             }
