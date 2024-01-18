@@ -523,9 +523,10 @@ fun DataListFull(
     imageVector: ImageVector ?= null,
     iconText: String?= null,
     colorLogo: Color,
+    actionIcon: ImageVector= Icons.Outlined.ArrowForward,
     additionalDataColor: Color?= null,
     colorLogoTint: Color? = null,
-    onClickListener: (() -> Unit)? =null
+    onClickListener: (() -> Unit)? =null,
 ) {
     Box(
         modifier = Modifier
@@ -625,7 +626,7 @@ fun DataListFull(
                 }
                 if (additionData==null && data==null){
                     Image(
-                        imageVector = Icons.Outlined.ArrowForward,
+                        imageVector = actionIcon,
                         contentDescription = "front icon",
                         colorFilter = ColorFilter.tint(additionalDataColor ?: lightTextAccent),
                         modifier = Modifier.size(18.dp)

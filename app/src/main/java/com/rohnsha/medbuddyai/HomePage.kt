@@ -24,13 +24,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.EmojiPeople
-import androidx.compose.material.icons.filled.Psychology
-import androidx.compose.material.icons.filled.ReadMore
-import androidx.compose.material.icons.filled.SelfImprovement
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material.icons.outlined.CameraAlt
+import androidx.compose.material.icons.outlined.EmojiPeople
+import androidx.compose.material.icons.outlined.Psychology
+import androidx.compose.material.icons.outlined.ReadMore
+import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +40,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +65,7 @@ import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -161,6 +163,7 @@ fun HomeScreen(
                         Log.d("logStatus", "clicked")
                     }
                 )
+                val scope = rememberCoroutineScope()
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
@@ -173,7 +176,7 @@ fun HomeScreen(
                         modifier = Modifier
                             .padding(top = 14.dp)
                             .clickable {
-                                navController.navigate(bottomNavItems.Explore.route)
+                                scope.launch { navController.navigate(bottomNavItems.Explore.route) }
                             }
                     )
                 }
@@ -247,18 +250,18 @@ fun explore_diseases(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Neural", icon = Icons.Filled.Psychology, weight = .49f, navController = navController,)
+            explore_tabs(title = "Neural", icon = Icons.Outlined.Psychology, weight = .49f, navController = navController,)
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Derma", icon = Icons.Filled.EmojiPeople, weight = 1f, navController = navController,)
+            explore_tabs(title = "Derma", icon = Icons.Outlined.EmojiPeople, weight = 1f, navController = navController,)
         }
         Row(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Respiratory", icon = Icons.Filled.SelfImprovement, weight = .49f, navController = navController,)
+            explore_tabs(title = "Respiratory", icon = Icons.Outlined.SelfImprovement, weight = .49f, navController = navController,)
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "More", icon = Icons.Filled.ReadMore, weight = 1f, navController = navController)
+            explore_tabs(title = "More", icon = Icons.Outlined.ReadMore, weight = 1f, navController = navController)
         }
     }
 }
