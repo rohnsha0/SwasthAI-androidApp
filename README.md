@@ -50,7 +50,7 @@ We welcome contributions! If you would like to contribute to MedBuddyAI, please 
 
 ## Screenshots
 
-![Screenshot 1](https://i.postimg.cc/RFT6fSSM/image1.png)
+![Project Banenr](https://i.postimg.cc/PrC9PpsT/image1.jpg)
 
 ## License
 
