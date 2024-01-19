@@ -82,7 +82,9 @@ fun bottomNavGraph(
         }
 
         composable(route = bottomNavItems.mAI.route){
-            mAIScreen()
+            mAIScreen(
+                padding = padding
+            )
         }
 
         composable(

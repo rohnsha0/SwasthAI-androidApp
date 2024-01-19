@@ -63,6 +63,7 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -81,12 +82,21 @@ fun HomeScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        text = "MedBuddy AI",
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(600),
-                        fontSize = 26.sp
-                    )
+                    Row {
+                        Text(
+                            text = "Swasth",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 26.sp
+                        )
+                        Text(
+                            text = "AI",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 26.sp,
+                            color = customBlue
+                        )
+                    }
                         },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = BGMain
@@ -180,7 +190,8 @@ fun HomeScreen(
                             .padding(top = 14.dp)
                             .clickable {
                                 scope.launch { navController.navigate(bottomNavItems.Explore.route) }
-                            }
+                            },
+                        color = customBlue
                     )
                 }
             }
@@ -272,6 +283,7 @@ fun explore_diseases(
             fontFamily = fontFamily,
             fontWeight = FontWeight(600),
             fontSize = 15.sp,
+            color = customBlue,
             modifier = Modifier
                 .padding(top = 20.dp)
                 .align(Alignment.CenterHorizontally)

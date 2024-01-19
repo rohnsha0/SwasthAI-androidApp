@@ -13,6 +13,7 @@ val lightTextAccent= Color(0xFF485068)
 val customRed= Color(0xFFDF5060)
 val customGrey= Color(0xFF78839C)
 val customGreen= Color(0xFF75BF72)
+val customBlue= Color(0xFF347AF0)
 
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)

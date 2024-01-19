@@ -28,6 +28,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -230,6 +231,7 @@ fun TextInputThemed(
                     Modifier
                 }
             ),
+        textStyle = LocalTextStyle.current.copy(fontFamily = fontFamily, fontSize = 18.sp),
         value = value,
         readOnly = readOnly,
         onValueChange = { onValueChanged(it) },
