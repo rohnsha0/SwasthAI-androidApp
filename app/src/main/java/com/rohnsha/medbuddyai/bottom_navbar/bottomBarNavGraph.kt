@@ -13,6 +13,7 @@ import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
@@ -28,6 +29,8 @@ fun bottomNavGraph(
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
+    val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
+
 
     NavHost(
         navController = navController,
@@ -93,7 +96,8 @@ fun bottomNavGraph(
             ScanResultScreen(
                 padding = padding,
                 navController = navController,
-                viewModel = savePhotoViewModel
+                viewModel = savePhotoViewModel,
+                scanHistoryViewModel = scanHistoryviewModel
             )
         }
     }

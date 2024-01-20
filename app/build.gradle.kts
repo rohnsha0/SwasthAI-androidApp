@@ -94,7 +94,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.2")
 
-
+    //cameraX
     val cameraxVersion = "1.3.0-rc01"
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
@@ -106,15 +106,22 @@ dependencies {
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
     implementation("io.coil-kt:coil-compose:2.4.0")
 
+    //viewmodel
     val arch_version = "2.2.0-alpha01"
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$arch_version")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$arch_version")
 
+    //dagger hilt
     implementation("com.google.dagger:hilt-android:2.48")
     kapt("com.google.dagger:hilt-android-compiler:2.48")
     kapt("androidx.hilt:hilt-compiler:1.1.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 
+    //room db
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    androidTestImplementation("androidx.room:room-testing:2.6.1")
+
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
-    implementation("io.realm.kotlin:library-base:1.6.1")
 }

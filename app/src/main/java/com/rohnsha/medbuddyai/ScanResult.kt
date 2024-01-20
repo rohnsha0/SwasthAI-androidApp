@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -75,6 +74,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
@@ -92,6 +93,7 @@ import kotlin.random.Random
 
 private lateinit var disease_results: MutableState<disease_data_dataClass>
 private lateinit var photoCaptureViewModel: photoCaptureViewModel
+private lateinit var scanHistoryVM: scanHistoryViewModel
 private lateinit var otherDiseaseData: List<disease_version>
 private lateinit var modalState : MutableState<Boolean>
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,9 +102,11 @@ fun ScanResultScreen(
     padding: PaddingValues,
     viewModel: photoCaptureViewModel,
     navController: NavController,
+    scanHistoryViewModel: scanHistoryViewModel,
     resultsLevel: Int=0 // 0-> Scan, 1-> Scan History, 2-> Read Only
 ) {
     photoCaptureViewModel= viewModel
+    scanHistoryVM= scanHistoryViewModel
     var isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
     val isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
     val isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
@@ -305,7 +309,13 @@ fun ScanResultsSuccess(
     padding: PaddingValues,
     values: PaddingValues,
 ) {
-    val scrollState= rememberScrollState(0)
+    LaunchedEffect(key1 = disease_results.value){
+        scanHistoryVM.addScanHistory(scanHistory(
+            timestamp = System.currentTimeMillis(),
+            title = disease_results.value.disease_name,
+            domain = disease_results.value.domain
+        ))
+    }
     LazyColumn(
         modifier = Modifier
             .padding(values)
