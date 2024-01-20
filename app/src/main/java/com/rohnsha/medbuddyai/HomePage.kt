@@ -54,12 +54,11 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -76,7 +75,8 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    communityViewModel: communityVM
+    communityViewModel: communityVM,
+    scanHistoryVM: scanHistoryViewModel
 ) {
     Scaffold(
         topBar = {
@@ -540,8 +540,8 @@ fun ScanCard() {
     }
 }
 
-@Preview(showBackground = true)
+/*@Preview(showBackground = true)
 @Composable
 fun PreviewHome() {
     HomeScreen(padding = PaddingValues(all = 0.dp), navController = rememberNavController(), communityVM())
-}
+}*/

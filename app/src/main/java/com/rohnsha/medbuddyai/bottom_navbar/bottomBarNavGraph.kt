@@ -2,6 +2,7 @@ package com.rohnsha.medbuddyai.bottom_navbar
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -31,6 +32,9 @@ fun bottomNavGraph(
     val communityVM= viewModel<communityVM>()
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
 
+    LaunchedEffect(key1 = true){
+        scanHistoryviewModel.readScanHistory()
+    }
 
     NavHost(
         navController = navController,
@@ -40,7 +44,8 @@ fun bottomNavGraph(
             HomeScreen(
                 padding = padding,
                 navController = navController,
-                communityViewModel = communityVM
+                communityViewModel = communityVM,
+                scanHistoryviewModel
             )
         }
         composable(route = bottomNavItems.Community.route){
@@ -71,7 +76,8 @@ fun bottomNavGraph(
         ){
             ExploreScreen(
                 padding = padding,
-                navController = navController
+                navController = navController,
+                scanHistoryViewModel = scanHistoryviewModel,
             )
         }
 
