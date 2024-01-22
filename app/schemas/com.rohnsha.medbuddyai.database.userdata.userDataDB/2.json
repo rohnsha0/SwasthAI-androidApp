@@ -1,0 +1,152 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "05eb727593fc4649e1538c73f55bb5b2",
+    "entities": [
+      {
+        "tableName": "scan_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `title` TEXT NOT NULL, `domain` TEXT NOT NULL, PRIMARY KEY(`timestamp`))",
+        "fields": [
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "timestamp"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "intFastingTable",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeStamp` INTEGER NOT NULL, `targetTime` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, PRIMARY KEY(`timeStamp`))",
+        "fields": [
+          {
+            "fieldPath": "timeStamp",
+            "columnName": "timeStamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targetTime",
+            "columnName": "targetTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCompleted",
+            "columnName": "isCompleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "timeStamp"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "disease_data",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cure` TEXT NOT NULL, `cure_cycle` TEXT NOT NULL, `disease_name` TEXT NOT NULL, `domain` TEXT NOT NULL, `introduction` TEXT NOT NULL, `symptoms` TEXT NOT NULL, `thresholds` TEXT NOT NULL, `cover_link` TEXT NOT NULL, `model_version` TEXT NOT NULL, `model_accuracy` TEXT NOT NULL, PRIMARY KEY(`disease_name`))",
+        "fields": [
+          {
+            "fieldPath": "cure",
+            "columnName": "cure",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cure_cycle",
+            "columnName": "cure_cycle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "disease_name",
+            "columnName": "disease_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "introduction",
+            "columnName": "introduction",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symptoms",
+            "columnName": "symptoms",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thresholds",
+            "columnName": "thresholds",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cover_link",
+            "columnName": "cover_link",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "model_version",
+            "columnName": "model_version",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "model_accuracy",
+            "columnName": "model_accuracy",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "disease_name"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05eb727593fc4649e1538c73f55bb5b2')"
+    ]
+  }
+}

@@ -29,7 +29,7 @@ import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.DermBuddyAITheme
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
-import com.rohnsha.medbuddyai.ui.theme.customGrey
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import dagger.hilt.android.AndroidEntryPoint
@@ -88,13 +88,13 @@ class MainActivity : ComponentActivity() {
                                                 text = bottomNavItems.title,
                                                 fontSize = 12.sp,
                                                 fontFamily = fontFamily,
-                                                color = customGrey
                                             )
                                         },
                                         colors = NavigationBarItemDefaults.colors(
                                             indicatorColor = ViewDash,
-                                            selectedIconColor = formAccent,
-                                            unselectedIconColor = formAccent
+                                            selectedIconColor = customBlue,
+                                            unselectedIconColor = formAccent,
+                                            selectedTextColor = customBlue
                                         ),
                                         icon = {
                                             Icon(

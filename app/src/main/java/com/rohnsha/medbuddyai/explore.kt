@@ -2,6 +2,8 @@ package com.rohnsha.medbuddyai
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.HistoryToggleOff
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BrunchDining
 import androidx.compose.material.icons.outlined.CalendarViewDay
@@ -43,6 +45,7 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import java.time.Instant
@@ -130,18 +133,19 @@ fun ExploreScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            items(lastScans){data ->
+
+            items(lastScans.take(n = 3)){data ->
                 DataListFull(
                     title = data.title,
-                    subtitle = "from Practo",
-                    data = "300+",
+                    subtitle = data.domain,
+                    data = data.domain,
                     additionData = data.timestamp.let {
                         val instant = Instant.ofEpochMilli(it)
                         val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())
                         formatter.format(dateTime)
                     },
-                    imageVector = Icons.Filled.MedicalServices,
+                    imageVector = Icons.Filled.HistoryToggleOff,
                     colorLogo = Color.White,
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
@@ -149,6 +153,24 @@ fun ExploreScreen(
                         Log.d("logStatus", "clicked")
                     }
                 )
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "View More",
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600),
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 14.dp, bottom = 21.dp)
+                            .clickable {
+                            },
+                        color = customBlue
+                    )
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.bottom_navbar
 
+import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,6 +15,7 @@ import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
+import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
@@ -31,9 +33,16 @@ fun bottomNavGraph(
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
+    val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
 
     LaunchedEffect(key1 = true){
         scanHistoryviewModel.readScanHistory()
+    }
+
+    LaunchedEffect(key1 = true){
+        Log.d("dbStatus", "Starting VM")
+        diseaseDBviewModel.addDiseaseData()
+        Log.d("dbStatus", "Ending VM")
     }
 
     NavHost(
