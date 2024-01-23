@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.DermBuddyAI.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">#111D30</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/avd_anim</item>
-        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="windowSplashScreenBackground">#F4F5FA</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/avd_splash_day</item>
+        <item name="windowSplashScreenAnimationDuration">1500</item>
         <item name="postSplashScreenTheme">@style/Theme.DermBuddyAI</item>
     </style>
 </resources>
