@@ -14,9 +14,9 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_logo"
+        android:icon="@mipmap/ic_sw_logo"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_logo"
+        android:roundIcon="@mipmap/ic_sw_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.DermBuddyAI.Splash"
         tools:targetApi="31">

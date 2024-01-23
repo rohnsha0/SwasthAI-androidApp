@@ -1,9 +1,13 @@
 package com.rohnsha.medbuddyai.bottom_navbar
 
+import android.content.Context
+import android.content.pm.PackageInfo
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -22,26 +26,31 @@ import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.mAIScreen
+import kotlinx.coroutines.delay
 
 @Composable
 fun bottomNavGraph(
     navController: NavHostController,
     padding: PaddingValues,
-    snackBarVM: snackBarToggleVM
+    snackBarVM: snackBarToggleVM,
+    packageInfo: PackageInfo,
 ) {
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
+    val context: Context= LocalContext.current
 
     LaunchedEffect(key1 = true){
         scanHistoryviewModel.readScanHistory()
     }
 
+    Log.d("dbStatus", "state: ${diseaseDBviewModel.updatingDiseaseDB.collectAsState().value}")
     LaunchedEffect(key1 = true){
         Log.d("dbStatus", "Starting VM")
-        diseaseDBviewModel.addDiseaseData()
+        delay(750L)
+        diseaseDBviewModel.fetchUpdatedDB(versionName = packageInfo.versionName, context = context)
         Log.d("dbStatus", "Ending VM")
     }
 

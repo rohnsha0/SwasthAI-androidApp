@@ -111,10 +111,13 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                 ) { paddingValues ->
+                    Log.d("dbStatus", "package name: ${this.packageName}")
+                    Log.d("dbStatus", "version name: ${packageManager.getPackageInfo(this.packageName, 0).versionName}")
                     bottomNavGraph(
                         navController = navcontroller,
                         padding = paddingValues,
-                        snackBarVM = snackBarToggle
+                        snackBarVM = snackBarToggle,
+                        packageInfo = packageManager.getPackageInfo(this.packageName, 0)
                     )
                     Log.d("snackbarState", snackBarToggle.readyToSendToast.collectAsState().value.toString())
                     isLoadingCompleted=true
