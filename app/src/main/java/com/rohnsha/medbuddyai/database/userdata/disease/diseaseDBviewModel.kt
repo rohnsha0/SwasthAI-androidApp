@@ -59,8 +59,9 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private suspend fun addDiseaseData(
         onCompleteLambda: () -> Unit
     ){
-
+        Log.d("dbStatus", "entering fetchDIsease()")
         fetchDiseaseData()
+        Log.d("dbStatus", "done fetchDIsease()")
         if (_dataList.value.isNotEmpty()){
             for (data in _dataList.value){
                 Log.d("dbStatus", "attempting to add entries")
@@ -68,30 +69,44 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                 Log.d("dbStatus", "entries added succesfully")
                 onCompleteLambda()
             }
-        } else{
+        } else {
             Log.d("dbStatus", "entries found")
         }
     }
 
     private suspend fun fetchDiseaseData(){
         val list= mutableListOf<disease_data_dataClass>()
-        val dataInstance= Firebase.firestore.collection("lung")
-        for (data in dataInstance.get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
-            list.add(
-                disease_data_dataClass(
-                    symptoms = data?.get("symptoms") as String,
-                    model_accuracy = data["model_accuracy"] as String,
-                    model_version = data["model_version"] as String,
-                    thresholds = data["thresholds"] as String,
-                    domain = data["domain"] as String,
-                    cover_link = data["cover_link"] as String,
-                    disease_name = data["disease_name"] as String,
-                    cure = data["cure"] as String,
-                    cure_cycle = data["cure_cycle"] as String,
-                    introduction = data["introduction"] as String
+        try {
+            val dataInstance= Firebase.firestore.collection("lung")
+            for (data in dataInstance.get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+                list.add(
+                    disease_data_dataClass(
+                        symptoms = data?.get("symptoms") as String,
+                        model_accuracy = data["model_accuracy"] as String,
+                        model_version = data["model_version"] as String,
+                        thresholds = data["thresholds"] as String,
+                        domain = data["domain"] as String,
+                        cover_link = data["cover_link"] as String,
+                        disease_name = data["disease_name"] as String,
+                        cure = data["cure"] as String,
+                        cure_cycle = data["cure_cycle"] as String,
+                        introduction = data["introduction"] as String
+                    )
                 )
+            }
+            Log.d("dbStatus", "list: $list")
+            if (list.isEmpty()){
+                notificanService.showNotification(
+                    "Database Update Failed",
+                    "A database update was triggered but failed unintentionally. We will try again later!"
+                )
+            }
+            _dataList.value= list
+        } catch (e: Exception){
+            notificanService.showNotification(
+                "error occured",
+                "tap to know more"
             )
         }
-        _dataList.value= list
     }
 }

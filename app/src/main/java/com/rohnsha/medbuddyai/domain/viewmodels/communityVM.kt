@@ -130,11 +130,15 @@ class communityVM: ViewModel() {
 
     fun loginUser(){
         viewModelScope.launch {
-            if (_auth.currentUser==null){
-                _auth.signInWithEmailAndPassword("test@test.com", "test123456789").await()
-                Log.d("auth", "auth unsuccessfull")
-            } else{
-                Log.d("auth", "auth successfull")
+            try {
+                if (_auth.currentUser==null){
+                    _auth.signInWithEmailAndPassword("test@test.com", "test123456789").await()
+                    Log.d("auth", "auth unsuccessfull")
+                } else{
+                    Log.d("auth", "auth successfull")
+                }
+            } catch (_: Exception){
+
             }
         }
     }

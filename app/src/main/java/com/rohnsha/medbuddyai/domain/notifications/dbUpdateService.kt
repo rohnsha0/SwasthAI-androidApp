@@ -20,11 +20,14 @@ class dbUpdateService(
         PendingIntent.FLAG_IMMUTABLE
     )
 
-    fun showNotification(title: String, message: String){
+    fun showNotification(title: String, message: String, smallIcon: Int= R.drawable.notific_icon){
         val notification= NotificationCompat.Builder(context, dbUPDATEchannelName)
-            .setSmallIcon(R.drawable.notific_icon)
+            .setSmallIcon(smallIcon)
             .setContentTitle(title)
             .setContentText(message)
+            .setStyle(
+                if (message.length >= 45) NotificationCompat.BigTextStyle().bigText(message) else null
+            )
             .setContentIntent(pendingIntent)
             .build()
         notificationManager.notify(1, notification)
