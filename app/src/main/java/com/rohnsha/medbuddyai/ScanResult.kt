@@ -82,6 +82,7 @@ import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.dashBG
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
@@ -148,7 +149,7 @@ fun ScanResultScreen(
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = remember {
-                                    disease_results.value.domain
+                                    disease_results.value.domain.toString()
                                 },
                                 fontFamily = fontFamily,
                                 color = lightTextAccent,
@@ -211,8 +212,14 @@ fun ScanResultScreen(
         val scope= rememberCoroutineScope()
         if (!isStillLoading){
             if (isNormal){
+                Column {
+                    Text(text = "isNormal")
+                }
                 Log.d("loggingStatus", "normal")
             } else if (isErrored){
+                Column {
+                    Text(text = "isErrrored")
+                }
                 Log.d("loggingStatus", "errored")
             } else {
                 ScanResultsSuccess(padding = padding, values = values)
@@ -313,7 +320,7 @@ fun ScanResultsSuccess(
         scanHistoryVM.addScanHistory(scanHistory(
             timestamp = System.currentTimeMillis(),
             title = disease_results.value.disease_name,
-            domain = disease_results.value.domain
+            domain = disease_results.value.domain.toString()
         ))
     }
     LazyColumn(
@@ -332,11 +339,15 @@ fun ScanResultsSuccess(
                 Box(
                     modifier = Modifier
                 ){
+                    val color= remember {
+                        mutableStateOf(Color.Transparent)
+                    }
                     val painter= rememberAsyncImagePainter(
                         model = disease_results.value.cover_link,
                         onError = {
+                            color.value= customRed.copy(alpha = .25f)
                             Log.e("coil", "error response: ${it.painter}, ${it.result}")
-                        }
+                        },
                     )
                     Image(
                         painter = painter,
@@ -346,6 +357,7 @@ fun ScanResultsSuccess(
                             .fillMaxWidth()
                             .aspectRatio(16f / 9f)
                             .clip(RoundedCornerShape(8.dp))
+                            .background(color.value)
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

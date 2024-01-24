@@ -4,12 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
+import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
@@ -23,6 +25,12 @@ class photoCaptureViewModel: ViewModel() {
         .getInstance(ContextUtill.ContextUtils.getApplicationContext() as Application)
         .create(
             classificationVM::class.java
+        )
+
+    val viewModelDiseaseDB= ViewModelProvider.AndroidViewModelFactory
+        .getInstance(ContextUtill.ContextUtils.getApplicationContext() as Application)
+        .create(
+            diseaseDBviewModel::class.java
         )
 
     private val _bitmaps = MutableStateFlow<Bitmap?>(null)
@@ -91,22 +99,30 @@ class photoCaptureViewModel: ViewModel() {
     }
 
     private suspend fun classificationData(group_number: Int){
-        val collectionName= when(group_number){
-            0 -> "lung"
-            1 -> "brain"
-            else -> "null"
-        }
-        val dataInstance= Firebase.firestore.collection(collectionName)
         try {
+            val data= mutableStateOf(disease_data_dataClass())
             sortClassifiedList()
+
+            data.value= viewModelDiseaseDB.searchDB(
+                domain = group_number.toString(),
+                indexItem = _maxIndex.value.parentIndex.toString()
+            )
+
             Log.d("maxIndex", _maxIndex.value.toString())
-            val querySnapshot=dataInstance.document(_maxIndex.value.parentIndex.toString()).get().await()
-            val data=querySnapshot.toObject<disease_data_dataClass>()
-            Log.d("classificationDataInit", querySnapshot.data.toString())
-            if (data != null) {
-                _classificationData.value= data
+            if (data.value.disease_name != "") {
+                _classificationData.value= data.value
                 _loadingBoolean.value=false
                 _reloadingBoolean.value=false
+            } else {
+                val collectionName= when(group_number){
+                    0 -> "lung"
+                    1 -> "brain"
+                    else -> "null"
+                }
+                val dataInstance= Firebase.firestore.collection(collectionName)
+                val querySnapshot=dataInstance.document(_maxIndex.value.parentIndex.toString()).get().await()
+                data.value= querySnapshot.toObject<disease_data_dataClass>()!!
+                Log.d("classificationDataInit", querySnapshot.data.toString())
             }
         } catch (e: Exception){
             Log.e("classificationError", e.message.toString())

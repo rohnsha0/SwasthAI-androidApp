@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "05eb727593fc4649e1538c73f55bb5b2",
+    "identityHash": "fb9cf80f3a604dceb98ba634e890c9c7",
     "entities": [
       {
         "tableName": "scan_history",
@@ -70,7 +70,7 @@
       },
       {
         "tableName": "disease_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cure` TEXT NOT NULL, `cure_cycle` TEXT NOT NULL, `disease_name` TEXT NOT NULL, `domain` TEXT NOT NULL, `introduction` TEXT NOT NULL, `symptoms` TEXT NOT NULL, `thresholds` TEXT NOT NULL, `cover_link` TEXT NOT NULL, `model_version` TEXT NOT NULL, `model_accuracy` TEXT NOT NULL, PRIMARY KEY(`disease_name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cure` TEXT NOT NULL, `cure_cycle` TEXT NOT NULL, `disease_name` TEXT NOT NULL, `domain` TEXT NOT NULL, `diseaseIndex` TEXT NOT NULL, `introduction` TEXT NOT NULL, `symptoms` TEXT NOT NULL, `thresholds` TEXT NOT NULL, `cover_link` TEXT NOT NULL, `model_version` TEXT NOT NULL, `model_accuracy` TEXT NOT NULL, PRIMARY KEY(`disease_name`))",
         "fields": [
           {
             "fieldPath": "cure",
@@ -93,6 +93,12 @@
           {
             "fieldPath": "domain",
             "columnName": "domain",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "diseaseIndex",
+            "columnName": "diseaseIndex",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -146,7 +152,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '05eb727593fc4649e1538c73f55bb5b2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fb9cf80f3a604dceb98ba634e890c9c7')"
     ]
   }
 }

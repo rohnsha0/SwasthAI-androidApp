@@ -3,6 +3,7 @@ package com.rohnsha.medbuddyai.database.userdata.disease
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
+import androidx.room.Query
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 
 @Dao
@@ -10,5 +11,8 @@ interface diseaseDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addDiseaseData(diseaseDataDataclass: disease_data_dataClass)
+
+    @Query("SELECT * FROM disease_data WHERE domain LIKE :domain AND diseaseIndex LIKE :indexItem")
+    suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass
 
 }

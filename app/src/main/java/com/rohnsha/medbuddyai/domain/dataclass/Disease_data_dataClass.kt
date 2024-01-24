@@ -10,6 +10,7 @@ data class disease_data_dataClass(
     @PrimaryKey(autoGenerate = false)
     val disease_name: String="",
     val domain: String="",
+    val diseaseIndex: String="",
     val introduction: String="",
     val symptoms: String="",
     val thresholds: String="",

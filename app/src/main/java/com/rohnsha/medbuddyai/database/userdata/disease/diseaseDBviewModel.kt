@@ -31,6 +31,10 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         diseaseRepo= diseaseRepo(diseaseDAO)
     }
 
+    suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
+        return diseaseRepo.searchDB(domain, indexItem)
+    }
+
     suspend fun fetchUpdatedDB(versionName: String, context: Context){
         _processUpdatingDB.value= true
         val sharedPreferences= context.getSharedPreferences("packageVersionName", Context.MODE_PRIVATE)
@@ -78,7 +82,9 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         val list= mutableListOf<disease_data_dataClass>()
         try {
             val dataInstance= Firebase.firestore.collection("lung")
+            //Log.d("dbStatus", dataInstance.get().await().documents.toString())
             for (data in dataInstance.get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+                Log.d("dbStatus", data.toString())
                 list.add(
                     disease_data_dataClass(
                         symptoms = data?.get("symptoms") as String,
@@ -86,6 +92,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                         model_version = data["model_version"] as String,
                         thresholds = data["thresholds"] as String,
                         domain = data["domain"] as String,
+                        diseaseIndex = data["diseaseIndex"] as String,
                         cover_link = data["cover_link"] as String,
                         disease_name = data["disease_name"] as String,
                         cure = data["cure"] as String,
@@ -103,6 +110,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             }
             _dataList.value= list
         } catch (e: Exception){
+            Log.d("dbStatus", e.toString())
             notificanService.showNotification(
                 "error occured",
                 "tap to know more"

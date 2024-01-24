@@ -8,4 +8,8 @@ class diseaseRepo(private val diseaseDAO: diseaseDAO) {
         diseaseDAO.addDiseaseData(diseaseDataDataclass)
     }
 
+    suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
+        return diseaseDAO.searchDB(domain, indexItem)
+    }
+
 }
