@@ -6,8 +6,10 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.database.userdata.userDataDB
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
+import com.rohnsha.medbuddyai.domain.notifications.dbUpdateService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
@@ -18,6 +20,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val diseaseDAO: diseaseDAO
 
     private val _dataList= MutableStateFlow<List<disease_data_dataClass>>(emptyList())
+    val notificanService= dbUpdateService(ContextUtill.ContextUtils.getApplicationContext())
 
     private val _processUpdatingDB= MutableStateFlow(false)
     val updatingDiseaseDB= _processUpdatingDB.asStateFlow()
@@ -37,6 +40,10 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             try {
                 addDiseaseData {
                     sharedPreferences.edit().putString("packageVersionName", versionName).apply()
+                    notificanService.showNotification(
+                        title = "Database Updated Successfully",
+                        message = "If you want to update it again then head to preferences"
+                    )
                     _processUpdatingDB.value= false
                 }
             } catch (e: Exception){
