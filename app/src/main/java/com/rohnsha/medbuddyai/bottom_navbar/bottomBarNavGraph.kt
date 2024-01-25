@@ -17,6 +17,7 @@ import com.rohnsha.medbuddyai.CommunityScreen
 import com.rohnsha.medbuddyai.ExploreScreen
 import com.rohnsha.medbuddyai.HomeScreen
 import com.rohnsha.medbuddyai.MoreScreen
+import com.rohnsha.medbuddyai.ScanCategoryScreen
 import com.rohnsha.medbuddyai.ScanResultScreen
 import com.rohnsha.medbuddyai.ScanScreen
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
@@ -86,6 +87,13 @@ fun bottomNavGraph(
                 navController = navController,
                 photoCaptureVM = savePhotoViewModel,
                 classifierVM = classifierVM
+            )
+        }
+
+        composable(route = bottomNavItems.ScanCategory.route){
+            ScanCategoryScreen(
+                padding = padding,
+                navController
             )
         }
 

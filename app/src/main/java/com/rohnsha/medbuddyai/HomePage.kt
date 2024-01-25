@@ -312,7 +312,7 @@ fun explore_home(
                 icon = Icons.Outlined.CameraAlt,
                 weight = .4f,
                 navController = navController,
-                route = bottomNavItems.Scan.route
+                route = bottomNavItems.ScanCategory.route
             )
             Spacer(modifier = Modifier.width(12.dp))
             explore_tabs(
