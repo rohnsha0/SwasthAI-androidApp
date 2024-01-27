@@ -7,7 +7,8 @@ import android.util.Log
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.ml.ModelImgClf
+import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
+import com.rohnsha.medbuddyai.ml.XrayClfV1
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
 import org.tensorflow.lite.support.image.TensorImage
@@ -17,6 +18,7 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 class analyzer(
     private val context: Context,
     private val onResults: (classification) -> Unit,
+    private val index: Int
 ): ImageAnalysis.Analyzer {
 
     private var frameSkipCounter= 0
@@ -35,17 +37,19 @@ class analyzer(
                 matrix,
                 true
             )
-            val model= ModelImgClf.newInstance(context)
             var tensorImage= TensorImage(DataType.FLOAT32)
             tensorImage.load(rotatedBitmap)
-            var imageProcessor= ImageProcessor.Builder()
+            val imageProcessor= ImageProcessor.Builder()
                 .add(ResizeOp(256, 256, ResizeOp.ResizeMethod.BILINEAR))
                 .build()
             tensorImage= imageProcessor.process(tensorImage)
             val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
             inputFeature0.loadBuffer(tensorImage.buffer)
-            val outputs= model.process(inputFeature0)
-            val outputFeature0 =outputs.outputFeature0AsTensorBuffer
+            val outputFeature0 = when(index){
+                0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            }
             val results= classification(
                 getMaxIndex(outputFeature0.floatArray), outputFeature0.floatArray[getMaxIndex(
                 outputFeature0.floatArray

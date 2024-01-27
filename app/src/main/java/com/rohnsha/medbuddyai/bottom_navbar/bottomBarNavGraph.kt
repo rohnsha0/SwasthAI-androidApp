@@ -10,8 +10,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.rohnsha.medbuddyai.BMIScreen
 import com.rohnsha.medbuddyai.CommunityScreen
 import com.rohnsha.medbuddyai.ExploreScreen
@@ -81,12 +83,20 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding)
         }
-        composable(route = bottomNavItems.Scan.route){
+        composable(
+            route = bottomNavItems.Scan.route,
+            arguments = listOf(
+                navArgument(scanIndexKey){
+                    type= NavType.IntType
+                }
+            )
+        ){
             ScanScreen(
                 padding = padding,
                 navController = navController,
                 photoCaptureVM = savePhotoViewModel,
-                classifierVM = classifierVM
+                classifierVM = classifierVM,
+                index = it.arguments!!.getInt(scanIndexKey)
             )
         }
 

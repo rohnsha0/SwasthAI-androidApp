@@ -111,7 +111,8 @@ fun ScanScreen(
     padding: PaddingValues,
     navController: NavHostController,
     photoCaptureVM: photoCaptureViewModel,
-    classifierVM: classificationVM
+    classifierVM: classificationVM,
+    index: Int
 ) {
     viewModelPhotoSave= photoCaptureVM
     viewModelClassification= classifierVM
@@ -182,7 +183,8 @@ fun ScanScreen(
         ) {
             //ScanOptions()
             ScanMainScreen(
-                navController
+                navController,
+                index
             )
         }
     }
@@ -384,7 +386,8 @@ private fun takePhoto(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanMainScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    index: Int
 ) {
     val conttext= LocalContext.current
     var itt= classification(0, 6f)
@@ -397,7 +400,8 @@ fun ScanMainScreen(
             context = conttext,
             onResults = {
                 detecteddClassification.value= it.indexNumber
-            }
+            },
+            index = index
         )
     }
     val controller= remember {

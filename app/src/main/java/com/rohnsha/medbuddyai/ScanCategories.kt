@@ -137,7 +137,7 @@ fun ScanCategoryScreen(
                     title = it.modelName,
                     subtitle = it.modelVersion,
                     colorLogo = Color.White,
-                    onClickListener = { navController.navigate(bottomNavItems.Scan.route) },
+                    onClickListener = { navController.navigate(route = bottomNavItems.Scan.returnScanIndex(0)) },
                     description = it.description,
                     isCancerous = it.isCancerous
                 )
@@ -158,7 +158,7 @@ fun ScanCategoryScreen(
                     title = it.modelName,
                     subtitle = it.modelVersion,
                     colorLogo = Color.White,
-                    onClickListener = { navController.navigate(bottomNavItems.Scan.route) },
+                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
                     description = it.description,
                     isCancerous = it.isCancerous
                 )

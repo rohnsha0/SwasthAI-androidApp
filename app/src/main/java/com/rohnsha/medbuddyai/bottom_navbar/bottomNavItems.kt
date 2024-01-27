@@ -13,6 +13,8 @@ import androidx.compose.material.icons.outlined.Forum
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
+const val scanIndexKey= "indexScan"
+
 sealed class bottomNavItems(
     val title: String,
     val route: String,
@@ -38,12 +40,18 @@ sealed class bottomNavItems(
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
 
+
+
     object Scan: bottomNavItems(
         title = "scan",
-        route = "scan",
+        route = "scan/{$scanIndexKey}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
-    )
+    ){
+        fun returnScanIndex(index: Int): String{
+            return this.route.replace(oldValue = "{$scanIndexKey}", newValue = index.toString())
+        }
+    }
 
     object ScanCategory: bottomNavItems(
         title = "scanCategory",
