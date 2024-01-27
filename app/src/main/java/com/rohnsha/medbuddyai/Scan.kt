@@ -181,7 +181,6 @@ fun ScanScreen(
                 .padding(top = 20.dp)
                 .fillMaxSize()
         ) {
-            //ScanOptions()
             ScanMainScreen(
                 navController,
                 index
@@ -394,6 +393,19 @@ fun ScanMainScreen(
     val detecteddClassification= remember {
         mutableStateOf(itt.indexNumber)
     }
+    Log.d("classificationCLassifier", detecteddClassification.value.toString())
+   val errorText= remember {
+       mutableStateOf(
+           if (detecteddClassification.value==0){
+               "Works best with ${when(index){
+                   0 -> "chest xray"
+                   else -> "brain mri"
+               }}"
+           } else {
+               "Perfect"
+           }
+       )
+   }
     val scope= rememberCoroutineScope()
     val analyzer= remember {
         analyzer(
@@ -416,10 +428,6 @@ fun ScanMainScreen(
             )
         }
     }
-    val listTest= listOf(
-        "Works best with XRAY/MRI Images",
-        "Perfect!",
-    )
     val isPredictingBool= remember {
         mutableStateOf(false)
     }
@@ -456,7 +464,7 @@ fun ScanMainScreen(
             )
             CameraPreviewSegmentOp(
                 title = "C1: ",
-                dataItem = listTest[detecteddClassification.value]
+                dataItem = errorText.value
             )
         }
         Spacer(modifier = Modifier.weight(1f))
@@ -540,9 +548,20 @@ fun ScanMainScreen(
                         bitmap.value= source?.let { it1 -> ImageDecoder.decodeBitmap(it1) }
                     }
                     val convertedBitmap= bitmap.value?.copy(Bitmap.Config.ARGB_8888, false)
-                    convertedBitmap?.let {
-                        it1 -> viewModelPhotoSave.onTakePhoto(it1)
+                    convertedBitmap?.let { it1 ->
+                        viewModelPhotoSave.onTakePhoto(it1)
                         isConfirming.value= true
+                        errorText.value= if (viewModelClassification.classify(
+                                context = conttext,
+                                it1,
+                                5, index = index)[0].indexNumber==0){
+                            "Works best with ${when(index){
+                                0 -> "chest xray"
+                                else -> "brain mri"
+                            }}"
+                        } else {
+                            "Perfect"
+                        }
                     }
                 }
                 Image(
@@ -626,7 +645,7 @@ fun CameraPreviewSegmentOp(
             fontFamily = fontFamily
         )
         Text(
-            text = if (!isConfirming.value) dataItem else "COnfirm and proceed",//listTest[detecteddClassification.value],
+            text = dataItem,
             fontFamily = fontFamily,
             fontWeight = FontWeight(600),
             fontSize = 14.sp
@@ -692,8 +711,4 @@ fun CameraControlsItem(
             )
         }
     }
-}
-
-private fun importFromGallery(){
-
 }

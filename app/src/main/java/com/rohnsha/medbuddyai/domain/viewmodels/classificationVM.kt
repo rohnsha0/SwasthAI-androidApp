@@ -6,9 +6,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.ml.ModelImgClf
+import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
+import com.rohnsha.medbuddyai.ml.XrayClfV1
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -22,6 +23,7 @@ class classificationVM: ViewModel() {
         context: Context,
         bitmap: Bitmap,
         scanOption: Int,
+        index: Int=0
     ): List<classification> {
         var predictedClasses:List<classification> = emptyList()
 
@@ -43,6 +45,7 @@ class classificationVM: ViewModel() {
             5 -> { predictedClasses= predictionMaster(
                 context = context,
                 inputFeature0 = inputFeature0,
+                index = index
             )}
         }
 
@@ -52,12 +55,16 @@ class classificationVM: ViewModel() {
 
     fun predictionMaster(
         inputFeature0: TensorBuffer,
-        context: Context
+        context: Context,
+        index: Int
     ): List<classification> {
         val predictedClassesLungs= mutableListOf<classification>()
 
-        val modelPneumonia= ModelImgClf.newInstance(context)
-        val outputPneumonia= modelPneumonia.process(inputFeature0).outputFeature0AsTensorBuffer
+        val outputPneumonia= when(index){
+            0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+        }
         val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)
         predictedClassesLungs.add(
             classification(
