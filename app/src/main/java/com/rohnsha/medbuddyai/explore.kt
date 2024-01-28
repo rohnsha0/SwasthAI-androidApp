@@ -18,15 +18,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.HistoryToggleOff
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.BrunchDining
 import androidx.compose.material.icons.outlined.CalendarViewDay
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Grain
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.SentimentDissatisfied
-import androidx.compose.material.icons.outlined.SyncLock
-import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -227,17 +224,6 @@ fun ExploreSelfAware(
             )
         }
         Spacer(modifier = Modifier.height(6.dp))
-        DataListFull(
-            title = "Import medical history",
-            subtitle = "improves diagnosis",
-            imageVector = Icons.Outlined.FileDownload,
-            colorLogo = Color.White,
-            additionalDataColor = lightTextAccent,
-            colorLogoTint = Color.Black,
-            onClickListener = {
-                Log.d("logStatus", "clicked")
-            }
-        )
     }
 }
 
@@ -283,17 +269,6 @@ fun ExploreWellbeing(
             }
         )
         DataListFull(
-            title = "Intermittent Fasting",
-            subtitle = "lose weight",
-            imageVector = Icons.Outlined.SyncLock,
-            colorLogo = Color.White,
-            additionalDataColor = lightTextAccent,
-            colorLogoTint = Color.Black,
-            onClickListener = {
-                Log.d("logStatus", "clicked")
-            }
-        )
-        DataListFull(
             title = "Diet Plan",
             subtitle = "that suits you best",
             imageVector = Icons.Outlined.BrunchDining,
@@ -321,10 +296,9 @@ fun explore_tools(
         explore_home(navController = navController)
         Spacer(modifier = Modifier.height(6.dp))
         DataListFull(
-            title = "Water Tracker",
-            subtitle = "track consumed water",
-            imageVector = Icons.Outlined.WaterDrop,
-            actionIcon = Icons.Outlined.Add,
+            title = "Import medical history",
+            subtitle = "improves diagnosis",
+            imageVector = Icons.Outlined.FileDownload,
             colorLogo = Color.White,
             additionalDataColor = lightTextAccent,
             colorLogoTint = Color.Black,
