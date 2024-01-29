@@ -122,7 +122,7 @@ fun ScanResultScreen(
     disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
     Log.d("dataSwitch", photoCaptureViewModel.classificationData.collectAsState().value.toString())
     Log.d("dataSwitchVariable", photoCaptureViewModel.classificationData.collectAsState().value.toString())
-    otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0)
+    otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0, isMaxIndex = false)
     Log.d("confidenceMax",
         otherDiseaseData.toString()
     )
@@ -460,6 +460,10 @@ fun ScanResultsSuccess(
 
 @Composable
 fun ClassificationConf() {
+    val modelData= photoCaptureViewModel.getDiseaseVersionData(
+        isMaxIndex = true, group_number = 0
+    )
+    Log.d("modelAccuracy", modelData[0].toString())
     Row(
         modifier = Modifier
             .height(60.dp)
@@ -475,7 +479,7 @@ fun ClassificationConf() {
         ) {
             Text(
                 modifier = Modifier,
-                text = "${disease_results.value.model_accuracy}%",
+                text = "${String.format("%.2f", modelData[0].modelAccuracy)}%",
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 fontWeight = FontWeight(600)
@@ -496,7 +500,7 @@ fun ClassificationConf() {
         ) {
             Text(
                 modifier = Modifier,
-                text = disease_results.value.model_version,
+                text = modelData[0].version,
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 fontWeight = FontWeight(600)
@@ -518,7 +522,7 @@ fun ClassificationConf() {
         ) {
             Text(
                 modifier = Modifier,
-                text = "${String.format("%.2f", photoCaptureViewModel.maxIndex.collectAsState().value.confident)}%",
+                text = "${String.format("%.2f", modelData[0].confidence)}%",
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 fontWeight = FontWeight(600)

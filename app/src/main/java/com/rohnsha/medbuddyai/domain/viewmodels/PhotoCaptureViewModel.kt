@@ -148,13 +148,25 @@ class photoCaptureViewModel: ViewModel() {
 
     fun getDiseaseVersionData(
         group_number: Int,
+        isMaxIndex: Boolean
     ): List<disease_version> {
         val reqList: MutableList<disease_version> = mutableListOf()
         val lungs= listOf(
-            disease_version("Pneumonia", "V2023.04.30"),
-            disease_version("Tuberculosis", "V2023.11.14"),
-            disease_version("Testimonia", "V2023.08.21")
+            disease_version("Pneumonia", "V2023.04.30", modelAccuracy = 97.70),
+            disease_version("Tuberculosis", "V2023.11.14", modelAccuracy = 97.60),
         )
+        if (isMaxIndex){
+            when(group_number){
+                0 -> {
+                    reqList.add(
+                        disease_version(
+                        lungs[_maxIndex.value.parentIndex!!].disease_name, lungs[_maxIndex.value.parentIndex!!].version,
+                            _maxIndex.value.confident, modelAccuracy = lungs[_maxIndex.value.parentIndex!!].modelAccuracy
+                    ))
+                }
+            }
+            return reqList
+        }
         _notMaxElements.value.forEach { classification ->
             when(group_number){
                 0-> {
