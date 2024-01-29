@@ -114,6 +114,7 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 scanHistoryViewModel = scanHistoryviewModel,
+                diseaseDBviewModel
             )
         }
 
@@ -134,12 +135,19 @@ fun bottomNavGraph(
 
         composable(
             route = bottomNavItems.ScanResult.route,
+            arguments = listOf(
+                navArgument(scanResultKey){
+                    type= NavType.IntType
+                }
+            )
         ){
             ScanResultScreen(
                 padding = padding,
                 navController = navController,
                 viewModel = savePhotoViewModel,
-                scanHistoryViewModel = scanHistoryviewModel
+                scanHistoryViewModel = scanHistoryviewModel,
+                diseaseDBviewModel = diseaseDBviewModel,
+                resultsLevel = it.arguments!!.getInt(scanResultKey)
             )
         }
     }

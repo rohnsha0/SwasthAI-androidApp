@@ -12,6 +12,6 @@ interface scanHistoryDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addScanHistory(scanHistory: scanHistory)
 
-    @Query("SELECT * FROM scan_history ORDER BY timestamp ASC")
+    @Query("SELECT * FROM scan_history ORDER BY timestamp DESC")
     fun readScanHistory(): Flow<List<scanHistory>>
 }

@@ -12,4 +12,8 @@ class diseaseRepo(private val diseaseDAO: diseaseDAO) {
         return diseaseDAO.searchDB(domain, indexItem)
     }
 
+    suspend fun searchDBbyName(name: String): disease_data_dataClass{
+        return diseaseDAO.searchDBbyName(name)
+    }
+
 }

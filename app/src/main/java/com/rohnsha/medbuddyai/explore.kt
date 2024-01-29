@@ -19,11 +19,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.HistoryToggleOff
 import androidx.compose.material.icons.outlined.BrunchDining
-import androidx.compose.material.icons.outlined.CalendarViewDay
 import androidx.compose.material.icons.outlined.FileDownload
 import androidx.compose.material.icons.outlined.Grain
 import androidx.compose.material.icons.outlined.MedicalInformation
-import androidx.compose.material.icons.outlined.SentimentDissatisfied
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -40,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -57,6 +56,7 @@ fun ExploreScreen(
     padding: PaddingValues,
     navController: NavHostController,
     scanHistoryViewModel: scanHistoryViewModel,
+    diseaseDBviewModel: diseaseDBviewModel
 ) {
     Scaffold(
         topBar = {
@@ -147,6 +147,9 @@ fun ExploreScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
+                        diseaseDBviewModel.inputNameToSearch(data, onCompleteLambda = {
+                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1))
+                        })
                         Log.d("logStatus", "clicked")
                     }
                 )
@@ -236,27 +239,17 @@ fun ExploreWellbeing(
             .padding(top = 16.dp)
             .fillMaxWidth()
     ) {
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .fillMaxWidth()
-        ) {
-            explore_tabs(
-                title = "Allergies",
-                icon = Icons.Outlined.SentimentDissatisfied,
-                weight = .49f,
-                navController = navController,
-                route = bottomNavItems.BMI.route
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(
-                title = "Habits",
-                icon = Icons.Outlined.CalendarViewDay,
-                weight = 1f,
-                navController = navController,
-            )
-        }
-        Spacer(modifier = Modifier.height(6.dp))
+        DataListFull(
+            title = "Suggested Actions/ Habits",
+            subtitle = "AI-based recommendations",
+            imageVector = Icons.Outlined.Grain,
+            colorLogo = Color.White,
+            additionalDataColor = lightTextAccent,
+            colorLogoTint = Color.Black,
+            onClickListener = {
+                Log.d("logStatus", "clicked")
+            }
+        )
         DataListFull(
             title = "Calorie Tracker",
             subtitle = "snap & track",

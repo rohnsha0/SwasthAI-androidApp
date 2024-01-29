@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.BlurOff
 import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ConnectWithoutContact
 import androidx.compose.material.icons.outlined.JoinLeft
@@ -74,6 +75,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
@@ -90,13 +92,20 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 import kotlin.random.Random
 
 private lateinit var disease_results: MutableState<disease_data_dataClass>
 private lateinit var photoCaptureViewModel: photoCaptureViewModel
+private lateinit var diseaseDBvm: diseaseDBviewModel
 private lateinit var scanHistoryVM: scanHistoryViewModel
 private lateinit var otherDiseaseData: List<disease_version>
 private lateinit var modalState : MutableState<Boolean>
+private var isStillLoading by Delegates.notNull<Boolean>()
+private var isNormal by Delegates.notNull<Boolean>()
+private var isErrored by Delegates.notNull<Boolean>()
+private var mode by Delegates.notNull<Int>()
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScanResultScreen(
@@ -104,28 +113,42 @@ fun ScanResultScreen(
     viewModel: photoCaptureViewModel,
     navController: NavController,
     scanHistoryViewModel: scanHistoryViewModel,
-    resultsLevel: Int=0 // 0-> Scan, 1-> Scan History, 2-> Read Only
+    resultsLevel: Int=1, // 0-> Scan, 1-> Scan History, 2-> Read Only,
+    diseaseDBviewModel: diseaseDBviewModel
 ) {
     photoCaptureViewModel= viewModel
+    diseaseDBvm= diseaseDBviewModel
+    mode= resultsLevel
     scanHistoryVM= scanHistoryViewModel
-    var isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
-    val isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
-    val isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
     val context= LocalContext.current
-    LaunchedEffect(key1 = true){
-        delay(500L)
-        photoCaptureViewModel.onClassify(context, 0)
-    }
     disease_results= remember {
         mutableStateOf(disease_data_dataClass())
     }
-    disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
-    Log.d("dataSwitch", photoCaptureViewModel.classificationData.collectAsState().value.toString())
-    Log.d("dataSwitchVariable", photoCaptureViewModel.classificationData.collectAsState().value.toString())
-    otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0, isMaxIndex = false)
-    Log.d("confidenceMax",
-        otherDiseaseData.toString()
-    )
+    when(resultsLevel){
+        0 -> {
+            isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
+            isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
+            isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
+            LaunchedEffect(key1 = true){
+                delay(500L)
+                photoCaptureViewModel.onClassify(context, 0)
+            }
+            disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
+            otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0, isMaxIndex = false)
+        }
+        1 -> {
+            isStillLoading= diseaseDBviewModel.isLoadingBoolean.collectAsState().value
+            isNormal=false
+            isErrored= diseaseDBviewModel.isErroredBoolean.collectAsState().value
+            LaunchedEffect(key1 = Unit){
+                delay(500L)
+                diseaseDBviewModel.searchByName()
+            }
+            disease_results.value= diseaseDBviewModel.data.collectAsState().value
+            otherDiseaseData= listOf(disease_version("", "", 0f, 01.0))
+        }
+    }
+
     modalState= rememberSaveable {
         mutableStateOf(false)
     }
@@ -141,7 +164,7 @@ fun ScanResultScreen(
                             verticalAlignment = Alignment.Bottom
                         ) {
                             Text(
-                                text = viewModel.classificationData.collectAsState().value.disease_name,
+                                text = disease_results.value.disease_name,
                                 fontFamily = fontFamily,
                                 fontWeight = FontWeight(600),
                                 fontSize = 26.sp,
@@ -316,12 +339,16 @@ fun ScanResultsSuccess(
     padding: PaddingValues,
     values: PaddingValues,
 ) {
-    LaunchedEffect(key1 = disease_results.value){
-        scanHistoryVM.addScanHistory(scanHistory(
-            timestamp = System.currentTimeMillis(),
-            title = disease_results.value.disease_name,
-            domain = disease_results.value.domain.toString()
-        ))
+    val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
+    if (mode==0){
+        LaunchedEffect(key1 = disease_results.value){
+            scanHistoryVM.addScanHistory(scanHistory(
+                timestamp = System.currentTimeMillis(),
+                title = disease_results.value.disease_name,
+                domain = disease_results.value.domain,
+                confidence = confidence
+            ))
+        }
     }
     LazyColumn(
         modifier = Modifier
@@ -361,7 +388,9 @@ fun ScanResultsSuccess(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                ClassificationConf()
+                if (mode==0){
+                    ClassificationConf()
+                }
             }
         }
         item {
@@ -417,19 +446,21 @@ fun ScanResultsSuccess(
                     Spacer(modifier = Modifier.height(13.dp))
                 }
             }
-            items(otherDiseaseData){ data ->
-                Column(
-                    modifier = Modifier
-                        .background(Color.White)
-                        .padding(vertical = 7.dp)
-                ) {
-                    DataListFull(
-                        title =data.disease_name,
-                        subtitle =data.version,
-                        data ="${String.format(" % .2f", data.confidence)}%",
-                        imageVector = Icons.Outlined.JoinLeft,
-                        colorLogo = dashBG
-                    ) {}
+            if (mode==0){
+                items(otherDiseaseData){ data ->
+                    Column(
+                        modifier = Modifier
+                            .background(Color.White)
+                            .padding(vertical = 7.dp)
+                    ) {
+                        DataListFull(
+                            title =data.disease_name,
+                            subtitle =data.version,
+                            data ="${String.format(" % .2f", data.confidence)}%",
+                            imageVector = Icons.Outlined.JoinLeft,
+                            colorLogo = dashBG
+                        ) {}
+                    }
                 }
             }
         }
@@ -461,7 +492,7 @@ fun ScanResultsSuccess(
 @Composable
 fun ClassificationConf() {
     val modelData= photoCaptureViewModel.getDiseaseVersionData(
-        isMaxIndex = true, group_number = 0
+        isMaxIndex = true, group_number = 0,
     )
     Log.d("modelAccuracy", modelData[0].toString())
     Row(
@@ -805,8 +836,15 @@ fun OptionScanResults() {
             onClickListener = {}
         )
         OptionsScanResultUNI(
-            title = "Domains",
-            icon = Icons.Outlined.SwitchAccessShortcut,
+            title = when(mode){
+                0 -> { "Domains" }
+                1 -> { "Recheck" }
+                else -> { "" }
+            },
+            icon = when(mode){
+                0 -> { Icons.Outlined.SwitchAccessShortcut }
+                else -> { Icons.Outlined.Camera }
+            },
             onClickListener = { modalState.value= true }
         )
     }

@@ -15,4 +15,7 @@ interface diseaseDAO {
     @Query("SELECT * FROM disease_data WHERE domain LIKE :domain AND diseaseIndex LIKE :indexItem")
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass
 
+    @Query("SELECT * FROM disease_data WHERE disease_name LIKE :name")
+    suspend fun searchDBbyName(name: String): disease_data_dataClass
+
 }

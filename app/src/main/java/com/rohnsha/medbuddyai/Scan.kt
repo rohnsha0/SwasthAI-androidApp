@@ -515,7 +515,7 @@ fun ScanMainScreen(
                                 if (branchClassification.indexNumber==0){
                                     bomError.value=true
                                 } else {
-                                    navController.navigate(bottomNavItems.ScanResult.route)
+                                    navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(0))
                                 }
                             }
                         }

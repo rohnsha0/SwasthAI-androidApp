@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "6418f451b07e93850170ec19caedb417",
+    "identityHash": "e18dc4c689609b27a3c297b770b6f100",
     "entities": [
       {
         "tableName": "scan_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `title` TEXT NOT NULL, `domain` TEXT NOT NULL, PRIMARY KEY(`timestamp`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `title` TEXT NOT NULL, `domain` TEXT NOT NULL, `confidence` REAL NOT NULL DEFAULT 0.0, PRIMARY KEY(`timestamp`))",
         "fields": [
           {
             "fieldPath": "timestamp",
@@ -25,6 +25,13 @@
             "columnName": "domain",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "confidence",
+            "columnName": "confidence",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
           }
         ],
         "primaryKey": {
@@ -140,7 +147,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6418f451b07e93850170ec19caedb417')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e18dc4c689609b27a3c297b770b6f100')"
     ]
   }
 }

@@ -7,6 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.userDataDB
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.notifications.dbUpdateService
@@ -25,6 +26,17 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val _processUpdatingDB= MutableStateFlow(false)
     val updatingDiseaseDB= _processUpdatingDB.asStateFlow()
 
+    private val _loadingBoolean= MutableStateFlow(true)
+    val isLoadingBoolean= _loadingBoolean.asStateFlow()
+
+    private val _erroredBoolean = MutableStateFlow(false)
+    val isErroredBoolean = _erroredBoolean.asStateFlow()
+
+    private val _dataLoaded= MutableStateFlow(disease_data_dataClass())
+    val data= _dataLoaded.asStateFlow()
+
+    private val _dataCached= MutableStateFlow(scanHistory(0L, "", "", 0f))
+    val dataCached= _dataCached.asStateFlow()
 
     init {
         diseaseDAO= userDataDB.getUserDBRefence(application).diseaseDAO()
@@ -33,6 +45,23 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
 
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
         return diseaseRepo.searchDB(domain, indexItem)
+    }
+
+    fun inputNameToSearch(dataCached: scanHistory, onCompleteLambda: () -> Unit){
+        _dataCached.value= dataCached
+        onCompleteLambda()
+    }
+
+    suspend fun searchByName(){
+        if (_dataCached.value.title!=""){
+            _dataLoaded.value=diseaseRepo.searchDBbyName(_dataCached.value.title)
+            _loadingBoolean.value= false
+        }
+
+        if (_dataLoaded.value.disease_name==""){
+            _erroredBoolean.value= true
+            _loadingBoolean.value= false
+        }
     }
 
     suspend fun fetchUpdatedDB(versionName: String, context: Context){
