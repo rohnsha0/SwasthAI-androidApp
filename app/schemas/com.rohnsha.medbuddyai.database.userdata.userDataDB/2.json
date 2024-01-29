@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "fb9cf80f3a604dceb98ba634e890c9c7",
+    "identityHash": "6418f451b07e93850170ec19caedb417",
     "entities": [
       {
         "tableName": "scan_history",
@@ -70,7 +70,7 @@
       },
       {
         "tableName": "disease_data",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cure` TEXT NOT NULL, `cure_cycle` TEXT NOT NULL, `disease_name` TEXT NOT NULL, `domain` TEXT NOT NULL, `diseaseIndex` TEXT NOT NULL, `introduction` TEXT NOT NULL, `symptoms` TEXT NOT NULL, `thresholds` TEXT NOT NULL, `cover_link` TEXT NOT NULL, `model_version` TEXT NOT NULL, `model_accuracy` TEXT NOT NULL, PRIMARY KEY(`disease_name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`cure` TEXT NOT NULL, `cure_cycle` TEXT NOT NULL, `disease_name` TEXT NOT NULL, `domain` TEXT NOT NULL, `diseaseIndex` TEXT NOT NULL, `introduction` TEXT NOT NULL, `symptoms` TEXT NOT NULL, `thresholds` TEXT NOT NULL, `cover_link` TEXT NOT NULL, PRIMARY KEY(`disease_name`))",
         "fields": [
           {
             "fieldPath": "cure",
@@ -125,18 +125,6 @@
             "columnName": "cover_link",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "model_version",
-            "columnName": "model_version",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "model_accuracy",
-            "columnName": "model_accuracy",
-            "affinity": "TEXT",
-            "notNull": true
           }
         ],
         "primaryKey": {
@@ -152,7 +140,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fb9cf80f3a604dceb98ba634e890c9c7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6418f451b07e93850170ec19caedb417')"
     ]
   }
 }

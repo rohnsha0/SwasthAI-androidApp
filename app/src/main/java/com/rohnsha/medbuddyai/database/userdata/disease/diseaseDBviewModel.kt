@@ -81,15 +81,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private suspend fun fetchDiseaseData(){
         val list= mutableListOf<disease_data_dataClass>()
         try {
-            val dataInstance= Firebase.firestore.collection("lung")
-            //Log.d("dbStatus", dataInstance.get().await().documents.toString())
+            val dataInstance= Firebase.firestore.collection("diseaseData")
             for (data in dataInstance.get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
                 Log.d("dbStatus", data.toString())
                 list.add(
                     disease_data_dataClass(
                         symptoms = data?.get("symptoms") as String,
-                        model_accuracy = data["model_accuracy"] as String,
-                        model_version = data["model_version"] as String,
                         thresholds = data["thresholds"] as String,
                         domain = data["domain"] as String,
                         diseaseIndex = data["diseaseIndex"] as String,
