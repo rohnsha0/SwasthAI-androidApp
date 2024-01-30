@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -18,12 +19,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material.icons.outlined.Calculate
@@ -98,6 +101,18 @@ fun HomeScreen(
                         )
                     }
                         },
+                actions = {
+                    Image(
+                        imageVector = Icons.Outlined.AdminPanelSettings,
+                        contentDescription = "Show accuracy button",
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .size(24.dp)
+                            .clickable {
+                                navController.navigate(bottomNavItems.Preferences.route)
+                            }
+                    )
+                },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = BGMain
                 )
