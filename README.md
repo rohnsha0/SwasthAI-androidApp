@@ -1,4 +1,4 @@
-# MedBuddyAI
+# SwasthAI Android Client
 
 Welcome to SwasthAI - Your Personal Health Assistant!
 
