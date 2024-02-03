@@ -45,7 +45,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOn
-import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Collections
 import androidx.compose.material.icons.outlined.FlashAuto
@@ -53,8 +52,9 @@ import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
 import androidx.compose.material.icons.outlined.WrongLocation
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -73,7 +73,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -97,7 +96,7 @@ import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
-import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -472,7 +471,8 @@ fun ScanMainScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.White, RoundedCornerShape(16.dp))
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = 12.dp, bottom = 18.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -596,7 +596,7 @@ fun ScanMainScreen(
                             modifier = Modifier
                                 .clickable {
                                     bomError.value = false
-                                    isPredictingBool.value= false
+                                    isPredictingBool.value = false
                                 }
                                 .padding(end = 30.dp),
                             text = "Rescan",
@@ -661,6 +661,21 @@ fun CameraControlsItem(
     onClickAction: () -> Unit,
     isPredicting: Boolean= false
 ) {
+    Button(
+        onClick = { onClickAction() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = customBlue,
+            contentColor = Color.White
+        )
+    ){
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            fontWeight = FontWeight(600),
+            fontFamily = fontFamily
+        )
+    }
+    /*
     Box(
         modifier = Modifier
             .padding(vertical = 13.dp)
@@ -710,5 +725,5 @@ fun CameraControlsItem(
                 fontSize = 14.sp,
             )
         }
-    }
+    }*/
 }
