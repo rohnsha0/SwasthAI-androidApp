@@ -1,8 +1,8 @@
-# MedBuddyAI
+# SwasthAI Android Client
 
-Welcome to MedBuddyAI - Your Personal Health Assistant!
+Welcome to SwasthAI - Your Personal Health Assistant!
 
-MedBuddyAI is an Android app designed to empower users to take control of their health by providing features such as disease detection through X-rays and MRIs, importing pathological/blood reports, accessing educational content about common diseases, participating in a health-focused community, and interacting with an integrated chatbot.
+SwasthAI is an Android app designed to empower users to take control of their health by providing features such as disease detection through X-rays and MRIs, importing pathological/blood reports, accessing educational content about common diseases, participating in a health-focused community, and interacting with an integrated chatbot.
 
 ## Features
 
