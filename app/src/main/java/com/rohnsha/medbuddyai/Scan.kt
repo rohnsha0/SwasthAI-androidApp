@@ -394,17 +394,16 @@ fun ScanMainScreen(
     }
     Log.d("classificationCLassifier", detecteddClassification.value.toString())
    val errorText= remember {
-       mutableStateOf(
-           if (detecteddClassification.value==0){
-               "Works best with ${when(index){
-                   0 -> "chest xray"
-                   else -> "brain mri"
-               }}"
-           } else {
-               "Perfect"
-           }
-       )
+       mutableStateOf("")
    }
+    errorText.value= if (detecteddClassification.value==0){
+        "Works best with ${when(index){
+            0 -> "chest xray"
+            else -> "brain mri"
+        }}"
+    } else {
+        "Perfect"
+    }
     val scope= rememberCoroutineScope()
     val analyzer= remember {
         analyzer(
@@ -491,11 +490,8 @@ fun ScanMainScreen(
                     }
             )
             val bitmapImg= viewModelPhotoSave.bitmaps.collectAsState().value
-            CameraControlsItem(
-                title = if (!isConfirming.value) "Capture" else "Proceed",
-                widthPercentage = if(!isPredictingBool.value) 0.5f else 0.6f,
-                paddingVal = PaddingValues(start = 6.5.dp, top=9.dp, bottom = 9.dp, end = 6.5.dp),
-                onClickAction = {
+            Button(
+                onClick = {
                     if (!isConfirming.value){
                         isPredictingBool.value= true
                         scope.launch {
@@ -525,8 +521,18 @@ fun ScanMainScreen(
                         }
                     }
                 },
-                isPredicting = isPredictingBool.value
-            )
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = customBlue,
+                    contentColor = Color.White
+                )
+            ){
+                Text(
+                    text = if (!isConfirming.value) "Capture" else "Proceed",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+            }
             if (!isConfirming.value){
                 val imageURI = remember {
                     mutableStateOf<Uri?>(null)
@@ -641,7 +647,6 @@ fun CameraPreviewSegmentOp(
         modifier = Modifier
             .padding(bottom = 6.dp, top = 20.dp)
             .height(30.dp)
-            //.background(Color.White, RoundedCornerShape(8.dp))
             .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -657,79 +662,4 @@ fun CameraPreviewSegmentOp(
             fontSize = 14.sp
         )
     }
-}
-
-@Composable
-fun CameraControlsItem(
-    title: String,
-    paddingVal: PaddingValues,
-    widthPercentage: Float,
-    onClickAction: () -> Unit,
-    isPredicting: Boolean= false
-) {
-    Button(
-        onClick = { onClickAction() },
-        colors = ButtonDefaults.buttonColors(
-            containerColor = customBlue,
-            contentColor = Color.White
-        )
-    ){
-        Text(
-            text = title,
-            fontSize = 16.sp,
-            fontWeight = FontWeight(600),
-            fontFamily = fontFamily
-        )
-    }
-    /*
-    Box(
-        modifier = Modifier
-            .padding(vertical = 13.dp)
-            //.fillMaxWidth(.4f)
-            .height(60.dp)
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-            .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
-            .clickable {
-                onClickAction()
-            }
-            .padding(vertical = 13.dp),
-        contentAlignment = Alignment.CenterStart
-    ){
-        Row(
-            modifier = Modifier,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(start = 13.dp)
-                    .height(34.dp)
-                    .width(34.dp)
-                    .background(color = Color.White, shape = RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
-            ){
-                if (isPredicting){
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        strokeWidth = 1.dp
-                    )
-                }
-                Icon(
-                    modifier = Modifier
-                        .height(24.dp)
-                        .width(24.dp)
-                        .padding(2.dp),
-                    imageVector = Icons.Outlined.Camera,
-                    contentDescription = "cam_icon"
-                )
-            }
-            Text(
-                modifier = Modifier
-                    .padding(start = 13.dp, end = 18.dp),
-                text = title,
-                fontWeight = FontWeight(600),
-                fontSize = 14.sp,
-            )
-        }
-    }*/
 }
