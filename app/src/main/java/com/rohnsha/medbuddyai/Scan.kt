@@ -47,11 +47,11 @@ import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Collections
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.FlashAuto
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
-import androidx.compose.material.icons.outlined.WrongLocation
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -477,13 +477,17 @@ fun ScanMainScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.WrongLocation,
+                imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.Delete,
                 contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan",
                 modifier = Modifier
                     .size(24.dp)
                     .padding(2.dp)
                     .clickable {
+                        if (!isConfirming.value){
 
+                        } else {
+                            isConfirming.value= false
+                        }
                     }
             )
             val bitmapImg= viewModelPhotoSave.bitmaps.collectAsState().value
@@ -579,6 +583,7 @@ fun ScanMainScreen(
             }
             if (bomError.value){
                 ModalBottomSheet(onDismissRequest = {
+                    isConfirming.value= false
                     bomError.value= false
                     isPredictingBool.value= false
                 }) {
@@ -595,6 +600,7 @@ fun ScanMainScreen(
                         Text(
                             modifier = Modifier
                                 .clickable {
+                                    isConfirming.value= false
                                     bomError.value = false
                                     isPredictingBool.value = false
                                 }
