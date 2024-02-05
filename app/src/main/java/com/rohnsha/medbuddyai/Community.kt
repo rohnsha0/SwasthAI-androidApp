@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -53,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.rohnsha.medbuddyai.domain.dataclass.communityFields
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -94,22 +94,6 @@ fun CommunityScreen(
         communityViewModel.getFeed()
         val postData= communityViewModel.feedContents.collectAsState().value
         Log.d("dataSnapCOmm", postData.toString())
-        val list= listOf(
-            communityFields(
-                "Rohan Shaw",
-                "Related Cough",
-                "12:00 AM",
-                "I am having this weird issue with blah glah",
-                "Heart"
-                ),
-            communityFields(
-                "Imaginary Shaw",
-                "Related Disease",
-                "02:00 AM",
-                "I am having this unknown rashes on the any organ to blahg lah",
-                "Lungs"
-            )
-        )
         val isCreateExpanded= remember {
             mutableStateOf(false)
         }
@@ -191,58 +175,62 @@ fun CommunityScreen(
                         ) }
                     )
                 }
-                if (isCreateExpanded.value){
-                    Spacer(modifier = Modifier.height(12.dp))
-                    TextInputThemed(
-                        value = title.value, 
-                        onValueChanged = { title.value= it },
-                        label = "Enter title",
-                        icon = Icons.Outlined.Title,
-                        onClose = { title.value = "" },
-                        isNumKey = false
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    TextInputThemed(
-                        value = content.value,
-                        onValueChanged = { content.value= it },
-                        label = "Enter contents",
-                        icon = Icons.Outlined.ShortText,
-                        isNumKey = false,
-                        onClose = { content.value = "" },
-                        singleLine = false
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
-                    ExposedDropdownMenuBox(
-                        expanded = domainExpanded.value,
-                        onExpandedChange = { domainExpanded.value = it },
-                    ) {
+                AnimatedVisibility (
+                    visible = isCreateExpanded.value,
+                ){
+                    Column {
+                        Spacer(modifier = Modifier.height(12.dp))
                         TextInputThemed(
-                            value = communityViewModel.returnDomain(domain.intValue),
-                            onValueChanged = {  },
-                            icon = when(domain.intValue){
-                                1 -> Icons.Outlined.Male
-                                2 -> Icons.Outlined.Female
-                                else -> Icons.Outlined.Transgender
-                            },
-                            label = "Select Domain",
-                            onClose = {  },
-                            isNumKey = true,
-                            readOnly = true,
-                            modifier = Modifier.menuAnchor()
+                            value = title.value,
+                            onValueChanged = { title.value= it },
+                            label = "Enter title",
+                            icon = Icons.Outlined.Title,
+                            onClose = { title.value = "" },
+                            isNumKey = false
                         )
-
-                        ExposedDropdownMenu(
+                        Spacer(modifier = Modifier.height(12.dp))
+                        TextInputThemed(
+                            value = content.value,
+                            onValueChanged = { content.value= it },
+                            label = "Enter contents",
+                            icon = Icons.Outlined.ShortText,
+                            isNumKey = false,
+                            onClose = { content.value = "" },
+                            singleLine = false
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        ExposedDropdownMenuBox(
                             expanded = domainExpanded.value,
-                            onDismissRequest = { domainExpanded.value = false },
+                            onExpandedChange = { domainExpanded.value = it },
                         ) {
-                            DropdownMenuItem(text = { Text(text = "Lungs") }, onClick = {
-                                domain.intValue= 1
-                                domainExpanded.value = false
-                            })
-                            DropdownMenuItem(text = { Text(text = "Brain") }, onClick = {
-                                domain.intValue= 2
-                                domainExpanded.value = false
-                            })
+                            TextInputThemed(
+                                value = communityViewModel.returnDomain(domain.intValue),
+                                onValueChanged = {  },
+                                icon = when(domain.intValue){
+                                    1 -> Icons.Outlined.Male
+                                    2 -> Icons.Outlined.Female
+                                    else -> Icons.Outlined.Transgender
+                                },
+                                label = "Select Domain",
+                                onClose = {  },
+                                isNumKey = true,
+                                readOnly = true,
+                                modifier = Modifier.menuAnchor()
+                            )
+
+                            ExposedDropdownMenu(
+                                expanded = domainExpanded.value,
+                                onDismissRequest = { domainExpanded.value = false },
+                            ) {
+                                DropdownMenuItem(text = { Text(text = "Lungs") }, onClick = {
+                                    domain.intValue= 1
+                                    domainExpanded.value = false
+                                })
+                                DropdownMenuItem(text = { Text(text = "Brain") }, onClick = {
+                                    domain.intValue= 2
+                                    domainExpanded.value = false
+                                })
+                            }
                         }
                     }
                 }
