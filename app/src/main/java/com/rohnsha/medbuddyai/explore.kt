@@ -148,7 +148,7 @@ fun ExploreScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         diseaseDBviewModel.inputNameToSearch(data, onCompleteLambda = {
-                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1))
+                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1, 9999))
                         })
                         Log.d("logStatus", "clicked")
                     }

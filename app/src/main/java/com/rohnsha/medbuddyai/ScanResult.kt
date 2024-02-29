@@ -114,7 +114,8 @@ fun ScanResultScreen(
     navController: NavController,
     scanHistoryViewModel: scanHistoryViewModel,
     resultsLevel: Int=1, // 0-> Scan, 1-> Scan History, 2-> Read Only,
-    diseaseDBviewModel: diseaseDBviewModel
+    diseaseDBviewModel: diseaseDBviewModel,
+    indexClassification: Int // model to be triggered
 ) {
     photoCaptureViewModel= viewModel
     diseaseDBvm= diseaseDBviewModel
@@ -131,7 +132,7 @@ fun ScanResultScreen(
             isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
             LaunchedEffect(key1 = true){
                 delay(500L)
-                photoCaptureViewModel.onClassify(context, 0)
+                photoCaptureViewModel.onClassify(context, index = indexClassification)
             }
             disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
             otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0, isMaxIndex = false)

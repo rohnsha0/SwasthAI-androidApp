@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 const val scanIndexKey= "indexScan"
 const val scanResultKey= "scanResultKey"
+const val scanResultIndex= "scanResultIndex"
 
 sealed class bottomNavItems(
     val title: String,
@@ -63,12 +64,12 @@ sealed class bottomNavItems(
 
     object ScanResult: bottomNavItems(
         title = "ScanResults",
-        route = "scan_result/{$scanResultKey}",
+        route = "scan_result/{$scanResultKey}/{$scanResultIndex}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     ){
-        fun returnScanResIndex(index: Int): String {
-            return this.route.replace(oldValue = "{$scanResultKey}", newValue = index.toString())
+        fun returnScanResIndex(level: Int, index: Int): String {
+            return "scan_result/$level/$index"
         }
     }
 

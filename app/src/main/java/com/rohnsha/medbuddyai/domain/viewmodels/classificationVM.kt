@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
+import com.rohnsha.medbuddyai.ml.GiomaTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
@@ -37,9 +38,12 @@ class classificationVM: ViewModel() {
         inputFeature0.loadBuffer(tensorImage.buffer)
 
         when(scanOption){
-            0 -> { predictedClasses=predictionLungs(context, bitmap) }
-            1 -> { predictedClasses= predictionHeart() }
-            2 -> { predictedClasses= predictionBrain() }
+            0 -> { predictedClasses= predictionLungs(context, bitmap) }
+            2 -> { predictedClasses= predictionHeart() }
+            1 -> { predictedClasses= predictionBrain(
+                inputFeature0 = inputFeature0,
+                context = context
+            ) }
             3 -> { predictionSkin() }
             4 -> { predictionLimbs() }
             5 -> { predictedClasses= predictionMaster(
@@ -88,11 +92,6 @@ class classificationVM: ViewModel() {
         return predictedClassesLungs
     }
 
-    fun predictionBrain(
-    ): List<classification>{
-        val predictedClassesLungs= mutableListOf<classification>()
-        return predictedClassesLungs
-    }
     fun predictionHeart(
     ): List<classification>{
         val predictedClassesLungs= mutableListOf<classification>()
@@ -104,6 +103,30 @@ class classificationVM: ViewModel() {
                 parentIndex = 1
             ),
         )
+
+        return predictedClassesLungs
+    }
+
+    fun predictionBrain(
+        inputFeature0: TensorBuffer,
+        context: Context
+    ): List<classification>{
+        val predictedClassesLungs= mutableListOf<classification>()
+
+        viewModelScope.launch {
+            val giomaTumorArray= GiomaTumorv1.newInstance(context)
+                .process(inputFeature0)
+                .outputFeature0AsTensorBuffer
+                .floatArray
+            val maxKeyGioma= getMaxIndex(giomaTumorArray)
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = maxKeyGioma,
+                    confident = giomaTumorArray[maxKeyGioma]*100,
+                    parentIndex = 0
+                )
+            )
+        }
 
         return predictedClassesLungs
     }

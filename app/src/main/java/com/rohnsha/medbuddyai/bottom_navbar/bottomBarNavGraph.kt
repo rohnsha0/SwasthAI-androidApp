@@ -138,16 +138,21 @@ fun bottomNavGraph(
             arguments = listOf(
                 navArgument(scanResultKey){
                     type= NavType.IntType
+                },
+                navArgument(scanResultIndex){
+                    type= NavType.IntType
                 }
             )
         ){
+            Log.d("acceptingChar", it.arguments!!.getInt(scanResultIndex).toString())
             ScanResultScreen(
                 padding = padding,
                 navController = navController,
                 viewModel = savePhotoViewModel,
                 scanHistoryViewModel = scanHistoryviewModel,
                 diseaseDBviewModel = diseaseDBviewModel,
-                resultsLevel = it.arguments!!.getInt(scanResultKey)
+                resultsLevel = it.arguments!!.getInt(scanResultKey),
+                indexClassification = it.arguments!!.getInt(scanResultIndex)
             )
         }
     }
