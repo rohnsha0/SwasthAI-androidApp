@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
 import com.rohnsha.medbuddyai.ml.GiomaTumorv1
+import com.rohnsha.medbuddyai.ml.MeningiomaTumorv1
+import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
@@ -124,6 +126,30 @@ class classificationVM: ViewModel() {
                     indexNumber = maxKeyGioma,
                     confident = giomaTumorArray[maxKeyGioma]*100,
                     parentIndex = 0
+                )
+            )
+            val pituitaryTumorArr= PituitaryTumorv1.newInstance(context)
+                .process(inputFeature0)
+                .outputFeature0AsTensorBuffer
+                .floatArray
+            val maxKeyPituitary= getMaxIndex(pituitaryTumorArr)
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = maxKeyPituitary,
+                    confident = pituitaryTumorArr[maxKeyPituitary]*100,
+                    parentIndex = 1
+                )
+            )
+            val meningiomaTumorArr= MeningiomaTumorv1.newInstance(context)
+                .process(inputFeature0)
+                .outputFeature0AsTensorBuffer
+                .floatArray
+            val maxKeyMeningioma= getMaxIndex(meningiomaTumorArr)
+            predictedClassesLungs.add(
+                classification(
+                    indexNumber = maxKeyMeningioma,
+                    confident = meningiomaTumorArr[maxKeyMeningioma],
+                    parentIndex = 2
                 )
             )
         }

@@ -65,6 +65,18 @@ class photoCaptureViewModel: ViewModel() {
     fun onTakePhoto(bitmap: Bitmap) {
         _bitmaps.value = bitmap
     }
+
+    fun flushValues(){
+        _bitmaps.value= null
+        _maxIndex.value= classification(confident = 0f, indexNumber = 404, parentIndex = 404)
+        _notMaxElements.value= emptyList()
+        _classificationData.value= disease_data_dataClass()
+        _loadingBoolean.value= true
+        _erroredBoolean.value= false
+        _listPrediction.value= emptyList()
+        _reloadingBoolean.value= false
+    }
+
     fun resetReloadBoolean(){
         _reloadingBoolean.value= true
     }
@@ -74,7 +86,7 @@ class photoCaptureViewModel: ViewModel() {
         _normalBoolean.value=false
         _reloadingBoolean.value= true
         val rawClassification= try {
-            viewModelClassifier.classify(context, _bitmaps.value!!, index)
+            viewModelClassifier.classify(context = context, bitmap = _bitmaps.value!!, scanOption = index)
         } catch (e: Exception){
             Log.d("successIndex", e.printStackTrace().toString())
             emptyList()
@@ -102,11 +114,16 @@ class photoCaptureViewModel: ViewModel() {
         try {
             val data= mutableStateOf(disease_data_dataClass())
             sortClassifiedList()
+            Log.d("bugErrrored", data.value.toString())
 
+            Log.d("bugErrrored", "attempting to start db search")
             data.value= viewModelDiseaseDB.searchDB(
                 domain = group_number.toString(),
                 indexItem = _maxIndex.value.parentIndex.toString()
             )
+            Log.d("bugErrrored", "db search cmplt")
+
+            Log.d("bugErrrored", data.value.toString())
 
             Log.d("maxIndex", _maxIndex.value.toString())
             if (data.value.disease_name != "") {
@@ -151,9 +168,15 @@ class photoCaptureViewModel: ViewModel() {
         isMaxIndex: Boolean
     ): List<disease_version> {
         val reqList: MutableList<disease_version> = mutableListOf()
+        Log.d("grPNumber", group_number.toString())
         val lungs= listOf(
             disease_version("Pneumonia", "V2023.04.30", modelAccuracy = 97.70),
             disease_version("Tuberculosis", "V2023.11.14", modelAccuracy = 97.60),
+        )
+        val brain= listOf(
+            disease_version("Gioma Tumor", "V2023.04.30", modelAccuracy = 97.70),
+            disease_version("Pituitary Tumor", "V2023.11.14", modelAccuracy = 97.60),
+            disease_version("Meningioma Tumor", "V2023.11.14", modelAccuracy = 97.60)
         )
         if (isMaxIndex){
             when(group_number){
@@ -164,6 +187,14 @@ class photoCaptureViewModel: ViewModel() {
                             _maxIndex.value.confident, modelAccuracy = lungs[_maxIndex.value.parentIndex!!].modelAccuracy
                     ))
                 }
+                1 -> {
+                    reqList.add(
+                        disease_version(
+                            brain[_maxIndex.value.parentIndex!!].disease_name, brain[_maxIndex.value.parentIndex!!].version,
+                            _maxIndex.value.confident, modelAccuracy = brain[_maxIndex.value.parentIndex!!].modelAccuracy
+                        )
+                    )
+                }
             }
             return reqList
         }
@@ -172,6 +203,11 @@ class photoCaptureViewModel: ViewModel() {
                 0-> {
                     reqList.add(disease_version(
                         lungs[classification.parentIndex!!].disease_name, lungs[classification.parentIndex].version, classification.confident
+                    ))
+                }
+                1 -> {
+                    reqList.add(disease_version(
+                        brain[classification.parentIndex!!].disease_name, brain[classification.parentIndex].version, classification.confident
                     ))
                 }
             }

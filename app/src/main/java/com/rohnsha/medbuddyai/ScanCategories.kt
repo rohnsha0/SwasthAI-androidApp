@@ -30,6 +30,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -42,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.dataclass.modelMarketPlace
+import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -51,7 +53,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @Composable
 fun ScanCategoryScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    photoCaptureViewModel: photoCaptureViewModel
 ) {
     Scaffold(
         topBar = {
@@ -98,6 +101,9 @@ fun ScanCategoryScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ){ value ->
+        LaunchedEffect(key1 = true, block = {
+            photoCaptureViewModel.flushValues()
+        })
 
         val respiratoryDiseases= listOf(
             modelMarketPlace("Lungs", "V2023.06.51",
@@ -106,11 +112,21 @@ fun ScanCategoryScreen(
         )
         val brainCateg= listOf(
             modelMarketPlace("Brain", "V2024.01.51",
-                "Includes pneumonia, tuberculosis", false
+                "Includes Gioma, Meningioma, Pituitary Tumor", false
             ),
             modelMarketPlace("Brain (Cancerous)", "V2024.01.51",
                 "Includes pneumonia, tuberculosis", true
             )
+        )
+
+        val miscellaneousCateg= listOf(
+            modelMarketPlace("Oral (Cancerous)", "V2024.01.51",
+                "Inludes oral cancer", true)
+        )
+
+        val kidneyCateg= listOf(
+            modelMarketPlace("Kidney", "V2024.01.24",
+                "Includes tests for kidney tumor", false)
         )
 
         LazyColumn(
@@ -154,6 +170,48 @@ fun ScanCategoryScreen(
                 Spacer(modifier = Modifier.height(10.dp))
             }
             items(brainCateg){
+                ModelItem(
+                    title = it.modelName,
+                    subtitle = it.modelVersion,
+                    colorLogo = Color.White,
+                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
+                    description = it.description,
+                    isCancerous = it.isCancerous
+                )
+            }
+            item {
+                Text(
+                    text = "Kidney",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            items(kidneyCateg){
+                ModelItem(
+                    title = it.modelName,
+                    subtitle = it.modelVersion,
+                    colorLogo = Color.White,
+                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
+                    description = it.description,
+                    isCancerous = it.isCancerous
+                )
+            }
+            item {
+                Text(
+                    text = "Miscellaneous",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            items(miscellaneousCateg){
                 ModelItem(
                     title = it.modelName,
                     subtitle = it.modelVersion,

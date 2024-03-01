@@ -135,7 +135,7 @@ fun ScanResultScreen(
                 photoCaptureViewModel.onClassify(context, index = indexClassification)
             }
             disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
-            otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(0, isMaxIndex = false)
+            otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
         }
         1 -> {
             isStillLoading= diseaseDBviewModel.isLoadingBoolean.collectAsState().value
@@ -449,10 +449,9 @@ fun ScanResultsSuccess(
             }
             if (mode==0){
                 items(otherDiseaseData){ data ->
-                    Column(
+                    Box(
                         modifier = Modifier
                             .background(Color.White)
-                            .padding(vertical = 7.dp)
                     ) {
                         DataListFull(
                             title =data.disease_name,
@@ -460,7 +459,7 @@ fun ScanResultsSuccess(
                             data ="${String.format(" % .2f", data.confidence)}%",
                             imageVector = Icons.Outlined.JoinLeft,
                             colorLogo = dashBG
-                        ) {}
+                        )
                     }
                 }
             }

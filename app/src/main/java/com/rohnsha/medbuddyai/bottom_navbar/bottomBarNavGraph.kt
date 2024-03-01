@@ -103,7 +103,8 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.ScanCategory.route){
             ScanCategoryScreen(
                 padding = padding,
-                navController
+                navController,
+                photoCaptureViewModel = savePhotoViewModel
             )
         }
 
