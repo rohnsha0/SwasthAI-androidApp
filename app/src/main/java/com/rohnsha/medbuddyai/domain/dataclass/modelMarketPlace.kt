@@ -4,5 +4,6 @@ data class modelMarketPlace(
     val modelName: String,
     val modelVersion: String,
     val description: String,
-    val isCancerous: Boolean
+    val isCancerous: Boolean,
+    val domainIndex: Int
 )

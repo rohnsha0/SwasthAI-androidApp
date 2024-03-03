@@ -220,15 +220,15 @@ fun ScanResultScreen(
         val rbList= remember {
             mutableStateListOf(
                 rbStructure(
-                    isChecked = true,
+                    isChecked = indexClassification==0,
                     title = "Lungs"
                 ),
                 rbStructure(
-                    isChecked = false,
+                    isChecked = indexClassification==1,
                     title = "Brain"
                 ),
                 rbStructure(
-                    isChecked = false,
+                    isChecked = indexClassification==2,
                     title = "Skin Manifestions"
                 ),
             )
