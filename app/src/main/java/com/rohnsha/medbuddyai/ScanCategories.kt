@@ -107,53 +107,53 @@ fun ScanCategoryScreen(
 
         val respiratoryDiseases= listOf(
             modelMarketPlace("Lungs", "Various",
-                "Includes pneumonia, tuberculosis", false, 0
+                "Pneumonia, Tuberculosis", false, 0
             ),
             modelMarketPlace("Lungs (Cancerous)", "V2023.06.51",
-                "Includes Lungs Cancer", true, 0)
+                "Lungs Cancer", true, 0)
         )
         val brainCateg= listOf(
             modelMarketPlace("Brain", "V2024.01.51",
-                "Includes Gioma, Meningioma, Pituitary Tumor", false, 1
+                "Gioma, Meningioma, Pituitary Tumor", false, 1
             ),
             modelMarketPlace("Brain (Cancerous)", "V2024.01.51",
-                "Includes pneumonia, tuberculosis", true, 1
+                "pneumonia, tuberculosis", true, 1
             )
         )
 
         val miscellaneousCateg= listOf(
             modelMarketPlace("Oral (Cancerous)", "V2024.01.51",
-                "Inludes oral cancer (mouth)", true, 1)
+                "Oral Cancer (mouth)", true, 1)
         )
 
         val kidneyCateg= listOf(
             modelMarketPlace("Kidney", "V2024.01.24",
-                "Includes tests for kidney tumor", false, 1)
+                "Kidney tumor", false, 1)
         )
 
         val skinManifestation= listOf(
             modelMarketPlace("Skin", "V2024.06.01",
-                "Includes tests for Skin Infections, Pigmentations, Eczima, Acne",
+                "Pigmentations, Eczima, Acne",
                 false, 1),
             modelMarketPlace("Skin (Cancerous)", "V2024.06.01",
-                "Includes tests for Skin cancer", true, 1)
+                "Skin cancer", true, 1)
         )
 
         val lymphatic= listOf(
             modelMarketPlace("Lymph Nodes", "V2024.06.01",
-                "Includes tests for Lymphomia", false, 1)
+                "Lymphoma", false, 1)
         )
 
         val digestive= listOf(
             modelMarketPlace("Colon (Cancerous)", "V2024.06.01",
-                "Includes tests for Lymphomia", false, 1)
+                "Colon Cancer", true, 1)
         )
 
         val reproductive= listOf(
-            modelMarketPlace("Breat (Cancerous)", "V2024.06.01",
-                "Includes tests for Lymphomia", false, 1),
+            modelMarketPlace("Breast (Cancerous)", "V2024.06.01",
+                "Breast Cancer", true, 1),
             modelMarketPlace("Cervical (Cancerous)", "V2024.06.01",
-                "Includes tests for Lymphomia", false, 1)
+                "Cervical Cancer", true, 1)
         )
 
         LazyColumn(
@@ -164,48 +164,6 @@ fun ScanCategoryScreen(
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(20.dp))
         ){
-            item{
-                Text(
-                    text = "Respiratory System",
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight(600),
-                    fontSize = 15.sp,
-                    modifier = Modifier
-                        .padding(top = 30.dp, start = 24.dp)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-            items(respiratoryDiseases){
-                ModelItem(
-                    title = it.modelName,
-                    subtitle = it.modelVersion,
-                    colorLogo = Color.White,
-                    onClickListener = { navController.navigate(route = bottomNavItems.Scan.returnScanIndex(it.domainIndex)) },
-                    description = it.description,
-                    isCancerous = it.isCancerous
-                )
-            }
-            item {
-                Text(
-                    text = "Nervous System",
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight(600),
-                    fontSize = 15.sp,
-                    modifier = Modifier
-                        .padding(top = 26.dp, start = 24.dp)
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-            items(brainCateg){
-                ModelItem(
-                    title = it.modelName,
-                    subtitle = it.modelVersion,
-                    colorLogo = Color.White,
-                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
-                    description = it.description,
-                    isCancerous = it.isCancerous
-                )
-            }
             item {
                 Text(
                     text = "Blood & Lymphatic System",
@@ -250,7 +208,7 @@ fun ScanCategoryScreen(
             }
             item {
                 Text(
-                    text = "Urinary System",
+                    text = "Hand & Neck",
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600),
                     fontSize = 15.sp,
@@ -259,7 +217,28 @@ fun ScanCategoryScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
-            items(kidneyCateg){
+            items(miscellaneousCateg){
+                ModelItem(
+                    title = it.modelName,
+                    subtitle = it.modelVersion,
+                    colorLogo = Color.White,
+                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
+                    description = it.description,
+                    isCancerous = it.isCancerous
+                )
+            }
+            item {
+                Text(
+                    text = "Nervous System",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            items(brainCateg){
                 ModelItem(
                     title = it.modelName,
                     subtitle = it.modelVersion,
@@ -290,6 +269,27 @@ fun ScanCategoryScreen(
                     isCancerous = it.isCancerous
                 )
             }
+            item{
+                Text(
+                    text = "Respiratory System",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 30.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            items(respiratoryDiseases){
+                ModelItem(
+                    title = it.modelName,
+                    subtitle = it.modelVersion,
+                    colorLogo = Color.White,
+                    onClickListener = { navController.navigate(route = bottomNavItems.Scan.returnScanIndex(it.domainIndex)) },
+                    description = it.description,
+                    isCancerous = it.isCancerous
+                )
+            }
             item {
                 Text(
                     text = "Skin Diseases",
@@ -313,7 +313,7 @@ fun ScanCategoryScreen(
             }
             item {
                 Text(
-                    text = "Hand & Neck",
+                    text = "Urinary System",
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600),
                     fontSize = 15.sp,
@@ -322,7 +322,7 @@ fun ScanCategoryScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
-            items(miscellaneousCateg){
+            items(kidneyCateg){
                 ModelItem(
                     title = it.modelName,
                     subtitle = it.modelVersion,
@@ -332,6 +332,7 @@ fun ScanCategoryScreen(
                     isCancerous = it.isCancerous
                 )
             }
+            item { Spacer(modifier = Modifier.height(18.dp)) }
         }
     }
 }
@@ -462,10 +463,11 @@ fun ModelItem(
             Text(
                 modifier = Modifier
                     .padding(top = 8.dp, start = 13.dp),
-                text = description,
+                text = "includes: $description",
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
-                color = lightTextAccent
+                color = lightTextAccent,
+                maxLines = 1
             )
         }
     }

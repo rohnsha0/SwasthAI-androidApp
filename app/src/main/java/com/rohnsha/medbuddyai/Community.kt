@@ -243,7 +243,7 @@ fun CommunityScreen(
                         .padding(bottom = 6.dp, top = 18.dp)
                 )
             }
-            if (!postData.isEmpty()){
+            if (postData.isNotEmpty()){
                 items(postData){ data ->
                     CommunityPostItem(
                         title = data.title?: "Unknown",
