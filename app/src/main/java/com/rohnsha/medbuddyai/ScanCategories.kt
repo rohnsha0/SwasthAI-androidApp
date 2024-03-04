@@ -107,14 +107,14 @@ fun ScanCategoryScreen(
 
         val respiratoryDiseases= listOf(
             modelMarketPlace("Lungs", "Various",
-                "Pneumonia, Tuberculosis", false, 0
+                "Pneumonia, Tuberculosis", false, 7
             ),
             modelMarketPlace("Lungs (Cancerous)", "V2023.06.51",
                 "Lungs Cancer", true, 0)
         )
         val brainCateg= listOf(
             modelMarketPlace("Brain", "V2024.01.51",
-                "Gioma, Meningioma, Pituitary Tumor", false, 1
+                "Gioma, Meningioma, Pituitary Tumor", false, 3
             ),
             modelMarketPlace("Brain (Cancerous)", "V2024.01.51",
                 "pneumonia, tuberculosis", true, 1

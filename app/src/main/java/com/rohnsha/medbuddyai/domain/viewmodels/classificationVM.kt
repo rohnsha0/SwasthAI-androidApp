@@ -7,8 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
+import com.rohnsha.medbuddyai.ml.BreastCancerV1
+import com.rohnsha.medbuddyai.ml.ColonCacnerV1
 import com.rohnsha.medbuddyai.ml.GiomaTumorv1
+import com.rohnsha.medbuddyai.ml.KidneyTumorV1
 import com.rohnsha.medbuddyai.ml.MeningiomaTumorv1
+import com.rohnsha.medbuddyai.ml.OralCacnerV1
 import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
@@ -39,22 +43,87 @@ class classificationVM: ViewModel() {
         val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
         inputFeature0.loadBuffer(tensorImage.buffer)
 
-        when(scanOption){
-            0 -> { predictedClasses= predictionLungs(context, bitmap) }
-            2 -> { predictedClasses= predictionHeart() }
-            1 -> { predictedClasses= predictionBrain(
-                inputFeature0 = inputFeature0,
-                context = context
-            ) }
-            3 -> { predictionSkin() }
-            4 -> { predictionLimbs() }
-            5 -> { predictedClasses= predictionMaster(
-                context = context,
-                inputFeature0 = inputFeature0,
-                index = index
-            )}
+        predictedClasses= when(scanOption){
+            1 -> { predictionColon(inputFeature0 = inputFeature0, context = context) }
+            2 -> { predictionOral(inputFeature0 = inputFeature0, context = context) }
+            3 -> { predictionBrain(inputFeature0 = inputFeature0, context = context) }
+            5 -> { predictionBreast(inputFeature0 = inputFeature0, context = context) }
+            7 -> { predictionLungs(context = context, bitmap = bitmap) }
+            11 -> { predictionKidney(inputFeature0 = inputFeature0, context = context) }
+            999 -> { predictionMaster(context = context, inputFeature0 = inputFeature0, index = index)}
+            else -> { emptyList() }
         }
 
+        return predictedClasses
+    }
+
+    private fun predictionBreast(
+        inputFeature0: TensorBuffer,
+        context: Context
+    ): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputBreast= BreastCancerV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexBreast= getMaxIndex(outputBreast.floatArray)
+        predictedClass.add(
+            classification(maxIndexBreast, outputBreast.floatArray[maxIndexBreast]*100, 0)
+        )
+
+        return predictedClass
+    }
+
+    private fun predictionKidney(
+        inputFeature0: TensorBuffer,
+        context: Context
+    ): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputKidney= KidneyTumorV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexKidney= getMaxIndex(outputKidney.floatArray)
+        predictedClass.add(
+            classification(maxIndexKidney, outputKidney.floatArray[maxIndexKidney]*100, 0)
+        )
+
+        return predictedClass
+    }
+
+    private fun predictionOral(
+        inputFeature0: TensorBuffer,
+        context: Context
+    ): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputOral= OralCacnerV1.newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexOral= getMaxIndex(outputOral.floatArray)
+        predictedClass.add(
+            classification(
+                indexNumber = maxIndexOral,
+                confident = outputOral.floatArray[getMaxIndex(outputOral.floatArray)]*100,
+                parentIndex = 0
+            ),
+        )
+
+        return predictedClass
+    }
+
+    private fun predictionColon(inputFeature0: TensorBuffer, context: Context): List<classification> {
+        val predictedClasses= mutableListOf<classification>()
+        val outputColon= ColonCacnerV1.newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexColon= getMaxIndex(outputColon.floatArray)
+        predictedClasses.add(
+            classification(
+                indexNumber = maxIndexColon,
+                confident = outputColon.floatArray[getMaxIndex(outputColon.floatArray)]*100,
+                parentIndex = 0
+            ),
+        )
         return predictedClasses
     }
 
