@@ -44,8 +44,10 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.dataclass.modelMarketPlace
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
@@ -54,8 +56,9 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun ScanCategoryScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    photoCaptureViewModel: photoCaptureViewModel
-) {
+    photoCaptureViewModel: photoCaptureViewModel,
+    snackBarViewModel: snackBarToggleVM,
+    ) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -110,20 +113,17 @@ fun ScanCategoryScreen(
                 "Pneumonia, Tuberculosis", false, 7
             ),
             modelMarketPlace("Lungs (Cancerous)", "V2023.06.51",
-                "Lungs Cancer", true, 0)
+                "Lungs Adenocarcinoma, Squamous Cell Carcinoma", true, 0)
         )
         val brainCateg= listOf(
             modelMarketPlace("Brain", "V2024.01.51",
                 "Gioma, Meningioma, Pituitary Tumor", false, 3
-            ),
-            modelMarketPlace("Brain (Cancerous)", "V2024.01.51",
-                "pneumonia, tuberculosis", true, 1
             )
         )
 
         val miscellaneousCateg= listOf(
             modelMarketPlace("Oral (Cancerous)", "V2024.01.51",
-                "Oral Cancer (mouth)", true, 1)
+                "Oral Squamous Cell Carcinoma", true, 1)
         )
 
         val kidneyCateg= listOf(
@@ -141,19 +141,19 @@ fun ScanCategoryScreen(
 
         val lymphatic= listOf(
             modelMarketPlace("Lymph Nodes", "V2024.06.01",
-                "Lymphoma", false, 1)
+                "Acute Lymphoblastic Leukemia (Pre, Pro)", false, 1)
         )
 
         val digestive= listOf(
             modelMarketPlace("Colon (Cancerous)", "V2024.06.01",
-                "Colon Cancer", true, 1)
+                "Colon Adenocarcinoma", true, 1)
         )
 
         val reproductive= listOf(
             modelMarketPlace("Breast (Cancerous)", "V2024.06.01",
-                "Breast Cancer", true, 1),
+                "Breast Cancer", true, 4),
             modelMarketPlace("Cervical (Cancerous)", "V2024.06.01",
-                "Cervical Cancer", true, 1)
+                "Cervical Cancer", true, 5)
         )
 
         LazyColumn(
@@ -264,7 +264,16 @@ fun ScanCategoryScreen(
                     title = it.modelName,
                     subtitle = it.modelVersion,
                     colorLogo = Color.White,
-                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
+                    onClickListener = { if (it.domainIndex==5){
+                        snackBarViewModel.SendToast(
+                            "One of more field is empty!",
+                            customRed,
+                            PaddingValues(0.dp)
+                        )
+                    } else {
+                        navController.navigate(bottomNavItems.Scan.returnScanIndex(it.domainIndex))
+                    }
+                                                              },
                     description = it.description,
                     isCancerous = it.isCancerous
                 )
@@ -463,7 +472,7 @@ fun ModelItem(
             Text(
                 modifier = Modifier
                     .padding(top = 8.dp, start = 13.dp),
-                text = "includes: $description",
+                text = description,
                 fontSize = 14.sp,
                 fontFamily = fontFamily,
                 color = lightTextAccent,

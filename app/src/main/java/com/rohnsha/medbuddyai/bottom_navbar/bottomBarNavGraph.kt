@@ -104,7 +104,8 @@ fun bottomNavGraph(
             ScanCategoryScreen(
                 padding = padding,
                 navController,
-                photoCaptureViewModel = savePhotoViewModel
+                photoCaptureViewModel = savePhotoViewModel,
+                snackBarViewModel = snackBarVM
             )
         }
 

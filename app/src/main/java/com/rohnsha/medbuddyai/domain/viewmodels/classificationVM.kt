@@ -11,6 +11,10 @@ import com.rohnsha.medbuddyai.ml.BreastCancerV1
 import com.rohnsha.medbuddyai.ml.ColonCacnerV1
 import com.rohnsha.medbuddyai.ml.GiomaTumorv1
 import com.rohnsha.medbuddyai.ml.KidneyTumorV1
+import com.rohnsha.medbuddyai.ml.LeukEarlyV1
+import com.rohnsha.medbuddyai.ml.LeukProV1
+import com.rohnsha.medbuddyai.ml.LungSccV1
+import com.rohnsha.medbuddyai.ml.LungsActV1
 import com.rohnsha.medbuddyai.ml.MeningiomaTumorv1
 import com.rohnsha.medbuddyai.ml.OralCacnerV1
 import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
@@ -44,17 +48,64 @@ class classificationVM: ViewModel() {
         inputFeature0.loadBuffer(tensorImage.buffer)
 
         predictedClasses= when(scanOption){
+            0 -> { predictionLeukemia(inputFeature0 = inputFeature0, context = context) }
             1 -> { predictionColon(inputFeature0 = inputFeature0, context = context) }
             2 -> { predictionOral(inputFeature0 = inputFeature0, context = context) }
             3 -> { predictionBrain(inputFeature0 = inputFeature0, context = context) }
-            5 -> { predictionBreast(inputFeature0 = inputFeature0, context = context) }
-            7 -> { predictionLungs(context = context, bitmap = bitmap) }
+            4 -> { predictionBreast(inputFeature0 = inputFeature0, context = context) }
+            6 -> { predictionLungs(context = context, bitmap = bitmap) }
+            7 -> { predictionLungCancerous(context = context, inputFeature0 = inputFeature0) }
             11 -> { predictionKidney(inputFeature0 = inputFeature0, context = context) }
             999 -> { predictionMaster(context = context, inputFeature0 = inputFeature0, index = index)}
             else -> { emptyList() }
         }
 
         return predictedClasses
+    }
+
+    private fun predictionLungCancerous(context: Context, inputFeature0: TensorBuffer,): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputputPre= LungsActV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexPre= getMaxIndex(outputputPre.floatArray)
+        predictedClass.add(
+            classification(maxIndexPre, outputputPre.floatArray[maxIndexPre]*100, 0)
+        )
+        val outputputPro= LungSccV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexPro= getMaxIndex(outputputPre.floatArray)
+        predictedClass.add(
+            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 0)
+        )
+        return predictedClass
+    }
+
+    private fun predictionLeukemia(
+        inputFeature0: TensorBuffer,
+        context: Context
+    ): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputputPre= LeukEarlyV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexPre= getMaxIndex(outputputPre.floatArray)
+        predictedClass.add(
+            classification(maxIndexPre, outputputPre.floatArray[maxIndexPre]*100, 0)
+        )
+        val outputputPro= LeukProV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexPro= getMaxIndex(outputputPre.floatArray)
+        predictedClass.add(
+            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 0)
+        )
+        return predictedClass
     }
 
     private fun predictionBreast(
