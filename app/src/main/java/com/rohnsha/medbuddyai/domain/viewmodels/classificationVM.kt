@@ -19,6 +19,9 @@ import com.rohnsha.medbuddyai.ml.MeningiomaTumorv1
 import com.rohnsha.medbuddyai.ml.OralCacnerV1
 import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
+import com.rohnsha.medbuddyai.ml.SkinAcneV1
+import com.rohnsha.medbuddyai.ml.SkinCancerV1
+import com.rohnsha.medbuddyai.ml.SkinInfectionV1
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
 import kotlinx.coroutines.launch
@@ -55,12 +58,30 @@ class classificationVM: ViewModel() {
             4 -> { predictionBreast(inputFeature0 = inputFeature0, context = context) }
             6 -> { predictionLungs(context = context, bitmap = bitmap) }
             7 -> { predictionLungCancerous(context = context, inputFeature0 = inputFeature0) }
+            8 -> { predictionSkin(context = context, inputFeature0 = inputFeature0) }
+            9 -> { predictionSkinCancerous(context = context, inputFeature0 = inputFeature0) }
             11 -> { predictionKidney(inputFeature0 = inputFeature0, context = context) }
             999 -> { predictionMaster(context = context, inputFeature0 = inputFeature0, index = index)}
             else -> { emptyList() }
         }
 
         return predictedClasses
+    }
+
+    private fun predictionSkinCancerous(
+        context: Context,
+        inputFeature0: TensorBuffer
+    ): List<classification> {
+        val predictedClass= mutableListOf<classification>()
+        val outputputPre= SkinCancerV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+        val maxIndexPre= getMaxIndex(outputputPre.floatArray)
+        predictedClass.add(
+            classification(maxIndexPre, outputputPre.floatArray[maxIndexPre]*100, 0)
+        )
+        return  predictedClass
     }
 
     private fun predictionLungCancerous(context: Context, inputFeature0: TensorBuffer,): List<classification> {
@@ -202,31 +223,50 @@ class classificationVM: ViewModel() {
         return predictedClassesLungs
     }
 
-    fun predictionLimbs(
-    ): List<classification>{
-        val predictedClassesLungs= mutableListOf<classification>()
-        return predictedClassesLungs
-    }
+    fun predictionSkin(context: Context, inputFeature0: TensorBuffer): List<classification>{
+        val predictedClasses= mutableListOf<classification>()
 
-    fun predictionSkin(
-    ): List<classification>{
-        val predictedClassesLungs= mutableListOf<classification>()
-        return predictedClassesLungs
-    }
-
-    fun predictionHeart(
-    ): List<classification>{
-        val predictedClassesLungs= mutableListOf<classification>()
-
-        predictedClassesLungs.add(
-            classification(
-                indexNumber = 1,
-                confident = 0.98f*100,
-                parentIndex = 1
-            ),
+        val skinAcne= SkinAcneV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+            .floatArray
+        val maxAcne= getMaxIndex(skinAcne)
+        predictedClasses.add(
+            classification(maxAcne, skinAcne[maxAcne]*100, 0)
         )
 
-        return predictedClassesLungs
+        val skinEzima= SkinAcneV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+            .floatArray
+        val maxEzima= getMaxIndex(skinEzima)
+        predictedClasses.add(
+            classification(maxEzima, skinEzima[maxEzima]*100, 1)
+        )
+
+        val infection= SkinInfectionV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+            .floatArray
+        val maxInfection= getMaxIndex(infection)
+        predictedClasses.add(
+            classification(maxInfection, infection[maxInfection], 2)
+        )
+
+        val pigmentation= SkinInfectionV1
+            .newInstance(context)
+            .process(inputFeature0)
+            .outputFeature0AsTensorBuffer
+            .floatArray
+        val maxPigmentation= getMaxIndex(pigmentation)
+        predictedClasses.add(
+            classification(maxPigmentation, pigmentation[maxPigmentation], 3)
+        )
+
+        return predictedClasses
     }
 
     fun predictionBrain(

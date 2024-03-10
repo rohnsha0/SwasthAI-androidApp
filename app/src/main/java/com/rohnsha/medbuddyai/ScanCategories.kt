@@ -134,9 +134,9 @@ fun ScanCategoryScreen(
         val skinManifestation= listOf(
             modelMarketPlace("Skin", "V2024.06.01",
                 "Pigmentations, Eczima, Acne",
-                false, 1),
+                false, 8),
             modelMarketPlace("Skin (Cancerous)", "V2024.06.01",
-                "Skin cancer", true, 1)
+                "Skin cancer", true, 9)
         )
 
         val lymphatic= listOf(
