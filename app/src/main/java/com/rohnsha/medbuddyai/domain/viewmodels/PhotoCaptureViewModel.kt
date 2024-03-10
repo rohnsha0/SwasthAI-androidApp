@@ -117,6 +117,7 @@ class photoCaptureViewModel: ViewModel() {
             Log.d("bugErrrored", data.value.toString())
 
             Log.d("bugErrrored", "attempting to start db search")
+            Log.d("bugErrrored", "domain= $group_number\nIndexItem= ${_maxIndex.value.parentIndex}")
             data.value= viewModelDiseaseDB.searchDB(
                 domain = group_number.toString(),
                 indexItem = _maxIndex.value.parentIndex.toString()
@@ -169,47 +170,91 @@ class photoCaptureViewModel: ViewModel() {
     ): List<disease_version> {
         val reqList: MutableList<disease_version> = mutableListOf()
         Log.d("grPNumber", group_number.toString())
-        val lungs= listOf(
-            disease_version("Pneumonia", "V2023.04.30", modelAccuracy = 97.70),
-            disease_version("Tuberculosis", "V2023.11.14", modelAccuracy = 97.60),
-        )
-        val brain= listOf(
-            disease_version("Gioma Tumor", "V2023.04.30", modelAccuracy = 97.70),
-            disease_version("Pituitary Tumor", "V2023.11.14", modelAccuracy = 97.60),
-            disease_version("Meningioma Tumor", "V2023.11.14", modelAccuracy = 97.60)
-        )
+
+        val selectedDomain= when(group_number){
+            0 -> {
+                listOf(
+                    disease_version("Acute Lymphoblastic Leukemia (Early)", "V2024.03.04", modelAccuracy = 98.9),
+                    disease_version("Acute Lymphoblastic Leukemia (Pro)", "V2024.03.04", modelAccuracy = 100.0)
+                )
+            }
+            1 -> {
+                listOf(
+                    disease_version("Colon Cancer", "V2024.02.05", modelAccuracy = 98.5)
+                )
+            }
+            2 -> {
+                listOf(
+                    disease_version("Oral Cancer", modelAccuracy = 95.25, version = "V2024.02.03")
+                )
+            }
+            3 -> {
+                listOf(
+                    disease_version("Gioma Tumor", "V2023.04.30", modelAccuracy = 97.70),
+                    disease_version("Pituitary Tumor", "V2023.11.14", modelAccuracy = 97.60),
+                    disease_version("Meningioma Tumor", "V2023.11.14", modelAccuracy = 97.60)
+                )
+            }
+            4 -> {
+                listOf(
+                    disease_version("Breast Cancer", "V2024.03.02", modelAccuracy = 93.25)
+                )
+            }
+            6 -> {
+                listOf(
+                    disease_version("Pneumonia", "V2023.04.30", modelAccuracy = 97.70),
+                    disease_version("Tuberculosis", "V2023.11.14", modelAccuracy = 97.60),
+                )
+            }
+            7 -> {
+                listOf(
+                    disease_version("Lung Adenocarcinoma", "V2024.03.04", modelAccuracy = 99.25),
+                    disease_version("Lung Squamous Cell Carcinoma", "V2024.03.05", modelAccuracy = 100.0)
+                )
+            }
+            8 -> {
+                listOf(
+                    disease_version("Acne", "V2024.03.10", modelAccuracy = 94.8),
+                    disease_version("Ezcima", "V2024.03.10", modelAccuracy = 91.8),
+                    disease_version("Infection", "V2024.03.10", modelAccuracy = 76.8),
+                    disease_version("Pigmentation", "V2024.03.10", modelAccuracy = 81.6)
+                )
+            }
+            9 -> {
+                listOf(
+                    disease_version("Skin Malignant Cancer", "V2024.03.10", modelAccuracy = 85.6)
+                )
+            }
+            11 -> {
+                listOf(
+                    disease_version("Kindey Tumor", "V2024.02.02", modelAccuracy = 94.75)
+                )
+            }
+            else -> { emptyList() }
+        }
+
+        Log.d("logError", "max values: ${_maxIndex.value}")
+        Log.d("logError", "selected index: ${_maxIndex.value}")
+
         if (isMaxIndex){
-            when(group_number){
-                0 -> {
-                    reqList.add(
-                        disease_version(
-                        lungs[_maxIndex.value.parentIndex!!].disease_name, lungs[_maxIndex.value.parentIndex!!].version,
-                            _maxIndex.value.confident, modelAccuracy = lungs[_maxIndex.value.parentIndex!!].modelAccuracy
+            selectedDomain.let {
+                reqList.add(
+                    disease_version(
+                        it[_maxIndex.value.parentIndex!!].disease_name,
+                        it[_maxIndex.value.parentIndex!!].version,
+                        _maxIndex.value.confident,
+                        modelAccuracy = it[_maxIndex.value.parentIndex!!].modelAccuracy
                     ))
-                }
-                1 -> {
-                    reqList.add(
-                        disease_version(
-                            brain[_maxIndex.value.parentIndex!!].disease_name, brain[_maxIndex.value.parentIndex!!].version,
-                            _maxIndex.value.confident, modelAccuracy = brain[_maxIndex.value.parentIndex!!].modelAccuracy
-                        )
-                    )
-                }
             }
             return reqList
         }
         _notMaxElements.value.forEach { classification ->
-            when(group_number){
-                0-> {
-                    reqList.add(disease_version(
-                        lungs[classification.parentIndex!!].disease_name, lungs[classification.parentIndex].version, classification.confident
-                    ))
-                }
-                1 -> {
-                    reqList.add(disease_version(
-                        brain[classification.parentIndex!!].disease_name, brain[classification.parentIndex].version, classification.confident
-                    ))
-                }
+            selectedDomain.let {
+                reqList.add(disease_version(
+                    it[classification.parentIndex!!].disease_name,
+                    it[classification.parentIndex].version,
+                    classification.confident
+                ))
             }
         }
         return reqList

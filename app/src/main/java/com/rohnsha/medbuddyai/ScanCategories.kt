@@ -110,7 +110,7 @@ fun ScanCategoryScreen(
 
         val respiratoryDiseases= listOf(
             modelMarketPlace("Lungs", "Various",
-                "Pneumonia, Tuberculosis", false, 7
+                "Pneumonia, Tuberculosis", false, 6
             ),
             modelMarketPlace("Lungs (Cancerous)", "V2023.06.51",
                 "Lungs Adenocarcinoma, Squamous Cell Carcinoma", true, 0)

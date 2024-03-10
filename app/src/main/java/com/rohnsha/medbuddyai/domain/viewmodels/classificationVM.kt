@@ -21,7 +21,9 @@ import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.SkinAcneV1
 import com.rohnsha.medbuddyai.ml.SkinCancerV1
+import com.rohnsha.medbuddyai.ml.SkinEzcamaV1
 import com.rohnsha.medbuddyai.ml.SkinInfectionV1
+import com.rohnsha.medbuddyai.ml.SkinPigmentationV1
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
 import kotlinx.coroutines.launch
@@ -236,7 +238,7 @@ class classificationVM: ViewModel() {
             classification(maxAcne, skinAcne[maxAcne]*100, 0)
         )
 
-        val skinEzima= SkinAcneV1
+        val skinEzima= SkinEzcamaV1
             .newInstance(context)
             .process(inputFeature0)
             .outputFeature0AsTensorBuffer
@@ -256,7 +258,7 @@ class classificationVM: ViewModel() {
             classification(maxInfection, infection[maxInfection], 2)
         )
 
-        val pigmentation= SkinInfectionV1
+        val pigmentation= SkinPigmentationV1
             .newInstance(context)
             .process(inputFeature0)
             .outputFeature0AsTensorBuffer

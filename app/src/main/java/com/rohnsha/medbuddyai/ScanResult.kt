@@ -246,7 +246,7 @@ fun ScanResultScreen(
                 }
                 Log.d("loggingStatus", "errored")
             } else {
-                ScanResultsSuccess(padding = padding, values = values)
+                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification)
                 if (modalState.value){
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -339,6 +339,7 @@ fun LoadingLayout(
 fun ScanResultsSuccess(
     padding: PaddingValues,
     values: PaddingValues,
+    indexClassification: Int
 ) {
     val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
     if (mode==0){
@@ -390,7 +391,7 @@ fun ScanResultsSuccess(
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 if (mode==0){
-                    ClassificationConf()
+                    ClassificationConf(indexClassification = indexClassification)
                 }
             }
         }
@@ -490,9 +491,9 @@ fun ScanResultsSuccess(
 }
 
 @Composable
-fun ClassificationConf() {
+fun ClassificationConf(indexClassification: Int) {
     val modelData= photoCaptureViewModel.getDiseaseVersionData(
-        isMaxIndex = true, group_number = 0,
+        isMaxIndex = true, group_number = indexClassification,
     )
     Log.d("modelAccuracy", modelData[0].toString())
     Row(
