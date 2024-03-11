@@ -113,7 +113,7 @@ fun ScanCategoryScreen(
                 "Pneumonia, Tuberculosis", false, 6
             ),
             modelMarketPlace("Lungs (Cancerous)", "V2023.06.51",
-                "Lungs Adenocarcinoma, Squamous Cell Carcinoma", true, 0)
+                "Lungs Adenocarcinoma, Squamous Cell Carcinoma", true, 7)
         )
         val brainCateg= listOf(
             modelMarketPlace("Brain", "V2024.01.51",
@@ -123,12 +123,12 @@ fun ScanCategoryScreen(
 
         val miscellaneousCateg= listOf(
             modelMarketPlace("Oral (Cancerous)", "V2024.01.51",
-                "Oral Squamous Cell Carcinoma", true, 1)
+                "Oral Squamous Cell Carcinoma", true, 2)
         )
 
         val kidneyCateg= listOf(
             modelMarketPlace("Kidney", "V2024.01.24",
-                "Kidney tumor", false, 1)
+                "Kidney tumor", false, 11)
         )
 
         val skinManifestation= listOf(
@@ -141,7 +141,7 @@ fun ScanCategoryScreen(
 
         val lymphatic= listOf(
             modelMarketPlace("Lymph Nodes", "V2024.06.01",
-                "Acute Lymphoblastic Leukemia (Pre, Pro)", false, 1)
+                "Acute Lymphoblastic Leukemia (Pre, Pro)", false, 0)
         )
 
         val digestive= listOf(

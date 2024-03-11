@@ -102,7 +102,7 @@ class classificationVM: ViewModel() {
             .outputFeature0AsTensorBuffer
         val maxIndexPro= getMaxIndex(outputputPre.floatArray)
         predictedClass.add(
-            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 0)
+            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 1)
         )
         return predictedClass
     }
@@ -126,7 +126,7 @@ class classificationVM: ViewModel() {
             .outputFeature0AsTensorBuffer
         val maxIndexPro= getMaxIndex(outputputPre.floatArray)
         predictedClass.add(
-            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 0)
+            classification(maxIndexPro, outputputPro.floatArray[maxIndexPro]*100, 1)
         )
         return predictedClass
     }
