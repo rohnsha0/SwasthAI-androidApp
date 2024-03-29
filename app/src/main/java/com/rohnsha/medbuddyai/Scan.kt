@@ -510,7 +510,8 @@ fun ScanMainScreen(
                             if (bitmapImg != null) {
                                 isPredictingBool.value= true
                                 delay(600L)
-                                val branchClassification = viewModelClassification.classify(conttext, bitmapImg, 999)[0]
+                                val branchClassification = viewModelClassification.classify(
+                                    conttext, bitmapImg, scanOption = 999, index = index)[0]
                                 Log.d("bitmapResults", branchClassification.toString())
                                 if (branchClassification.indexNumber==0){
                                     bomError.value=true

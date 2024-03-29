@@ -24,6 +24,7 @@ import com.rohnsha.medbuddyai.ml.SkinCancerV1
 import com.rohnsha.medbuddyai.ml.SkinEzcamaV1
 import com.rohnsha.medbuddyai.ml.SkinInfectionV1
 import com.rohnsha.medbuddyai.ml.SkinPigmentationV1
+import com.rohnsha.medbuddyai.ml.SkinSegmentationv1
 import com.rohnsha.medbuddyai.ml.TuberculosisV1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
 import kotlinx.coroutines.launch
@@ -41,7 +42,7 @@ class classificationVM: ViewModel() {
         scanOption: Int,
         index: Int=0
     ): List<classification> {
-        var predictedClasses:List<classification> = emptyList()
+        var predictedClasses:List<classification>
 
         var tensorImage= TensorImage(DataType.FLOAT32)
         tensorImage.load(bitmap)
@@ -51,6 +52,7 @@ class classificationVM: ViewModel() {
         tensorImage= imageProcessor.process(tensorImage)
         val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
         inputFeature0.loadBuffer(tensorImage.buffer)
+        Log.d("inputString", "scanOption: $scanOption, index: $index")
 
         predictedClasses= when(scanOption){
             0 -> { predictionLeukemia(inputFeature0 = inputFeature0, context = context) }
@@ -201,30 +203,6 @@ class classificationVM: ViewModel() {
         return predictedClasses
     }
 
-
-    fun predictionMaster(
-        inputFeature0: TensorBuffer,
-        context: Context,
-        index: Int
-    ): List<classification> {
-        val predictedClassesLungs= mutableListOf<classification>()
-
-        val outputPneumonia= when(index){
-            0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
-            1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
-            else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
-        }
-        val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)
-        predictedClassesLungs.add(
-            classification(
-                indexNumber = maxIndexPneumonia,
-                confident = outputPneumonia.floatArray[getMaxIndex(outputPneumonia.floatArray)]*100,
-                parentIndex = 0
-            ),
-        )
-        return predictedClassesLungs
-    }
-
     fun predictionSkin(context: Context, inputFeature0: TensorBuffer): List<classification>{
         val predictedClasses= mutableListOf<classification>()
 
@@ -360,6 +338,33 @@ class classificationVM: ViewModel() {
             modelTuberCulosis.close()
         }
 
+        return predictedClassesLungs
+    }
+
+    fun predictionMaster(
+        inputFeature0: TensorBuffer,
+        context: Context,
+        index: Int
+    ): List<classification> {
+        val predictedClassesLungs= mutableListOf<classification>()
+
+        Log.d("inputString", "index: $index")
+
+        val outputPneumonia= when(index){
+            0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            8 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            9 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+        }
+        val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)
+        predictedClassesLungs.add(
+            classification(
+                indexNumber = maxIndexPneumonia,
+                confident = outputPneumonia.floatArray[getMaxIndex(outputPneumonia.floatArray)]*100,
+                parentIndex = 0
+            ),
+        )
         return predictedClassesLungs
     }
 

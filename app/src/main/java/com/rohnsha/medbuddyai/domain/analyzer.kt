@@ -8,6 +8,7 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
+import com.rohnsha.medbuddyai.ml.SkinSegmentationv1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.support.image.ImageProcessor
@@ -45,15 +46,19 @@ class analyzer(
             tensorImage= imageProcessor.process(tensorImage)
             val inputFeature0 = TensorBuffer.createFixedSize(intArrayOf(1, 256, 256, 3), DataType.FLOAT32)
             inputFeature0.loadBuffer(tensorImage.buffer)
+            Log.d("inputString", "indexAnalyzer: $index")
             val outputFeature0 = when(index){
                 0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
                 1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                8 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                9 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
                 else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
             }
             val results= classification(
                 getMaxIndex(outputFeature0.floatArray), outputFeature0.floatArray[getMaxIndex(
                 outputFeature0.floatArray
             )] * 100)
+            Log.d("inputString", "result: $results")
             onResults(results)
             Log.d("analyzerSuccess", results.indexNumber.toString())
         }

@@ -315,7 +315,7 @@ fun ScanCategoryScreen(
                     title = it.modelName,
                     subtitle = it.modelVersion,
                     colorLogo = Color.White,
-                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(1)) },
+                    onClickListener = { navController.navigate(bottomNavItems.Scan.returnScanIndex(it.domainIndex)) },
                     description = it.description,
                     isCancerous = it.isCancerous
                 )
