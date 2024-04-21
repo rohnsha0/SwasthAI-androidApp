@@ -87,6 +87,13 @@ sealed class bottomNavItems(
         selectedIcon = Icons.Filled.Explore
     )
 
+    object Chatbot: bottomNavItems(
+        title = "chat",
+        route = "chat",
+        unselectedIcon = Icons.Outlined.Explore,
+        selectedIcon = Icons.Filled.Explore
+    )
+
     object mAI: bottomNavItems(
         title = "sAI",
         route = "m_ai",

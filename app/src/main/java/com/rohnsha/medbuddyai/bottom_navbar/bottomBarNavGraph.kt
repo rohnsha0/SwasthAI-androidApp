@@ -21,6 +21,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.screens.BMIScreen
+import com.rohnsha.medbuddyai.screens.ChatBotScreen
 import com.rohnsha.medbuddyai.screens.CommunityScreen
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
@@ -131,7 +132,14 @@ fun bottomNavGraph(
 
         composable(route = bottomNavItems.mAI.route){
             mAIScreen(
-                padding = padding
+                padding = padding,
+                navController
+            )
+        }
+
+        composable(route = bottomNavItems.Chatbot.route){
+            ChatBotScreen(
+                paddingValues = padding,
             )
         }
 

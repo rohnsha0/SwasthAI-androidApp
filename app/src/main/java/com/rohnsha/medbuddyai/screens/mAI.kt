@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
@@ -39,7 +41,7 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @Composable
 fun mAIScreen(
     padding: PaddingValues,
-    //navController: NavHostController
+    navController: NavHostController
 ) {
     Scaffold(
         topBar = {
@@ -87,7 +89,7 @@ fun mAIScreen(
                     imageVector = Icons.Outlined.Speed,
                     colorLogo = customRed,
                     onClickListener = {
-                        //navController.navigate(bottomNavItems.)
+                        navController.navigate(bottomNavItems.Chatbot.route)
                     }
                 )
             }
