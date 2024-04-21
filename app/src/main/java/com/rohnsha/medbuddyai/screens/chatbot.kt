@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Send
@@ -38,7 +39,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.rohnsha.medbuddyai.api.chatbot.chatbot_obj.chatService
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.Pink40
@@ -50,19 +50,7 @@ import kotlinx.coroutines.launch
 fun ChatBotScreen(
     paddingValues: PaddingValues
 ) {
-
-    val dynamicURL= "https://api-jjtysweprq-el.a.run.app/chat/hi!"
-    val response= remember {
-        mutableStateOf("")
-    }
-
     val scope= rememberCoroutineScope()
-
-    LaunchedEffect(key1 = true) {
-        response.value= chatService.getChatReply(dynamicURL).message
-        Log.d("chatResponse", response.value)
-    }
-
     val chatbotViewModel= viewModel<chatVM>()
 
     val messageField= remember {
@@ -78,6 +66,18 @@ fun ChatBotScreen(
             messaageList.add(message)
         }
     }
+    LaunchedEffect(key1 = chatbotViewModel.messageCount.collectAsState().value) {
+        val count= chatbotViewModel.messageCount
+        Log.d("sizes", "vm: ${count}, size: ${messaageList.size}")
+    }
+    val scrollState = rememberLazyListState()
+
+    LaunchedEffect(chatbotViewModel.messageCount.collectAsState().value) {
+        if (messaageList.isNotEmpty()) {
+            scrollState.animateScrollToItem(messaageList.size- 1)
+        }
+    }
+
 
 
     Scaffold(
@@ -110,7 +110,8 @@ fun ChatBotScreen(
                 .padding(top = 30.dp, start = 24.dp, end = 24.dp)
         ) {
             LazyColumn(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                state = scrollState
             ) {
                 items(messaageList){
                     Messages(message = it)
@@ -128,9 +129,12 @@ fun ChatBotScreen(
                         .size(24.dp)
                         .clickable {
                             scope.launch {
-                                chatbotViewModel.chat(messageField.value, resetMessageFeld = {
-                                    messageField.value = ""
-                                })
+                                chatbotViewModel.chat(
+                                    messageField.value,
+                                    resetMessageFeild = {
+                                        messageField.value = ""
+                                    },
+                                    onCompletion = {  })
                             }
                         }
                 )

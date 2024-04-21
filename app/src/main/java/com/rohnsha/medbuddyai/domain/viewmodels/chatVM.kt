@@ -16,16 +16,17 @@ class chatVM: ViewModel() {
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
 
-    suspend fun chat(message: String, resetMessageFeld: () -> Unit){
+    suspend fun chat(message: String, resetMessageFeild: () -> Unit, onCompletion: () -> Unit){
         val dynamicURL= "https://api-jjtysweprq-el.a.run.app/chat/$message"
         try {
             _listMessages.emit(message)
             _messageCount.value += 1
-            resetMessageFeld()
+            resetMessageFeild()
             val response= chatService.getChatReply(dynamicURL)
             _listMessages.emit(response.message)
             _messageCount.value += 1
             Log.d("errorChat", response.message)
+            onCompletion()
         } catch (e: Exception){
             Log.d("errorChat", e.toString())
             _listMessages.emit("there might be any other issues")

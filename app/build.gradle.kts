@@ -18,8 +18,8 @@ android {
         applicationId = "com.rohnsha.medbuddyai"
         minSdk = 26
         targetSdk = 34
-        versionCode = 10
-        versionName = "2024.3.18.98"
+        versionCode = 11
+        versionName = "2024.4.22.204"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -66,7 +66,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("androidx.compose.material:material-icons-extended:1.5.1")
+    implementation("androidx.compose.material:material-icons-extended:1.6.6")
     implementation("androidx.navigation:navigation-compose:2.7.2")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.2")
