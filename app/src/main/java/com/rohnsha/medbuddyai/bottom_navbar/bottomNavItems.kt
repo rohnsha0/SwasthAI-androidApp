@@ -88,7 +88,7 @@ sealed class bottomNavItems(
     )
 
     object mAI: bottomNavItems(
-        title = "mAI",
+        title = "sAI",
         route = "m_ai",
         unselectedIcon = Icons.Outlined.Assistant,
         selectedIcon = Icons.Filled.Assistant

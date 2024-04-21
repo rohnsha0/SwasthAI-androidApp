@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai
+package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize

@@ -45,9 +45,9 @@ class MainActivity : ComponentActivity() {
             DermBuddyAITheme {
                 val items= listOf(
                     bottomNavItems.Home,
-                    bottomNavItems.Explore,
-                    bottomNavItems.Community,
                     bottomNavItems.mAI,
+                    bottomNavItems.Community,
+                    bottomNavItems.Preferences,
                 )
                 var selectedItemIndex by rememberSaveable {
                     mutableIntStateOf(0)
@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                                 contentDescription = bottomNavItems.title
                                             )
                                         },
-                                        alwaysShowLabel = true,
+                                        alwaysShowLabel = false,
                                     )
                                 }
                             }

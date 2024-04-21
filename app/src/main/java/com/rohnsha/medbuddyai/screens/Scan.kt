@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai
+package com.rohnsha.medbuddyai.screens
 
 import android.Manifest
 import android.app.Activity
@@ -90,6 +90,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
@@ -113,8 +114,8 @@ fun ScanScreen(
     classifierVM: classificationVM,
     index: Int
 ) {
-    viewModelPhotoSave= photoCaptureVM
-    viewModelClassification= classifierVM
+    viewModelPhotoSave = photoCaptureVM
+    viewModelClassification = classifierVM
     var cameraPermissionState: PermissionState= rememberPermissionState(permission = Manifest.permission.CAMERA)
 
     if (cameraPermissionState.status.isGranted){
@@ -430,7 +431,7 @@ fun ScanMainScreen(
         mutableStateOf(false)
     }
 
-    isConfirming= remember {
+    isConfirming = remember {
         mutableStateOf(false)
     }
 

@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai
+package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize
@@ -117,40 +117,40 @@ fun ScanResultScreen(
     diseaseDBviewModel: diseaseDBviewModel,
     indexClassification: Int // model to be triggered
 ) {
-    photoCaptureViewModel= viewModel
-    diseaseDBvm= diseaseDBviewModel
-    mode= resultsLevel
-    scanHistoryVM= scanHistoryViewModel
+    photoCaptureViewModel = viewModel
+    diseaseDBvm = diseaseDBviewModel
+    mode = resultsLevel
+    scanHistoryVM = scanHistoryViewModel
     val context= LocalContext.current
-    disease_results= remember {
+    disease_results = remember {
         mutableStateOf(disease_data_dataClass())
     }
     when(resultsLevel){
         0 -> {
-            isStillLoading= photoCaptureViewModel.isLoadingBoolean.collectAsState().value
-            isNormal= photoCaptureViewModel.isNormalBoolean.collectAsState().value
-            isErrored= photoCaptureViewModel.isErroredBoolean.collectAsState().value
+            isStillLoading = photoCaptureViewModel.isLoadingBoolean.collectAsState().value
+            isNormal = photoCaptureViewModel.isNormalBoolean.collectAsState().value
+            isErrored = photoCaptureViewModel.isErroredBoolean.collectAsState().value
             LaunchedEffect(key1 = true){
                 delay(500L)
                 photoCaptureViewModel.onClassify(context, index = indexClassification)
             }
             disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
-            otherDiseaseData= photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
+            otherDiseaseData = photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
         }
         1 -> {
-            isStillLoading= diseaseDBviewModel.isLoadingBoolean.collectAsState().value
-            isNormal=false
-            isErrored= diseaseDBviewModel.isErroredBoolean.collectAsState().value
+            isStillLoading = diseaseDBviewModel.isLoadingBoolean.collectAsState().value
+            isNormal =false
+            isErrored = diseaseDBviewModel.isErroredBoolean.collectAsState().value
             LaunchedEffect(key1 = Unit){
                 delay(500L)
                 diseaseDBviewModel.searchByName()
             }
             disease_results.value= diseaseDBviewModel.data.collectAsState().value
-            otherDiseaseData= listOf(disease_version("", "", 0f, 01.0))
+            otherDiseaseData = listOf(disease_version("", "", 0f, 01.0))
         }
     }
 
-    modalState= rememberSaveable {
+    modalState = rememberSaveable {
         mutableStateOf(false)
     }
     val infoStateOpen = remember {
@@ -342,7 +342,7 @@ fun ScanResultsSuccess(
     indexClassification: Int
 ) {
     val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
-    if (mode==0){
+    if (mode ==0){
         LaunchedEffect(key1 = disease_results.value){
             scanHistoryVM.addScanHistory(scanHistory(
                 timestamp = System.currentTimeMillis(),
@@ -390,7 +390,7 @@ fun ScanResultsSuccess(
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                if (mode==0){
+                if (mode ==0){
                     ClassificationConf(indexClassification = indexClassification)
                 }
             }
@@ -448,7 +448,7 @@ fun ScanResultsSuccess(
                     Spacer(modifier = Modifier.height(13.dp))
                 }
             }
-            if (mode==0){
+            if (mode ==0){
                 items(otherDiseaseData){ data ->
                     Box(
                         modifier = Modifier

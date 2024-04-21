@@ -14,21 +14,21 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.rohnsha.medbuddyai.BMIScreen
-import com.rohnsha.medbuddyai.CommunityScreen
-import com.rohnsha.medbuddyai.ExploreScreen
-import com.rohnsha.medbuddyai.HomeScreen
-import com.rohnsha.medbuddyai.MoreScreen
-import com.rohnsha.medbuddyai.ScanCategoryScreen
-import com.rohnsha.medbuddyai.ScanResultScreen
-import com.rohnsha.medbuddyai.ScanScreen
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
-import com.rohnsha.medbuddyai.mAIScreen
+import com.rohnsha.medbuddyai.screens.BMIScreen
+import com.rohnsha.medbuddyai.screens.CommunityScreen
+import com.rohnsha.medbuddyai.screens.ExploreScreen
+import com.rohnsha.medbuddyai.screens.HomeScreen
+import com.rohnsha.medbuddyai.screens.MoreScreen
+import com.rohnsha.medbuddyai.screens.ScanCategoryScreen
+import com.rohnsha.medbuddyai.screens.ScanResultScreen
+import com.rohnsha.medbuddyai.screens.ScanScreen
+import com.rohnsha.medbuddyai.screens.mAIScreen
 import kotlinx.coroutines.delay
 
 @Composable

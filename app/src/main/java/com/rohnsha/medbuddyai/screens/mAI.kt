@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai
+package com.rohnsha.medbuddyai.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -38,7 +38,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun mAIScreen(
-    padding: PaddingValues
+    padding: PaddingValues,
+    //navController: NavHostController
 ) {
     Scaffold(
         topBar = {
@@ -84,7 +85,10 @@ fun mAIScreen(
                     data = "54",
                     additionData = "Imbalanced",
                     imageVector = Icons.Outlined.Speed,
-                    colorLogo = customRed
+                    colorLogo = customRed,
+                    onClickListener = {
+                        //navController.navigate(bottomNavItems.)
+                    }
                 )
             }
         }
