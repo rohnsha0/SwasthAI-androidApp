@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -34,14 +35,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rohnsha.medbuddyai.domain.dataclass.messageDC
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
-import com.rohnsha.medbuddyai.ui.theme.Pink40
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.launch
 
@@ -58,7 +62,7 @@ fun ChatBotScreen(
     }
 
     val messaageList= remember {
-        mutableListOf<String>()
+        mutableListOf<messageDC>()
     }
     
     LaunchedEffect(chatbotViewModel.messageCount.collectAsState().value) {
@@ -114,7 +118,7 @@ fun ChatBotScreen(
                 state = scrollState
             ) {
                 items(messaageList){
-                    Messages(message = it)
+                    Messages(messageInfo = it)
                 }
             }
             Row(
@@ -134,7 +138,7 @@ fun ChatBotScreen(
                                     resetMessageFeild = {
                                         messageField.value = ""
                                     },
-                                    onCompletion = {  })
+                                    onCompletion = { })
                             }
                         }
                 )
@@ -145,15 +149,52 @@ fun ChatBotScreen(
 
 @Composable
 fun Messages(
-    message: String
+    messageInfo: messageDC
 ) {
-    if (message!=""){
+    if (messageInfo.message!=""){
         Box(
             modifier = Modifier
-                .background(Pink40)
-                .padding(9.dp)
+                .padding(vertical = 6.dp)
+                .then(
+                    if (messageInfo.isBotMessage){
+                        Modifier.padding(end = 20.dp)
+                    } else {
+                        Modifier.padding(start = 20.dp)
+                    }
+                )
+                .fillMaxWidth()
+                .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
+                .clickable { },
+            contentAlignment = Alignment.CenterStart
         ){
-            Text(text = message)
+            Column {
+                Text(
+                    text = messageInfo.message,
+                    fontSize = 14.sp,
+                    fontFamily = fontFamily,
+                    modifier = Modifier
+                        .padding(start = 13.dp, end = 24.dp, bottom = 8.dp, top = 13.dp)
+                        .fillMaxWidth()
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .background(BGMain)
+                        .fillMaxWidth()
+                        .padding(start = 13.dp, end = 24.dp, bottom = 5.dp, top = 3.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ){
+                    Text(
+                        text = "${if (messageInfo.isBotMessage) "SwasthAI Chat - QnA" else "You"} | 22 Apr 2022, 21:15",
+                        fontSize = 10.sp,
+                        fontFamily = fontFamily,
+                        modifier = Modifier,
+                        color = customBlue,
+                        fontWeight = FontWeight(600)
+                    )
+                }
+            }
         }
     }
 }

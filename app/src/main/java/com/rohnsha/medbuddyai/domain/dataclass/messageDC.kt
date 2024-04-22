@@ -1,0 +1,6 @@
+package com.rohnsha.medbuddyai.domain.dataclass
+
+data class messageDC(
+    val message: String,
+    val isBotMessage: Boolean
+)

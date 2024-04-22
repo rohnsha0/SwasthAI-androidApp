@@ -58,6 +58,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -254,7 +255,7 @@ fun CommunityScreen(
                                 it.toLong())
                         }
                             ?: "Unspecified",
-                        colorLogo = customRed,
+                        colorLogo = customBlue,
                         postData = data.content?: "Unknown"
                     )
                 }
