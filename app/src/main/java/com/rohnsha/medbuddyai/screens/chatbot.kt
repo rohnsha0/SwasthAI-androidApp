@@ -47,11 +47,14 @@ import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatBotScreen(
-    paddingValues: PaddingValues
+    paddingValues: PaddingValues,
 ) {
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
@@ -148,7 +151,7 @@ fun ChatBotScreen(
 
 @Composable
 fun Messages(
-    messageInfo: messageDC
+    messageInfo: messageDC,
 ) {
     if (messageInfo.message!=""){
         Row {
@@ -165,7 +168,6 @@ fun Messages(
                             Modifier.padding(start = 20.dp)
                         }
                     )
-                    //.fillMaxWidth()
                     .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
                     .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
                 contentAlignment = Alignment.CenterStart
@@ -177,18 +179,19 @@ fun Messages(
                         fontFamily = fontFamily,
                         modifier = Modifier
                             .padding(start = 13.dp, end = 24.dp, bottom = 8.dp, top = 13.dp)
-                            //.fillMaxWidth()
                     )
                     Box(
                         modifier = Modifier
                             .padding(2.dp)
                             .background(BGMain)
-                            //.fillMaxWidth()
                             .padding(start = 13.dp, end = 24.dp, bottom = 5.dp, top = 3.dp),
                         contentAlignment = Alignment.CenterEnd
                     ){
+                        val formatter = SimpleDateFormat("MMMM dd, yyyy - HH:mm", Locale.getDefault())
                         Text(
-                            text = "${if (messageInfo.isBotMessage) "SwasthAI Chat - QnA" else "You"} | 22 Apr 2022, 21:15",
+                            text = "${if (messageInfo.isBotMessage) "SwasthAI Chat - QnA" else "You"} | ${formatter.format(
+                                Date(messageInfo.timestamp)
+                            )}",
                             fontSize = 10.sp,
                             fontFamily = fontFamily,
                             modifier = Modifier,

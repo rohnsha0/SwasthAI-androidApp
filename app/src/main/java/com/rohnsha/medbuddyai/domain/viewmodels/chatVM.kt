@@ -20,17 +20,17 @@ class chatVM: ViewModel() {
     suspend fun chat(message: String, resetMessageFeild: () -> Unit, onCompletion: () -> Unit){
         val dynamicURL= "https://api-jjtysweprq-el.a.run.app/chat/$message"
         try {
-            _listMessages.emit(messageDC(message, false))
+            _listMessages.emit(messageDC(message, false, System.currentTimeMillis()))
             _messageCount.value += 1
             resetMessageFeild()
             val response= chatService.getChatReply(dynamicURL)
-            _listMessages.emit(messageDC(response.message, true))
+            _listMessages.emit(messageDC(response.message, true, System.currentTimeMillis()))
             _messageCount.value += 1
             Log.d("errorChat", response.message)
             onCompletion()
         } catch (e: Exception){
             Log.d("errorChat", e.toString())
-            _listMessages.emit(messageDC("there might be any other issues", true))
+            _listMessages.emit(messageDC("there might be any other issues", true, System.currentTimeMillis()))
         }
     }
 
