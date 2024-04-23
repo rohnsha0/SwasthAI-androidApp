@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -152,48 +151,55 @@ fun Messages(
     messageInfo: messageDC
 ) {
     if (messageInfo.message!=""){
-        Box(
-            modifier = Modifier
-                .padding(vertical = 6.dp)
-                .then(
-                    if (messageInfo.isBotMessage){
-                        Modifier.padding(end = 20.dp)
-                    } else {
-                        Modifier.padding(start = 20.dp)
-                    }
-                )
-                .fillMaxWidth()
-                .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-                .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
-                .clickable { },
-            contentAlignment = Alignment.CenterStart
-        ){
-            Column {
-                Text(
-                    text = messageInfo.message,
-                    fontSize = 14.sp,
-                    fontFamily = fontFamily,
-                    modifier = Modifier
-                        .padding(start = 13.dp, end = 24.dp, bottom = 8.dp, top = 13.dp)
-                        .fillMaxWidth()
-                )
-                Box(
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .background(BGMain)
-                        .fillMaxWidth()
-                        .padding(start = 13.dp, end = 24.dp, bottom = 5.dp, top = 3.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ){
-                    Text(
-                        text = "${if (messageInfo.isBotMessage) "SwasthAI Chat - QnA" else "You"} | 22 Apr 2022, 21:15",
-                        fontSize = 10.sp,
-                        fontFamily = fontFamily,
-                        modifier = Modifier,
-                        color = customBlue,
-                        fontWeight = FontWeight(600)
+        Row {
+            if (!messageInfo.isBotMessage){
+                Spacer(modifier = Modifier.weight(1f))
+            }
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .then(
+                        if (messageInfo.isBotMessage) {
+                            Modifier.padding(end = 20.dp)
+                        } else {
+                            Modifier.padding(start = 20.dp)
+                        }
                     )
+                    //.fillMaxWidth()
+                    .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                    .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.CenterStart
+            ){
+                Column {
+                    Text(
+                        text = messageInfo.message,
+                        fontSize = 14.sp,
+                        fontFamily = fontFamily,
+                        modifier = Modifier
+                            .padding(start = 13.dp, end = 24.dp, bottom = 8.dp, top = 13.dp)
+                            //.fillMaxWidth()
+                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(2.dp)
+                            .background(BGMain)
+                            //.fillMaxWidth()
+                            .padding(start = 13.dp, end = 24.dp, bottom = 5.dp, top = 3.dp),
+                        contentAlignment = Alignment.CenterEnd
+                    ){
+                        Text(
+                            text = "${if (messageInfo.isBotMessage) "SwasthAI Chat - QnA" else "You"} | 22 Apr 2022, 21:15",
+                            fontSize = 10.sp,
+                            fontFamily = fontFamily,
+                            modifier = Modifier,
+                            color = customBlue,
+                            fontWeight = FontWeight(600)
+                        )
+                    }
                 }
+            }
+            if (messageInfo.isBotMessage){
+                Spacer(modifier = Modifier.weight(1f))
             }
         }
     }
