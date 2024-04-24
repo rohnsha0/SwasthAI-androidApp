@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.IOException
 
 class chatVM: ViewModel() {
 
@@ -29,8 +30,34 @@ class chatVM: ViewModel() {
             Log.d("errorChat", response.message)
             onCompletion()
         } catch (e: Exception){
-            Log.d("errorChat", e.toString())
-            _listMessages.emit(messageDC("there might be any other issues", true, System.currentTimeMillis()))
+            when (e) {
+                is retrofit2.HttpException -> {
+                    val errorMessage = when (e.code()) {
+                        504 -> "Gateway timeout: The server is not responding"
+                        500 -> "Internal server error"
+                        404 -> "Resource not found"
+                        // Add more cases for other HTTP error codes
+                        else -> "An HTTP error occurred: ${e.code()} ${e.message()}"
+                    }
+                    Log.d("errorChat", e.stackTrace.toString())
+                    Log.d("errorChat", errorMessage)
+                    Log.d("errorChat", e.toString())
+                    _listMessages.emit(messageDC(errorMessage, true, System.currentTimeMillis()))
+                }
+                is IOException -> {
+                    Log.d("errorChat", e.stackTrace.toString())
+                    Log.d("errorChat", "Network error: ${e.message}")
+                    Log.d("errorChat", e.toString())
+                    _listMessages.emit(messageDC("Network error occurred, please check your connection", true, System.currentTimeMillis()))
+                }
+                else -> {
+                    Log.d("errorChat", e.stackTrace.toString())
+                    Log.d("errorChat", e.message ?: "An unknown error occurred")
+                    Log.d("errorChat", e.toString())
+                    _listMessages.emit(messageDC("An unknown error occurred, please try again later", true, System.currentTimeMillis()))
+                }
+            }
+            _messageCount.value += 1
         }
     }
 
