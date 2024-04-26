@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -127,14 +128,27 @@ fun ChatBotScreen(
                 state = scrollState
             ) {
                 items(messaageList){
-                    Messages(messageInfo = it)
+                    if (!it.isError){
+                        Messages(messageInfo = it)
+                    } else{
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                            Text(
+                                text = it.message,
+                                color = lightTextAccent,
+                                fontFamily = fontFamily,
+                                fontSize = 10.sp,
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                    }
                 }
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
                 modifier= Modifier
-                    .padding(bottom = 10.dp, start = 13.dp, end=10.dp, top = 16.dp)
+                    .padding(bottom = 10.dp, start = 13.dp, end = 10.dp, top = 16.dp)
                     .fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -143,6 +157,7 @@ fun ChatBotScreen(
                     modifier = Modifier
                         .weight(1f)
                         .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
+                    shape= RoundedCornerShape(16.dp),
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent,
@@ -158,12 +173,14 @@ fun ChatBotScreen(
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
-                                chatbotViewModel.chat(
-                                    messageField.value,
-                                    resetMessageFeild = {
-                                        messageField.value = ""
-                                    },
-                                    onCompletion = { })
+                                if (messageField.value != "") {
+                                    chatbotViewModel.chat(
+                                        messageField.value,
+                                        resetMessageFeild = {
+                                            messageField.value = ""
+                                        },
+                                        onCompletion = { })
+                                }
                             }
                         }
                         .background(customBlue)

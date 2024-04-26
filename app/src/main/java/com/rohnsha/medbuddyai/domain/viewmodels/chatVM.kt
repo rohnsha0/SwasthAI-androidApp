@@ -42,19 +42,19 @@ class chatVM: ViewModel() {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", errorMessage)
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC(errorMessage, true, System.currentTimeMillis()))
+                    _listMessages.emit(messageDC(errorMessage, true, System.currentTimeMillis(), isError = true))
                 }
                 is IOException -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", "Network error: ${e.message}")
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC("Network error occurred, please check your connection", true, System.currentTimeMillis()))
+                    _listMessages.emit(messageDC("Network error occurred, please check your connection", true, System.currentTimeMillis(), isError = true))
                 }
                 else -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", e.message ?: "An unknown error occurred")
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC("An unknown error occurred, please try again later", true, System.currentTimeMillis()))
+                    _listMessages.emit(messageDC("An unknown error occurred, please try again later", true, System.currentTimeMillis(), isError = true))
                 }
             }
             _messageCount.value += 1
