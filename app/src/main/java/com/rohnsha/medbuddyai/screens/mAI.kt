@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -15,7 +16,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
-import androidx.compose.material.icons.outlined.Speed
+import androidx.compose.material.icons.outlined.QuestionMark
+import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -33,7 +35,6 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
-import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
@@ -48,7 +49,7 @@ fun mAIScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "AI Doctor",
+                        text = "AI Toolkit",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -73,7 +74,7 @@ fun mAIScreen(
         ){
             item {
                 Text(
-                    text = "Query regarding last scans?",
+                    text = "Chat",
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600),
                     fontSize = 15.sp,
@@ -82,14 +83,38 @@ fun mAIScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 DataListFull(
-                    title = "mPoints",
-                    subtitle = "Fit Score",
-                    data = "54",
-                    additionData = "Imbalanced",
-                    imageVector = Icons.Outlined.Speed,
-                    colorLogo = customRed,
+                    title = "QnA - General",
+                    subtitle = "ai-based advise",
+                    imageVector = Icons.Outlined.QuestionMark,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
                     onClickListener = {
+                        Log.d("logStatus", "clicked")
                         navController.navigate(bottomNavItems.Chatbot.route)
+                    }
+                )
+                DataListFull(
+                    title = "QnA - Specialized Diseases",
+                    subtitle = "ai-based specialized advice",
+                    imageVector = Icons.Outlined.QuestionMark,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        Log.d("logStatus", "clicked")
+                        navController.navigate(bottomNavItems.Chatbot.route)
+                    }
+                )
+                DataListFull(
+                    title = "AI Symptom Checker",
+                    subtitle = "check what's wrong",
+                    imageVector = Icons.Outlined.SmartToy,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        Log.d("logStatus", "clicked")
                     }
                 )
             }

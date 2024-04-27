@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,17 +48,22 @@ class snackBarToggleVM: ViewModel() {
     private val _message= MutableStateFlow("")
     private val _color= MutableStateFlow(Color.Black)
     private val _padding= MutableStateFlow(PaddingValues(0.dp))
+    private val _icon= MutableStateFlow(Icons.Outlined.Close)
 
     fun SendToast(
         message: String,
         indicator_color: Color,
         padding: PaddingValues,
+        icon: ImageVector? = null
     ){
         viewModelScope.launch {
             Log.d("snackbarStateTrue", "doing truth")
             _message.value=message
             _color.value= indicator_color
             _padding.value= padding
+            if (icon!=null){
+                _icon.value= icon
+            }
             _readyToSend.value= true
             Log.d("snackbarStateTrue", "done truth")
         }
@@ -84,7 +90,7 @@ class snackBarToggleVM: ViewModel() {
                         .size(24.dp)
                         .background(_color.collectAsState().value, CircleShape)
                         .padding(4.dp),
-                    imageVector = Icons.Outlined.Close,
+                    imageVector = _icon.collectAsState().value,
                     contentDescription = "snackbar image"
                 )
                 Text(

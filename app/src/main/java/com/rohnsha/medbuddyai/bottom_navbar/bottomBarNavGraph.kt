@@ -14,6 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
@@ -44,6 +45,7 @@ fun bottomNavGraph(
     val communityVM= viewModel<communityVM>()
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
+    val chatdbVM= viewModel<chatDB_VM>()
     val context: Context= LocalContext.current
 
     LaunchedEffect(key1 = true){
@@ -140,6 +142,8 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.Chatbot.route){
             ChatBotScreen(
                 paddingValues = padding,
+                snackBarVM,
+                chatdbVm = chatdbVM
             )
         }
 

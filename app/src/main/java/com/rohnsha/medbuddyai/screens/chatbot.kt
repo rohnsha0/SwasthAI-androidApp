@@ -1,7 +1,9 @@
 package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,12 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,11 +50,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.domain.dataclass.messageDC
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.launch
@@ -61,6 +70,8 @@ import java.util.Locale
 @Composable
 fun ChatBotScreen(
     paddingValues: PaddingValues,
+    snackBarToggleVM: snackBarToggleVM,
+    chatdbVm: chatDB_VM
 ) {
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
@@ -78,6 +89,8 @@ fun ChatBotScreen(
             messaageList.add(message)
         }
     }
+
+    Log.d("chatList", messaageList.toString())
     LaunchedEffect(key1 = chatbotViewModel.messageCount.collectAsState().value) {
         val count= chatbotViewModel.messageCount
         Log.d("sizes", "vm: ${count}, size: ${messaageList.size}")
@@ -144,11 +157,29 @@ fun ChatBotScreen(
                     }
                 }
             }
+            val listGreet= listOf("Hi!", "Hello!")
+            Spacer(modifier = Modifier.height(10.dp))
+            AnimatedVisibility(visible = messaageList.isEmpty()) {
+                LazyRow(
+                    Modifier.padding(start = 7.dp)
+                ) {
+                    items(listGreet){
+                        ChatStarters(text = it) { messageField.value = it }
+                    }
+                }
+            }
+            Button(onClick = {
+                scope.launch {
+                    Log.d("dbData", chatdbVm.readChatWithMessages(1).toString())
+                }
+            }) {
+                Text(text = "ClickableSpan")
+            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
                 modifier= Modifier
-                    .padding(bottom = 10.dp, start = 13.dp, end = 10.dp, top = 16.dp)
+                    .padding(bottom = 10.dp, start = 13.dp, end = 10.dp)
                     .fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -173,6 +204,13 @@ fun ChatBotScreen(
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
+                                chatdbVm.addChat(chatEntity(timestamp = 0L))
+                                Log.d(
+                                    "dataadded",
+                                    chatdbVm
+                                        .readChatHistory()
+                                        .toString()
+                                )
                                 if (messageField.value != "") {
                                     chatbotViewModel.chat(
                                         messageField.value,
@@ -180,6 +218,13 @@ fun ChatBotScreen(
                                             messageField.value = ""
                                         },
                                         onCompletion = { })
+                                } else {
+                                    snackBarToggleVM.SendToast(
+                                        message = "Enter a message to be sent",
+                                        indicator_color = customYellow,
+                                        padding = PaddingValues(2.dp),
+                                        icon = Icons.Outlined.Warning
+                                    )
                                 }
                             }
                         }
@@ -189,6 +234,21 @@ fun ChatBotScreen(
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ChatStarters(text: String, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .padding(horizontal = 6.dp, vertical = 6.dp)
+            .border(width = 2.dp, color = ViewDash, shape = RoundedCornerShape(16.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clickable { onClick() }
+    ){
+        Text(
+            text = text
+        )
     }
 }
 
