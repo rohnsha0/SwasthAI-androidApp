@@ -4,14 +4,19 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
-import kotlinx.coroutines.flow.Flow
 
 class chatRepo(private val chatDAO: chatDAO, private val  messageDAO: messageDAO) {
 
-    val chatHistory: Flow<List<chatEntity>> = chatDAO.readChats()
+    suspend fun readChatHistory(): List<chatEntity>{
+        return chatDAO.readChats()
+    }
 
     suspend fun addChat(chatEntity: chatEntity){
         chatDAO.addChat(chatEntity)
+    }
+
+    suspend fun getChatCount(): Int{
+        return chatDAO.getChatCount()
     }
 
     suspend fun addMessages(messageEntity: messageEntity){

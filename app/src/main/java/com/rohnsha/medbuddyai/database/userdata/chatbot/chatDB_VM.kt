@@ -36,13 +36,15 @@ class chatDB_VM(application: Application): AndroidViewModel(application) {
     }
 
     suspend fun readChatHistory(): List<chatEntity> {
-        var history= emptyList<chatEntity>()
-        viewModelScope.launch {
-            repo.chatHistory.collect{
-                history= it
-            }
+        return withContext(viewModelScope.coroutineContext){
+            repo.readChatHistory()
         }
-        return history
+    }
+
+    suspend fun getChatCounts(): Int{
+        return withContext(viewModelScope.coroutineContext){
+            repo.getChatCount()
+        }
     }
 
     suspend fun readChatWithMessages(chatid: Int): List<chatWithMessage>{

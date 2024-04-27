@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 const val scanIndexKey= "indexScan"
 const val scanResultKey= "scanResultKey"
 const val scanResultIndex= "scanResultIndex"
+const val chatID= "chatID"
 
 sealed class bottomNavItems(
     val title: String,
@@ -89,10 +90,14 @@ sealed class bottomNavItems(
 
     object Chatbot: bottomNavItems(
         title = "chat",
-        route = "chat",
+        route = "chat/{$chatID}",
         unselectedIcon = Icons.Outlined.Explore,
         selectedIcon = Icons.Filled.Explore
-    )
+    ){
+        fun returnChatID(chatID: Int): String{
+            return "chat/$chatID"
+        }
+    }
 
     object mAI: bottomNavItems(
         title = "sAI",

@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.SmartToy
@@ -24,6 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,8 +38,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
@@ -42,8 +50,26 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @Composable
 fun mAIScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    chatdbVm: chatDB_VM
 ) {
+
+    val chatCount= remember {
+        mutableStateOf(Int.MAX_VALUE)
+    }
+    val chatHistory= remember {
+        mutableStateOf(emptyList<chatEntity>())
+    }
+
+    LaunchedEffect(Unit) {
+        chatCount.value= chatdbVm.getChatCounts()
+        chatHistory.value= chatdbVm.readChatHistory()
+        Log.d("dbCountInner", "chatcount: $chatCount, \n" +
+                "chatHistory: ${chatHistory.value}")
+    }
+
+    Log.d("dbCount", "chatcount: $chatCount, \nchatHistory: ${chatHistory.value}")
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -91,7 +117,7 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
-                        navController.navigate(bottomNavItems.Chatbot.route)
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatCount.value+1))
                     }
                 )
                 DataListFull(
@@ -103,7 +129,7 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
-                        navController.navigate(bottomNavItems.Chatbot.route)
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatCount.value+1))
                     }
                 )
                 DataListFull(
@@ -115,6 +141,29 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
+                    }
+                )
+                if (chatCount.value>0){
+                    Text(
+                        text = "Pending Rechecks",
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600),
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 18.dp, start = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+
+            items(chatHistory.value.take(n = 3)){
+                DataListFull(
+                    title = "QnA",
+                    colorLogo = customBlue,
+                    subtitle = "Chat ID: ${it.id}",
+                    imageVector = Icons.Outlined.History,
+                    onClickListener = {
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(it.id))
                     }
                 )
             }

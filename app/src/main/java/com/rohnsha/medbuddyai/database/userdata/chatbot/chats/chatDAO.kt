@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatWithMessage
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface chatDAO {
@@ -15,9 +14,12 @@ interface chatDAO {
     suspend fun addChat(chatEntity: chatEntity)
 
     @Query("select * from chats")
-    fun readChats(): Flow<List<chatEntity>>
+    suspend fun readChats(): List<chatEntity>
 
     @Transaction
     @Query("select * from chats where id = :chatId")
     suspend fun getChatWithMessages(chatId: Int): List<chatWithMessage>
+
+    @Query("select count(*) from chats")
+    suspend fun getChatCount(): Int
 }

@@ -3,6 +3,9 @@ package com.rohnsha.medbuddyai.domain.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.rohnsha.medbuddyai.api.chatbot.chatbot_obj.chatService
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
+import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.dataclass.messageDC
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,8 +21,22 @@ class chatVM: ViewModel() {
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
 
-    suspend fun chat(message: String, resetMessageFeild: () -> Unit, onCompletion: () -> Unit){
+    suspend fun chat(message: String, resetMessageFeild: () -> Unit, vmChat: chatDB_VM, chatID: Int){
+
+        vmChat.addMessages(messageEntity(
+            message = message,
+            isBotMessage = false,
+            timestamp = System.currentTimeMillis(),
+            isError = false,
+            chatId = chatID
+        ))
+
         val dynamicURL= "https://api-jjtysweprq-el.a.run.app/chat/$message"
+        if (_messageCount.value==0){
+            vmChat.addChat(
+                chatEntity(timestamp = System.currentTimeMillis())
+            )
+        }
         try {
             _listMessages.emit(messageDC(message, false, System.currentTimeMillis()))
             _messageCount.value += 1
@@ -27,8 +44,14 @@ class chatVM: ViewModel() {
             val response= chatService.getChatReply(dynamicURL)
             _listMessages.emit(messageDC(response.message, true, System.currentTimeMillis()))
             _messageCount.value += 1
+            vmChat.addMessages(messageEntity(
+                message = response.message,
+                isBotMessage = true,
+                timestamp = System.currentTimeMillis(),
+                isError = false,
+                chatId = chatID
+            ))
             Log.d("errorChat", response.message)
-            onCompletion()
         } catch (e: Exception){
             when (e) {
                 is retrofit2.HttpException -> {
@@ -43,18 +66,39 @@ class chatVM: ViewModel() {
                     Log.d("errorChat", errorMessage)
                     Log.d("errorChat", e.toString())
                     _listMessages.emit(messageDC(errorMessage, true, System.currentTimeMillis(), isError = true))
+                    vmChat.addMessages(messageEntity(
+                        message = errorMessage,
+                        isBotMessage = true,
+                        timestamp = System.currentTimeMillis(),
+                        isError = true,
+                        chatId = chatID
+                    ))
                 }
                 is IOException -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", "Network error: ${e.message}")
                     Log.d("errorChat", e.toString())
                     _listMessages.emit(messageDC("Network error occurred, please check your connection", true, System.currentTimeMillis(), isError = true))
+                    vmChat.addMessages(messageEntity(
+                        message = "Network error occurred, please check your connection",
+                        isBotMessage = true,
+                        timestamp = System.currentTimeMillis(),
+                        isError = true,
+                        chatId = chatID
+                    ))
                 }
                 else -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", e.message ?: "An unknown error occurred")
                     Log.d("errorChat", e.toString())
                     _listMessages.emit(messageDC("An unknown error occurred, please try again later", true, System.currentTimeMillis(), isError = true))
+                    vmChat.addMessages(messageEntity(
+                        message = "An unknown error occurred, please try again later",
+                        isBotMessage = true,
+                        timestamp = System.currentTimeMillis(),
+                        isError = true,
+                        chatId = chatID
+                    ))
                 }
             }
             _messageCount.value += 1

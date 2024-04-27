@@ -31,9 +31,9 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
-import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.domain.dataclass.messageDC
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
@@ -71,7 +70,8 @@ import java.util.Locale
 fun ChatBotScreen(
     paddingValues: PaddingValues,
     snackBarToggleVM: snackBarToggleVM,
-    chatdbVm: chatDB_VM
+    chatdbVm: chatDB_VM,
+    chatID: Int
 ) {
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
@@ -83,7 +83,22 @@ fun ChatBotScreen(
     val messaageList= remember {
         mutableListOf<messageDC>()
     }
-    
+
+    LaunchedEffect(key1 = true) {
+        chatdbVm.readChatWithMessages(chatID).forEach {
+            it.messages.forEach {
+                messaageList.add(
+                    messageDC(
+                        message = it.message,
+                        isBotMessage = it.isBotMessage,
+                        timestamp = it.timestamp,
+                        isError = it.isError
+                    )
+                )
+            }
+        }
+    }
+
     LaunchedEffect(chatbotViewModel.messageCount.collectAsState().value) {
         chatbotViewModel.messagesList.collect{ message ->
             messaageList.add(message)
@@ -102,7 +117,6 @@ fun ChatBotScreen(
             scrollState.animateScrollToItem(messaageList.size- 1)
         }
     }
-
 
 
     Scaffold(
@@ -189,10 +203,12 @@ fun ChatBotScreen(
                         .weight(1f)
                         .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
                     shape= RoundedCornerShape(16.dp),
-                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                        unfocusedBorderColor = Color.Transparent,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = ViewDash,
+                        unfocusedContainerColor = ViewDash,
+                        disabledContainerColor = ViewDash,
                         focusedBorderColor = Color.Transparent,
-                        containerColor = ViewDash
+                        unfocusedBorderColor = Color.Transparent,
                     ),
                     placeholder = { Text(text = "Enter your query", color= lightTextAccent) }
                 )
@@ -204,20 +220,14 @@ fun ChatBotScreen(
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
-                                chatdbVm.addChat(chatEntity(timestamp = 0L))
-                                Log.d(
-                                    "dataadded",
-                                    chatdbVm
-                                        .readChatHistory()
-                                        .toString()
-                                )
                                 if (messageField.value != "") {
                                     chatbotViewModel.chat(
                                         messageField.value,
                                         resetMessageFeild = {
                                             messageField.value = ""
                                         },
-                                        onCompletion = { })
+                                        vmChat = chatdbVm, chatID = chatID
+                                    )
                                 } else {
                                     snackBarToggleVM.SendToast(
                                         message = "Enter a message to be sent",

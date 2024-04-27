@@ -135,15 +135,23 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.mAI.route){
             mAIScreen(
                 padding = padding,
-                navController
+                navController, chatdbVM
             )
         }
 
-        composable(route = bottomNavItems.Chatbot.route){
+        composable(
+            route = bottomNavItems.Chatbot.route,
+            arguments = listOf(
+                navArgument(chatID){
+                    type= NavType.IntType
+                }
+            )
+        ){
             ChatBotScreen(
                 paddingValues = padding,
                 snackBarVM,
-                chatdbVm = chatdbVM
+                chatdbVm = chatdbVM,
+                chatID = it.arguments!!.getInt(chatID)
             )
         }
 
@@ -158,7 +166,6 @@ fun bottomNavGraph(
                 }
             )
         ){
-            Log.d("acceptingChar", it.arguments!!.getInt(scanResultIndex).toString())
             ScanResultScreen(
                 padding = padding,
                 navController = navController,
