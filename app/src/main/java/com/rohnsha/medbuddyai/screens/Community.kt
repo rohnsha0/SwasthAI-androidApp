@@ -54,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -255,7 +256,7 @@ fun CommunityScreen(
                     CommunityPostItem(
                         title = data.title?: "Unknown",
                         subtitle = "by ${data.author}",
-                        data = "${it.replies.size} replies (${it.post.id})",
+                        data = "${it.replies.size} replies",
                         additionData = data.timestamp?.let {
                             communityViewModel.calculateTimeDifference(
                                 it.toLong())
@@ -263,14 +264,12 @@ fun CommunityScreen(
                             ?: "Unspecified",
                         colorLogo = customBlue,
                         postData = data.content?: "Unknown",
-                        onClickListener = { communityViewModel.addReply(
-                            replyContent = "hello this is test reply",
-                            postID = it.post.id ?: "null"
-                        ) }
+                        onClickListener = {
+                            it.post.id?.let { it1 -> Log.d("repliesID", it1) }
+                            navController.navigate(bottomNavItems.CommunityReply.returnPostID(
+                            it.post.id!!
+                        )) }
                     )
-                }
-                items(replyData){
-                    it.content?.let { it1 -> DataListFull(title = it1, colorLogo = customBlue) }
                 }
             }
         }

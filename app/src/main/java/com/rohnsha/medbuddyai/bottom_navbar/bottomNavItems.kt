@@ -17,6 +17,7 @@ const val scanIndexKey= "indexScan"
 const val scanResultKey= "scanResultKey"
 const val scanResultIndex= "scanResultIndex"
 const val chatID= "chatID"
+const val postID= "postID"
 
 sealed class bottomNavItems(
     val title: String,
@@ -36,14 +37,24 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Forum,
         selectedIcon = Icons.Filled.Forum
     )
+
+    object CommunityReply: bottomNavItems(
+        title = "CommunityReply",
+        route = "communityReply/{$postID}",
+        unselectedIcon = Icons.Outlined.Forum,
+        selectedIcon = Icons.Filled.Forum
+    ){
+        fun returnPostID(postID: String): String{
+            return "communityReply/$postID"
+        }
+    }
+
     object Preferences: bottomNavItems(
         title = "Preferences",
         route = "Preferences",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     )
-
-
 
     object Scan: bottomNavItems(
         title = "scan",

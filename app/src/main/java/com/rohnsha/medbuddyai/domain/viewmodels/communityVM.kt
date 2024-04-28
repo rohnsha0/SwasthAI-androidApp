@@ -199,11 +199,15 @@ class communityVM: ViewModel() {
         }
     }
 
-    fun mergePostReplies(postData: List<Post> = _postFeed.value, replyData: List<Reply> = _replyFeed.value): MutableList<postWithReply> {
+    fun mergePostReplies(postData: List<Post> = _postFeed.value, replyData: List<Reply> = _replyFeed.value, postID: String? = null): MutableList<postWithReply> {
         val postsWithReplies = mutableListOf<postWithReply>()
 
         for (post in postData) {
-            val postReplies = replyData.filter { it.id?.contains(post.id ?: "") ?: false }
+            val postReplies = if (postID == null) {
+                replyData.filter { it.id?.contains(post.id ?: "") ?: false }
+            } else {
+                replyData.filter { it.id == post.id }
+            }
             postsWithReplies.add(postWithReply(post, postReplies))
         }
         return postsWithReplies

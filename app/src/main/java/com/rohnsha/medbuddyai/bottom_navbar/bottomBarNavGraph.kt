@@ -23,6 +23,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.screens.BMIScreen
 import com.rohnsha.medbuddyai.screens.ChatBotScreen
+import com.rohnsha.medbuddyai.screens.CommunityReply
 import com.rohnsha.medbuddyai.screens.CommunityScreen
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
@@ -79,6 +80,15 @@ fun bottomNavGraph(
                 snackBarViewModel = snackBarVM,
                 communityViewModel = communityVM
             )
+        }
+        composable(route = bottomNavItems.CommunityReply.route,
+                arguments = listOf(
+                    navArgument(postID){
+                        type= NavType.StringType
+                    }
+                )
+            ){
+            CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM)
         }
         composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding)
