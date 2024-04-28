@@ -7,12 +7,16 @@ data class Post(
     val content: String? = null,
     val timestamp: String? = null,
     val domain: String? = null,
-    val replies: List<Reply>? = null
 )
 
 data class Reply(
     val id: String? = null,
     val author: String? = null,
     val content: String? = null,
-    val timestamp: Long? = null
+    val timestamp: String? = null
+)
+
+data class postWithReply(
+    val post: Post,
+    val replies: List<Reply>
 )

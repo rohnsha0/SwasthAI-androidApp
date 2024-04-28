@@ -22,12 +22,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Quickreply
 import androidx.compose.material.icons.outlined.CloseFullscreen
 import androidx.compose.material.icons.outlined.FeaturedPlayList
 import androidx.compose.material.icons.outlined.Female
 import androidx.compose.material.icons.outlined.Male
 import androidx.compose.material.icons.outlined.PostAdd
+import androidx.compose.material.icons.outlined.Quickreply
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material.icons.outlined.Title
@@ -94,7 +94,12 @@ fun CommunityScreen(
     ) { values ->
         communityViewModel.getFeed()
         val postData= communityViewModel.feedContents.collectAsState().value
-        Log.d("dataSnapCOmm", postData.toString())
+        val replyData= communityViewModel.replyContents.collectAsState().value
+        Log.d("dataSnapCOmmPost", postData.toString())
+        Log.d("dataSnapCOmmReply", replyData.toString())
+        val postsWithReplies = communityViewModel.mergePostReplies()
+        Log.d("dataSnapCOmmPostReply", postsWithReplies.toString())
+
         val isCreateExpanded= remember {
             mutableStateOf(false)
         }
@@ -245,19 +250,27 @@ fun CommunityScreen(
                 )
             }
             if (postData.isNotEmpty()){
-                items(postData){ data ->
+                items(postsWithReplies){ it ->
+                    val data= it.post
                     CommunityPostItem(
                         title = data.title?: "Unknown",
                         subtitle = "by ${data.author}",
-                        data = data.domain?: "Unknown",
+                        data = "${it.replies.size} replies (${it.post.id})",
                         additionData = data.timestamp?.let {
                             communityViewModel.calculateTimeDifference(
                                 it.toLong())
                         }
                             ?: "Unspecified",
                         colorLogo = customBlue,
-                        postData = data.content?: "Unknown"
+                        postData = data.content?: "Unknown",
+                        onClickListener = { communityViewModel.addReply(
+                            replyContent = "hello this is test reply",
+                            postID = it.post.id ?: "null"
+                        ) }
                     )
+                }
+                items(replyData){
+                    it.content?.let { it1 -> DataListFull(title = it1, colorLogo = customBlue) }
                 }
             }
         }
@@ -270,7 +283,7 @@ fun CommunityPostItem(
     subtitle: String,
     data: String,
     additionData: String? =null,
-    imageVector: ImageVector= Icons.Filled.Quickreply,
+    imageVector: ImageVector= Icons.Outlined.Quickreply,
     colorLogo: Color,
     additionalDataColor: Color?= null,
     colorLogoTint: Color? = null,
@@ -283,7 +296,11 @@ fun CommunityPostItem(
             .fillMaxWidth()
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
             .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
-            .clickable { },
+            .clickable {
+                if (onClickListener != null) {
+                    onClickListener()
+                }
+            },
         contentAlignment = Alignment.CenterStart
     ){
         Column {
