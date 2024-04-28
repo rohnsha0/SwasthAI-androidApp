@@ -145,7 +145,7 @@ fun mAIScreen(
                 )
                 if (chatCount.value>0){
                     Text(
-                        text = "Pending Rechecks",
+                        text = "Chat History",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 15.sp,

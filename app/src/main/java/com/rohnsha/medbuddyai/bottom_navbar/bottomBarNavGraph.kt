@@ -69,7 +69,7 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 communityViewModel = communityVM,
-                scanHistoryviewModel
+                scanHistoryviewModel, diseaseDBviewModel
             )
         }
         composable(route = bottomNavItems.Community.route){

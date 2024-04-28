@@ -22,10 +22,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Biotech
@@ -45,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -72,6 +76,11 @@ import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,8 +88,12 @@ fun HomeScreen(
     padding: PaddingValues,
     navController: NavHostController,
     communityViewModel: communityVM,
-    scanHistoryVM: scanHistoryViewModel
+    scanHistoryVM: scanHistoryViewModel,
+    diseaseDBviewModel: diseaseDBviewModel
 ) {
+
+    val lastScans= scanHistoryVM.scanHistoryEntries.collectAsState().value
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -221,15 +234,61 @@ fun HomeScreen(
                 )
                 explore_diseases(navController = navController)
             }
-            item {
-                Text(
-                    text = "Current Medical Affairs",
-                    fontFamily = fontFamily,
-                    fontWeight = FontWeight(600),
-                    fontSize = 15.sp,
-                    modifier = Modifier
-                        .padding(top = 26.dp, start = 24.dp)
+            if (lastScans.size>0){
+                item {
+                    Text(
+                        text = "Scan History",
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600),
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(top = 18.dp, start = 24.dp)
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+            items(lastScans.take(n = 3)){data ->
+                DataListFull(
+                    title = data.title,
+                    subtitle = data.domain,
+                    data = data.domain,
+                    additionData = data.timestamp.let {
+                        val instant = Instant.ofEpochMilli(it)
+                        val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+                        val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())
+                        formatter.format(dateTime)
+                    },
+                    imageVector = Icons.Filled.History,
+                    colorLogo = customBlue,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        diseaseDBviewModel.inputNameToSearch(data, onCompleteLambda = {
+                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1, 9999))
+                        })
+                        Log.d("logStatus", "clicked")
+                    }
                 )
+            }
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 21.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (lastScans.size>3){
+                        Text(
+                            text = "View More",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 15.sp,
+                            modifier = Modifier
+                                .padding(top = 14.dp)
+                                .clickable {
+                                },
+                            color = customBlue
+                        )
+                    }
+                }
             }
         }
     }

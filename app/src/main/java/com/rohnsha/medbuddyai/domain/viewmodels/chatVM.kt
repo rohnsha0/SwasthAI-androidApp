@@ -6,7 +6,6 @@ import com.rohnsha.medbuddyai.api.chatbot.chatbot_obj.chatService
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
-import com.rohnsha.medbuddyai.domain.dataclass.messageDC
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -15,7 +14,7 @@ import java.io.IOException
 
 class chatVM: ViewModel() {
 
-    private val _listMessages= MutableSharedFlow<messageDC>()
+    private val _listMessages= MutableSharedFlow<messageEntity>()
     val messagesList= _listMessages.asSharedFlow()
 
     private val _messageCount= MutableStateFlow(0)
@@ -38,19 +37,20 @@ class chatVM: ViewModel() {
             )
         }
         try {
-            _listMessages.emit(messageDC(message, false, System.currentTimeMillis()))
+            _listMessages.emit(messageEntity(message = message, isBotMessage =  false, timestamp = System.currentTimeMillis(), isError = false, chatId = chatID))
             _messageCount.value += 1
             resetMessageFeild()
             val response= chatService.getChatReply(dynamicURL)
-            _listMessages.emit(messageDC(response.message, true, System.currentTimeMillis()))
-            _messageCount.value += 1
-            vmChat.addMessages(messageEntity(
+            val resultAPI= messageEntity(
                 message = response.message,
                 isBotMessage = true,
                 timestamp = System.currentTimeMillis(),
                 isError = false,
                 chatId = chatID
-            ))
+            )
+            _listMessages.emit(resultAPI)
+            _messageCount.value += 1
+            vmChat.addMessages(resultAPI)
             Log.d("errorChat", response.message)
         } catch (e: Exception){
             when (e) {
@@ -65,40 +65,43 @@ class chatVM: ViewModel() {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", errorMessage)
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC(errorMessage, true, System.currentTimeMillis(), isError = true))
-                    vmChat.addMessages(messageEntity(
+                    val errorData= messageEntity(
                         message = errorMessage,
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
                         chatId = chatID
-                    ))
+                    )
+                    _listMessages.emit(errorData)
+                    vmChat.addMessages(errorData)
                 }
                 is IOException -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", "Network error: ${e.message}")
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC("Network error occurred, please check your connection", true, System.currentTimeMillis(), isError = true))
-                    vmChat.addMessages(messageEntity(
+                    val errorData= messageEntity(
                         message = "Network error occurred, please check your connection",
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
                         chatId = chatID
-                    ))
+                    )
+                    _listMessages.emit(errorData)
+                    vmChat.addMessages(errorData)
                 }
                 else -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", e.message ?: "An unknown error occurred")
                     Log.d("errorChat", e.toString())
-                    _listMessages.emit(messageDC("An unknown error occurred, please try again later", true, System.currentTimeMillis(), isError = true))
-                    vmChat.addMessages(messageEntity(
+                    val errorData= messageEntity(
                         message = "An unknown error occurred, please try again later",
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
                         chatId = chatID
-                    ))
+                    )
+                    _listMessages.emit(errorData)
+                    vmChat.addMessages(errorData)
                 }
             }
             _messageCount.value += 1

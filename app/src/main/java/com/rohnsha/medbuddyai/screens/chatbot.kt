@@ -26,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.Warning
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -51,7 +50,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
-import com.rohnsha.medbuddyai.domain.dataclass.messageDC
+import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -81,20 +80,13 @@ fun ChatBotScreen(
     }
 
     val messaageList= remember {
-        mutableListOf<messageDC>()
+        mutableListOf<messageEntity>()
     }
 
     LaunchedEffect(key1 = true) {
         chatdbVm.readChatWithMessages(chatID).forEach {
             it.messages.forEach {
-                messaageList.add(
-                    messageDC(
-                        message = it.message,
-                        isBotMessage = it.isBotMessage,
-                        timestamp = it.timestamp,
-                        isError = it.isError
-                    )
-                )
+                messaageList.add(it)
             }
         }
     }
@@ -182,13 +174,6 @@ fun ChatBotScreen(
                     }
                 }
             }
-            Button(onClick = {
-                scope.launch {
-                    Log.d("dbData", chatdbVm.readChatWithMessages(1).toString())
-                }
-            }) {
-                Text(text = "ClickableSpan")
-            }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start,
@@ -264,7 +249,7 @@ fun ChatStarters(text: String, onClick: () -> Unit) {
 
 @Composable
 fun Messages(
-    messageInfo: messageDC,
+    messageInfo: messageEntity,
 ) {
     if (messageInfo.message!=""){
         Row {

@@ -9,6 +9,8 @@ import com.google.firebase.database.getValue
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.domain.dataclass.Post
+import com.rohnsha.medbuddyai.domain.dataclass.Reply
+import com.rohnsha.medbuddyai.domain.dataclass.postWithReply
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,8 +28,49 @@ class communityVM: ViewModel() {
     private val _database= Firebase.database
     private val _postRef= _database.reference
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
+    private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
+    private val _postCount= MutableStateFlow(0L)
 
     val feedContents= _postFeed.asStateFlow()
+    val replyContents= _replyFeed.asStateFlow()
+
+    fun addReply(
+        replyContent: String,
+        postID: String
+    ){
+        viewModelScope.launch {
+            if (_auth.currentUser!=null){
+                val username= postID.substringBefore("_")
+
+                _postRef.child("replies").child(username).child(postID).get()
+                    .addOnSuccessListener {
+                        val replyCount= it.childrenCount
+                        Log.d("authUserActionInner", replyCount.toString())
+                        Log.d("authUserAction", replyCount.toString())
+                        val reply= Reply(
+                            id = postID,
+                            content = replyContent,
+                            timestamp = System.currentTimeMillis().toString(),
+                            author = username
+                        )
+
+                        _postRef
+                            .child("replies")
+                            .child(username)
+                            .child(postID)
+                            .child("${postID}_reply${replyCount+1}")
+                            .setValue(reply)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("authUserAction", "Reply successful")
+                                } else {
+                                    Log.e("authUserAction", "Reply unsuccessful", task.exception)
+                                }
+                            }
+                    }
+            }
+        }
+    }
 
     fun post(
         title: String,
@@ -40,7 +83,15 @@ class communityVM: ViewModel() {
             if (_auth.currentUser!=null){
                 val username= _auth.currentUser!!.email!!.substringBefore("@")
                 Log.d("authUsername", username)
+                    _postRef.child("posts").child(username).get()
+                    .addOnSuccessListener {
+                        _postCount.value= it.childrenCount+1L
+                        Log.d("postCountInner", _postCount.value.toString())
+                    }
+                Log.d("postCount", _postCount.value.toString())
+                val postID= "${username}_${_postCount.value}"
                 val newPost= Post(
+                    id = postID,
                     author = username,
                     title = title,
                     content = content,
@@ -48,7 +99,7 @@ class communityVM: ViewModel() {
                     domain = returnDomain(domainIndex)
                 )
                 Log.d("authUserAction", newPost.toString())
-                _postRef.child("posts").child(username).child(title).setValue(newPost)
+                _postRef.child("posts").child(username).child(postID).setValue(newPost)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("authUserAction", "Post successful")
@@ -65,11 +116,11 @@ class communityVM: ViewModel() {
         if (_auth.currentUser!=null){
             viewModelScope.launch {
                 val posts = mutableListOf<Post>()
+                val replies= mutableListOf<Reply>()
                 _postRef.get()
                     .addOnSuccessListener {
                         Log.d("dataSnap", it.toString())
                         for (childSnapshot in it.child("posts").children) {
-                            val userKey = childSnapshot.key
                             for (postSnapshot in childSnapshot.children) {
                                 val postData = postSnapshot.getValue<Map<String, String>>()
 
@@ -78,8 +129,10 @@ class communityVM: ViewModel() {
                                 val content = postData?.get("content") ?: "No content"
                                 val timestamp= postData?.get("timestamp") ?: "Unnoticed"
                                 val domain = postData?.get("domain") ?: "Unspecified"
+                                val id= postData?.get("id") ?: "null"
 
                                 val post = Post(
+                                    id = id,
                                     author = author,
                                     title = title,
                                     content = content,
@@ -89,8 +142,26 @@ class communityVM: ViewModel() {
                                 posts.add(post)
                             }
                         }
-                        Log.d("dataSnap", "data: $posts")
-                        _postFeed.value= posts
+                        for (childSnapshot in it.child("replies").children) {
+                            for (postSnapshot in childSnapshot.children) {
+                                for (itemm in postSnapshot.children){
+                                    val postData = itemm.getValue<Map<String, String>>()
+                                    val id = postData?.get("id") ?: "Unknown"
+                                    val author = postData?.get("author") ?: "Unknown"
+                                    val content = postData?.get("content") ?: "Unknown"
+                                    val timestamp = postData?.get("timestamp") ?: "Unknown"
+
+                                    val reply= Reply(
+                                        id, author, content, timestamp
+                                    )
+                                    replies.add(reply)
+                                    Log.d("dataSnap", "data: $reply")
+                                }
+                            }
+                        }
+                        _postFeed.value=posts
+                        _replyFeed.value= replies
+                        Log.d("dataSnapReplyPosts", "posts: ${_postFeed.value}\nreplies: ${_replyFeed.value}")
                     }
             }
         }
@@ -126,6 +197,16 @@ class communityVM: ViewModel() {
                 formatter.format(dateTime)
             }
         }
+    }
+
+    fun mergePostReplies(postData: List<Post> = _postFeed.value, replyData: List<Reply> = _replyFeed.value): MutableList<postWithReply> {
+        val postsWithReplies = mutableListOf<postWithReply>()
+
+        for (post in postData) {
+            val postReplies = replyData.filter { it.id?.contains(post.id ?: "") ?: false }
+            postsWithReplies.add(postWithReply(post, postReplies))
+        }
+        return postsWithReplies
     }
 
     fun loginUser(){
