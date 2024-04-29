@@ -32,6 +32,12 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home
     )
+    object DiseaseCatelogue: bottomNavItems(
+        title = "Diseases Catalogue",
+        route = "disease_catalogue",
+        unselectedIcon = Icons.Outlined.Home,
+        selectedIcon = Icons.Filled.Home
+    )
     object Community: bottomNavItems(
         title = "Community",
         route = "community",

@@ -148,6 +148,17 @@ fun ScanResultScreen(
             disease_results.value= diseaseDBviewModel.data.collectAsState().value
             otherDiseaseData = listOf(disease_version("", "", 0f, 01.0))
         }
+        2 -> {
+            isStillLoading = diseaseDBviewModel.isLoadingBoolean.collectAsState().value
+            isNormal =false
+            isErrored = diseaseDBviewModel.isErroredBoolean.collectAsState().value
+            LaunchedEffect(key1 = Unit){
+                delay(500L)
+                diseaseDBviewModel.retrieveData()
+            }
+            disease_results.value= diseaseDBviewModel.data.collectAsState().value
+            otherDiseaseData = listOf(disease_version("", "", 0f, 01.0))
+        }
     }
 
     modalState = rememberSaveable {

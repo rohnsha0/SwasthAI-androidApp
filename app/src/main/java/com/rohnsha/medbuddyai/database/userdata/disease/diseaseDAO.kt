@@ -18,4 +18,7 @@ interface diseaseDAO {
     @Query("SELECT * FROM disease_data WHERE disease_name LIKE :name")
     suspend fun searchDBbyName(name: String): disease_data_dataClass
 
+    @Query("select * from disease_data")
+    suspend fun readDB(): List<disease_data_dataClass>
+
 }

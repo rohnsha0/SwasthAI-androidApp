@@ -16,4 +16,8 @@ class diseaseRepo(private val diseaseDAO: diseaseDAO) {
         return diseaseDAO.searchDBbyName(name)
     }
 
+    suspend fun readDB(): List<disease_data_dataClass>{
+        return  diseaseDAO.readDB()
+    }
+
 }

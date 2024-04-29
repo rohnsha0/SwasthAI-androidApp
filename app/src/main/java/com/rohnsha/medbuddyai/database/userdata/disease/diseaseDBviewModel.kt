@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
@@ -14,6 +15,7 @@ import com.rohnsha.medbuddyai.domain.notifications.dbUpdateService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
 class diseaseDBviewModel(application: Application): AndroidViewModel(application) {
 
@@ -36,7 +38,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     val data= _dataLoaded.asStateFlow()
 
     private val _dataCached= MutableStateFlow(scanHistory(0L, "", "", 0f))
-    val dataCached= _dataCached.asStateFlow()
+    private val _dataCachedReadOnly= MutableStateFlow(disease_data_dataClass())
 
     init {
         diseaseDAO= userDataDB.getUserDBRefence(application).diseaseDAO()
@@ -52,6 +54,18 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         onCompleteLambda()
     }
 
+    fun saveData(data: disease_data_dataClass, onCompleteLambda: () -> Unit){
+        _dataCachedReadOnly.value= data
+        onCompleteLambda()
+    }
+
+    fun retrieveData(){
+        if (_dataCachedReadOnly.value.disease_name!=""){
+            _dataLoaded.value= _dataCachedReadOnly.value
+            _loadingBoolean.value= false
+        }
+    }
+
     suspend fun searchByName(){
         if (_dataCached.value.title!=""){
             _dataLoaded.value=diseaseRepo.searchDBbyName(_dataCached.value.title)
@@ -61,6 +75,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         if (_dataLoaded.value.disease_name==""){
             _erroredBoolean.value= true
             _loadingBoolean.value= false
+        }
+    }
+
+    suspend fun readDB(): List<disease_data_dataClass>{
+        return withContext(viewModelScope.coroutineContext){
+            diseaseRepo.readDB()
         }
     }
 

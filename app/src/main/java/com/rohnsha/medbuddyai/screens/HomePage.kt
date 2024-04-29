@@ -34,6 +34,7 @@ import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.EmojiPeople
+import androidx.compose.material.icons.outlined.Engineering
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material.icons.outlined.SelfImprovement
@@ -71,11 +72,13 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
+import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
@@ -94,7 +97,8 @@ fun HomeScreen(
     communityViewModel: communityVM,
     scanHistoryVM: scanHistoryViewModel,
     diseaseDBviewModel: diseaseDBviewModel,
-    chatdbVm: chatDB_VM
+    chatdbVm: chatDB_VM,
+    snackBarToggleVM: snackBarToggleVM
 ) {
 
     val chatCount= remember {
@@ -203,7 +207,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .padding(top = 26.dp, start = 24.dp)
                 )
-                explore_home(navController = navController)
+                explore_home(navController = navController, snackBarToggleVM)
                 Spacer(modifier = Modifier.height(6.dp))
                 DataListFull(
                     title = "AI Symptom Checker",
@@ -275,9 +279,14 @@ fun HomeScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
-                        diseaseDBviewModel.inputNameToSearch(data, onCompleteLambda = {
-                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1, 9999))
-                        })
+                        diseaseDBviewModel.inputNameToSearch(data) {
+                            navController.navigate(
+                                bottomNavItems.ScanResult.returnScanResIndex(
+                                    1,
+                                    9999
+                                )
+                            )
+                        }
                         Log.d("logStatus", "clicked")
                     }
                 )
@@ -343,7 +352,6 @@ fun AddMoreDashWidget() {
 fun explore_diseases(
     navController: NavHostController
 ) {
-    val scope= rememberCoroutineScope()
     Column(
         modifier = Modifier
             .padding(top = 16.dp, start = 24.dp, end = 24.dp)
@@ -376,7 +384,7 @@ fun explore_diseases(
                 .padding(top = 20.dp)
                 .align(Alignment.CenterHorizontally)
                 .clickable {
-                    scope.launch { navController.navigate(bottomNavItems.Explore.route) }
+                    navController.navigate(bottomNavItems.DiseaseCatelogue.route)
                 }
         )
     }
@@ -384,7 +392,8 @@ fun explore_diseases(
 
 @Composable
 fun explore_home(
-    navController: NavHostController
+    navController: NavHostController,
+    snackBarToggleVM: snackBarToggleVM
 ) {
     Column(
         modifier = Modifier
@@ -407,7 +416,14 @@ fun explore_home(
                 title = "Decode Reports",
                 icon = Icons.Outlined.Biotech,
                 weight = 1f,
-                navController = navController,
+                onClickListener = {
+                    snackBarToggleVM.SendToast(
+                        message = "Feature not ready yet!",
+                        indicator_color = customYellow,
+                        padding = PaddingValues(2.dp),
+                        icon = Icons.Outlined.Engineering
+                    )
+                }
             )
         }
     }
@@ -421,7 +437,6 @@ fun explore_tabs(
     navController: NavHostController? = null,
     route: String= bottomNavItems.Community.route,
     onClickListener: (() -> Unit)? =null,
-
 ) {
     Box(
         modifier = Modifier

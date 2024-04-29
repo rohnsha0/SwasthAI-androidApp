@@ -40,6 +40,7 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -147,9 +148,14 @@ fun ExploreScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
-                        diseaseDBviewModel.inputNameToSearch(data, onCompleteLambda = {
-                            navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(1, 9999))
-                        })
+                        diseaseDBviewModel.inputNameToSearch(data) {
+                            navController.navigate(
+                                bottomNavItems.ScanResult.returnScanResIndex(
+                                    1,
+                                    9999
+                                )
+                            )
+                        }
                         Log.d("logStatus", "clicked")
                     }
                 )
@@ -286,7 +292,7 @@ fun explore_tools(
         modifier = Modifier
             .fillMaxWidth()
     ){
-        explore_home(navController = navController)
+        explore_home(navController = navController, snackBarToggleVM = snackBarToggleVM())
         Spacer(modifier = Modifier.height(6.dp))
         DataListFull(
             title = "Import medical history",

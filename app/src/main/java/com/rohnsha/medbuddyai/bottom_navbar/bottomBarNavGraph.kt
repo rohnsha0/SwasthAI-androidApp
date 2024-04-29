@@ -25,6 +25,7 @@ import com.rohnsha.medbuddyai.screens.BMIScreen
 import com.rohnsha.medbuddyai.screens.ChatBotScreen
 import com.rohnsha.medbuddyai.screens.CommunityReply
 import com.rohnsha.medbuddyai.screens.CommunityScreen
+import com.rohnsha.medbuddyai.screens.DiseasesCatelogue
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
 import com.rohnsha.medbuddyai.screens.MoreScreen
@@ -70,7 +71,7 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 communityViewModel = communityVM,
-                scanHistoryviewModel, diseaseDBviewModel, chatdbVM
+                scanHistoryviewModel, diseaseDBviewModel, chatdbVM, snackBarVM
             )
         }
         composable(route = bottomNavItems.Community.route){
@@ -120,6 +121,10 @@ fun bottomNavGraph(
                 photoCaptureViewModel = savePhotoViewModel,
                 snackBarViewModel = snackBarVM
             )
+        }
+
+        composable(route = bottomNavItems.DiseaseCatelogue.route){
+            DiseasesCatelogue(padding, diseaseDBviewModel, navController)
         }
 
         composable(
