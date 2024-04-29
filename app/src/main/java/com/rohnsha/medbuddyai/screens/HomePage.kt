@@ -47,7 +47,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,6 +67,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
@@ -89,9 +93,17 @@ fun HomeScreen(
     navController: NavHostController,
     communityViewModel: communityVM,
     scanHistoryVM: scanHistoryViewModel,
-    diseaseDBviewModel: diseaseDBviewModel
+    diseaseDBviewModel: diseaseDBviewModel,
+    chatdbVm: chatDB_VM
 ) {
 
+    val chatCount= remember {
+        mutableStateOf(Int.MAX_VALUE)
+    }
+
+    LaunchedEffect(key1 = true) {
+        chatCount.value= chatdbVm.getChatCounts()
+    }
     val lastScans= scanHistoryVM.scanHistoryEntries.collectAsState().value
 
     Scaffold(
@@ -201,7 +213,7 @@ fun HomeScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
-                        Log.d("logStatus", "clicked")
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 1, chatID =  chatCount.value+1))
                     }
                 )
                 val scope = rememberCoroutineScope()
@@ -272,7 +284,9 @@ fun HomeScreen(
             }
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 21.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 21.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     if (lastScans.size>3){

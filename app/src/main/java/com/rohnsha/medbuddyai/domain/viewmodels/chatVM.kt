@@ -20,7 +20,13 @@ class chatVM: ViewModel() {
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
 
-    suspend fun chat(message: String, resetMessageFeild: () -> Unit, vmChat: chatDB_VM, chatID: Int){
+    suspend fun chat(
+        message: String,
+        resetMessageFeild: () -> Unit,
+        vmChat: chatDB_VM,
+        chatID: Int,
+        mode: Int //0 -> qna, 1 -> ai_symptoms_checker
+    ){
 
         vmChat.addMessages(messageEntity(
             message = message,
@@ -30,7 +36,17 @@ class chatVM: ViewModel() {
             chatId = chatID
         ))
 
-        val dynamicURL= "https://api-jjtysweprq-el.a.run.app/chat/$message"
+        val dynamicURL= when(mode){
+            0 -> {
+                "https://api-jjtysweprq-el.a.run.app/chat/$message"
+            }
+            1 -> {
+                "https://api-jjtysweprq-el.a.run.app/symptoms/$message"
+            }
+            else -> {
+                "https://api-jjtysweprq-el.a.run.app/chat/$message"
+            }
+        }
         if (_messageCount.value==0){
             vmChat.addChat(
                 chatEntity(timestamp = System.currentTimeMillis())

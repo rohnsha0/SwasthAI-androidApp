@@ -18,6 +18,7 @@ const val scanResultKey= "scanResultKey"
 const val scanResultIndex= "scanResultIndex"
 const val chatID= "chatID"
 const val postID= "postID"
+const val chatMode= "chatMode"
 
 sealed class bottomNavItems(
     val title: String,
@@ -101,12 +102,12 @@ sealed class bottomNavItems(
 
     object Chatbot: bottomNavItems(
         title = "chat",
-        route = "chat/{$chatID}",
+        route = "chat/{$chatMode}/{$chatID}",
         unselectedIcon = Icons.Outlined.Explore,
         selectedIcon = Icons.Filled.Explore
     ){
-        fun returnChatID(chatID: Int): String{
-            return "chat/$chatID"
+        fun returnChatID(chatID: Int, chatMode: Int): String{
+            return "chat/$chatMode/$chatID"
         }
     }
 

@@ -70,7 +70,8 @@ fun ChatBotScreen(
     paddingValues: PaddingValues,
     snackBarToggleVM: snackBarToggleVM,
     chatdbVm: chatDB_VM,
-    chatID: Int
+    chatID: Int,
+    mode: Int //0 -> qna, 1 -> ai_symptoms_checker
 ) {
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
@@ -146,6 +147,25 @@ fun ChatBotScreen(
                     .padding(start = 24.dp, end = 24.dp),
                 state = scrollState
             ) {
+                if (messaageList.isEmpty()){
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = when(mode){
+                                    0 -> "You are chatting"
+                                    else -> { "You are chatting" }
+                                },
+                                color = lightTextAccent,
+                                fontFamily = fontFamily,
+                                fontSize = 13.sp,
+                            )
+                        }
+                    }
+                }
                 items(messaageList){
                     if (!it.isError){
                         Messages(messageInfo = it)
@@ -211,7 +231,7 @@ fun ChatBotScreen(
                                         resetMessageFeild = {
                                             messageField.value = ""
                                         },
-                                        vmChat = chatdbVm, chatID = chatID
+                                        vmChat = chatdbVm, chatID = chatID, mode = mode
                                     )
                                 } else {
                                     snackBarToggleVM.SendToast(

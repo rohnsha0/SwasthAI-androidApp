@@ -117,7 +117,7 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
-                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatCount.value+1))
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID = chatCount.value+1))
                     }
                 )
                 DataListFull(
@@ -129,7 +129,7 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
-                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatCount.value+1))
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID =  chatCount.value+1))
                     }
                 )
                 DataListFull(
@@ -141,6 +141,7 @@ fun mAIScreen(
                     colorLogoTint = Color.Black,
                     onClickListener = {
                         Log.d("logStatus", "clicked")
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 1, chatID =  chatCount.value+1))
                     }
                 )
                 if (chatCount.value>0){
@@ -163,7 +164,7 @@ fun mAIScreen(
                     subtitle = "Chat ID: ${it.id}",
                     imageVector = Icons.Outlined.History,
                     onClickListener = {
-                        navController.navigate(bottomNavItems.Chatbot.returnChatID(it.id))
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID = it.id))
                     }
                 )
             }

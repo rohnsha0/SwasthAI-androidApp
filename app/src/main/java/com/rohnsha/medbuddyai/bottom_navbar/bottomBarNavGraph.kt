@@ -70,7 +70,7 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 communityViewModel = communityVM,
-                scanHistoryviewModel, diseaseDBviewModel
+                scanHistoryviewModel, diseaseDBviewModel, chatdbVM
             )
         }
         composable(route = bottomNavItems.Community.route){
@@ -154,6 +154,9 @@ fun bottomNavGraph(
             arguments = listOf(
                 navArgument(chatID){
                     type= NavType.IntType
+                },
+                navArgument(chatMode){
+                    type= NavType.IntType
                 }
             )
         ){
@@ -161,7 +164,8 @@ fun bottomNavGraph(
                 paddingValues = padding,
                 snackBarVM,
                 chatdbVm = chatdbVM,
-                chatID = it.arguments!!.getInt(chatID)
+                chatID = it.arguments!!.getInt(chatID),
+                mode = it.arguments!!.getInt(chatMode)
             )
         }
 
