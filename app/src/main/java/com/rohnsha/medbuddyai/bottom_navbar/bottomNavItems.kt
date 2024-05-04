@@ -19,6 +19,7 @@ const val scanResultIndex= "scanResultIndex"
 const val chatID= "chatID"
 const val postID= "postID"
 const val chatMode= "chatMode"
+const val domainSelection= "domianSelection"
 
 sealed class bottomNavItems(
     val title: String,
@@ -34,10 +35,14 @@ sealed class bottomNavItems(
     )
     object DiseaseCatelogue: bottomNavItems(
         title = "Diseases Catalogue",
-        route = "disease_catalogue",
+        route = "disease_catalogue/{$domainSelection}",
         unselectedIcon = Icons.Outlined.Home,
         selectedIcon = Icons.Filled.Home
-    )
+    ){
+        fun returnDiseaseCatelogue(domainSelection: Int): String{
+            return "disease_catalogue/$domainSelection"
+        }
+    }
     object Community: bottomNavItems(
         title = "Community",
         route = "community",

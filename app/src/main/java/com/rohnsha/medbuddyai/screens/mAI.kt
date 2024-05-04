@@ -4,10 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -167,6 +169,28 @@ fun mAIScreen(
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID = it.id))
                     }
                 )
+            }
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 21.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    if (chatHistory.value.size>3){
+                        Text(
+                            text = "View More",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 15.sp,
+                            modifier = Modifier
+                                .padding(top = 14.dp)
+                                .clickable {
+                                },
+                            color = customBlue
+                        )
+                    }
+                }
             }
         }
     }

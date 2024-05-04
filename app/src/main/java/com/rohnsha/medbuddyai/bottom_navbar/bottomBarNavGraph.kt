@@ -123,8 +123,15 @@ fun bottomNavGraph(
             )
         }
 
-        composable(route = bottomNavItems.DiseaseCatelogue.route){
-            DiseasesCatelogue(padding, diseaseDBviewModel, navController)
+        composable(
+            route = bottomNavItems.DiseaseCatelogue.route,
+            arguments = listOf(
+                navArgument(domainSelection){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            DiseasesCatelogue(padding, diseaseDBviewModel, navController, it.arguments!!.getInt(domainSelection))
         }
 
         composable(

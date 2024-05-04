@@ -78,6 +78,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         }
     }
 
+    suspend fun searchByDomain(domain: String): List<disease_data_dataClass>{
+        return withContext(viewModelScope.coroutineContext){
+            diseaseRepo.searchDBbyDomain(domain)
+        }
+    }
+
     suspend fun readDB(): List<disease_data_dataClass>{
         return withContext(viewModelScope.coroutineContext){
             diseaseRepo.readDB()

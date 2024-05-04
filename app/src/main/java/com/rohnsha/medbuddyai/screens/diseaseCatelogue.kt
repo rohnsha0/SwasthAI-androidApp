@@ -53,11 +53,17 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun DiseasesCatelogue(
     padding: PaddingValues,
     diseaseDBviewModel: diseaseDBviewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    domainSelection: Int
 ) {
+    val selectedDomain= remember {
+        mutableStateOf(Int.MAX_VALUE)
+    }
+
+    selectedDomain.value= domainSelection
 
     val isSelected= remember {
-        mutableStateOf(false)
+        mutableStateOf(selectedDomain.value!=Int.MAX_VALUE)
     }
 
     Scaffold(
@@ -110,7 +116,11 @@ fun DiseasesCatelogue(
         }
 
         LaunchedEffect(key1 = true) {
-            lists.value= diseaseDBviewModel.readDB()
+            lists.value= if (selectedDomain.value==Int.MAX_VALUE){
+                diseaseDBviewModel.readDB()
+            } else{
+                diseaseDBviewModel.searchByDomain(selectedDomain.value.toString())
+            }
         }
 
         LazyColumn(
@@ -173,9 +183,9 @@ fun DiseasesCatelogue(
                     subtitle = when(it.domain){
                         "0" -> "Blood & Lymphatics"
                         "1" -> "Digestive"
-                        "3" -> "Hand & Neck"
-                        "4" -> "Nervous System"
-                        "5" -> "Reproductive System"
+                        "2" -> "Hand & Neck"
+                        "3" -> "Nervous System"
+                        "4" -> "Reproductive System"
                         "6", "7" -> "Respiratory System"
                         "8", "9" -> "Skin"
                         "11" -> "Urinary System"
@@ -193,9 +203,9 @@ fun OptionsFilter(text: String, imageVector: ImageVector, onClickListener: () ->
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .then(
-                if (state){
+                if (state) {
                     Modifier.background(customBlue)
-                } else{
+                } else {
                     Modifier.background(ViewDash)
                 }
             )

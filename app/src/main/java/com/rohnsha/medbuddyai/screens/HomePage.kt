@@ -361,18 +361,26 @@ fun explore_diseases(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Neural", icon = Icons.Outlined.Psychology, weight = .49f, navController = navController,)
+            explore_tabs(title = "Neural", icon = Icons.Outlined.Psychology, weight = .49f, onClickListener = {
+                navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(3))
+            })
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Derma", icon = Icons.Outlined.EmojiPeople, weight = 1f, navController = navController,)
+            explore_tabs(title = "Derma", icon = Icons.Outlined.EmojiPeople, weight = 1f, onClickListener = {
+                navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(8))
+            })
         }
         Row(
             modifier = Modifier
                 .padding(top = 12.dp)
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Respiratory", icon = Icons.Outlined.SelfImprovement, weight = .49f, navController = navController,)
+            explore_tabs(title = "Respiratory", icon = Icons.Outlined.SelfImprovement, weight = .49f, onClickListener = {
+                navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(6))
+            })
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "More", icon = Icons.Outlined.ReadMore, weight = 1f, navController = navController)
+            explore_tabs(title = "Digestive", icon = Icons.Outlined.ReadMore, weight = 1f, onClickListener = {
+                navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(1))
+            })
         }
         Text(
             text = "View More",
@@ -384,7 +392,7 @@ fun explore_diseases(
                 .padding(top = 20.dp)
                 .align(Alignment.CenterHorizontally)
                 .clickable {
-                    navController.navigate(bottomNavItems.DiseaseCatelogue.route)
+                    navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(Int.MAX_VALUE))
                 }
         )
     }

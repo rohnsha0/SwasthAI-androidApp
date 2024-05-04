@@ -21,4 +21,6 @@ interface diseaseDAO {
     @Query("select * from disease_data")
     suspend fun readDB(): List<disease_data_dataClass>
 
+    @Query("SELECT * FROM disease_data WHERE domain LIKE :domain")
+    suspend fun searchDBbyDomain(domain: String): List<disease_data_dataClass>
 }

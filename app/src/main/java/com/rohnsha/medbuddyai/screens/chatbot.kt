@@ -41,11 +41,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -75,6 +77,11 @@ fun ChatBotScreen(
 ) {
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
+
+    val messageFieldState= remember {
+        mutableStateOf(true)
+    }
+
 
     val messageField= remember {
         mutableStateOf("")
@@ -145,23 +152,28 @@ fun ChatBotScreen(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 24.dp, end = 24.dp),
-                state = scrollState
+                state = scrollState,
             ) {
                 if (messaageList.isEmpty()){
                     item {
                         Box(
                             modifier = Modifier
                                 .fillMaxSize(),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Center
                         ){
                             Text(
                                 text = when(mode){
-                                    0 -> "You are chatting"
-                                    else -> { "You are chatting" }
+                                    0 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
+                                            " questions about medical"
+                                    1 -> "You are chatting with SwasthAI Symptom checker bot trained to detect possible" +
+                                            "symtoms associated with a disease"
+                                    else -> { "Undetected categorization of chat mode" }
                                 },
                                 color = lightTextAccent,
                                 fontFamily = fontFamily,
                                 fontSize = 13.sp,
+                                modifier = Modifier.align(Center),
+                                textAlign = TextAlign.Center
                             )
                         }
                     }
@@ -171,7 +183,7 @@ fun ChatBotScreen(
                         Messages(messageInfo = it)
                     } else{
                         Spacer(modifier = Modifier.height(6.dp))
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
                             Text(
                                 text = it.message,
                                 color = lightTextAccent,
