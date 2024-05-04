@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -99,9 +100,14 @@ fun ChatBotScreen(
     val collectingSymptoms= remember {
         mutableStateOf(true)
     }
-
+    val responseSymptom= remember {
+        mutableStateOf("")
+    }
     val detectedSymptom= remember {
         mutableListOf<String>()
+    }
+    val optionEnabled= remember {
+        mutableStateOf(false)
     }
 
     LaunchedEffect(key1 = true) {
@@ -160,7 +166,17 @@ fun ChatBotScreen(
             ModalBottomSheet(onDismissRequest = { bomState.value= false }) {
                 ChatBOM(context = {
                     detectedSymptom.add(it)
-                    messageField.value= detectedSymptom.joinToString(", ")
+                    val formattedSymptoms= detectedSymptom.joinToString(", ")
+                    messageField.value= "I am having $formattedSymptoms"
+                    scope.launch {
+                        chatbotViewModel.symptomChat(
+                            symptom = formattedSymptoms,
+                            vmChat = chatdbVm,
+                            chatID = chatID,
+                            outcome = { responseSymptom.value= it }
+                        )
+                    }
+                    optionEnabled.value= true
                                   },
                     state = { bomState.value= it }
                 )
@@ -222,14 +238,34 @@ fun ChatBotScreen(
                     }
                 }
             }
-            val listGreet= listOf("Hi!", "Hello!")
+            val listGreet= listOf(
+                moreActions("Yes") {
+                    detectedSymptom.add(responseSymptom.value)
+                    val formattedSymptoms= detectedSymptom.joinToString(", ")
+                    messageField.value= "I am having $formattedSymptoms"
+                    scope.launch {
+                        chatbotViewModel.symptomChat(
+                            symptom = formattedSymptoms,
+                            vmChat = chatdbVm,
+                            chatID = chatID,
+                            outcome = { responseSymptom.value= it }
+                        )
+                    }
+                },
+                moreActions("No") {
+                    optionEnabled.value = true
+                    scope.launch {
+                        chatbotViewModel.endSymptomTest(1, chatID)
+                    }
+                },
+            )
             Spacer(modifier = Modifier.height(10.dp))
-            AnimatedVisibility(visible = messaageList.isEmpty()) {
+            AnimatedVisibility(visible = optionEnabled.value) {
                 LazyRow(
                     Modifier.padding(start = 7.dp)
                 ) {
                     items(listGreet){
-                        ChatStarters(text = it) { messageField.value = it }
+                        ChatStarters(text = it.title) { it.onClick() }
                     }
                 }
             }
@@ -290,6 +326,7 @@ fun ChatBotScreen(
                                         },
                                         vmChat = chatdbVm, chatID = chatID, mode = mode
                                     )
+                                    optionEnabled.value= false
                                 } else {
                                     snackBarToggleVM.SendToast(
                                         message = "Enter a message to be sent",

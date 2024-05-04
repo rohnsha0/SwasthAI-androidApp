@@ -24,12 +24,12 @@ class chatVM: ViewModel() {
 
     private var retryCount = 0
 
-    suspend fun initializeChat(mode: Int, chatID: Int){
+    suspend fun endSymptomTest(mode: Int, chatID: Int){
         if (mode==1){
             Log.d("chatVM", "symptoms init")
             _listMessages.emit(
                 messageEntity(
-                    message = "Welcome to AI Symptom checker! Please enter your symptoms.",
+                    message = "Either send the message for getting the final disease, or add the symptom by search",
                     isBotMessage = true,
                     timestamp = System.currentTimeMillis(),
                     isError = false,
@@ -42,6 +42,54 @@ class chatVM: ViewModel() {
 
         }
         Log.d("chatVM", _listMessages.toString())
+    }
+
+    suspend fun symptomChat(
+        symptom: String,
+        isRetrying: Boolean= false,
+        vmChat: chatDB_VM,
+        chatID: Int, outcome: ((String) -> Unit)? = null
+    ){
+        if (_messageCount.value==0){
+            vmChat.addChat(
+                chatEntity(timestamp = System.currentTimeMillis())
+            )
+        }
+        if (!isRetrying){
+            val messageBody= messageEntity(
+                message = "Selected symptom: ${symptom.substringAfterLast(", ").trim()}",
+                isBotMessage =  false,
+                timestamp = System.currentTimeMillis(),
+                isError = true,
+                chatId = chatID
+            )
+            vmChat.addMessages(messageBody)
+            _listMessages.emit(
+                messageBody
+            )
+            _messageCount.value += 1
+        }
+
+        val dynamicURL= "https://api-jjtysweprq-el.a.run.app/next_symptom/$symptom"
+        try {
+            val response= chatService.getChatReply(dynamicURL)
+            val resultAPI= messageEntity(
+                message = response.message,
+                isBotMessage = true,
+                timestamp = System.currentTimeMillis(),
+                isError = false,
+                chatId = chatID
+            )
+            _listMessages.emit(resultAPI)
+            _messageCount.value += 1
+            vmChat.addMessages(resultAPI)
+            if (outcome != null) {
+                outcome(response.message)
+            }
+            Log.d("errorChat", response.message)
+        } catch (e: Exception){
+            symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true)
+        }
     }
 
     suspend fun chat(
@@ -67,13 +115,7 @@ class chatVM: ViewModel() {
             )
             vmChat.addMessages(messageBody)
             _listMessages.emit(
-                messageEntity(
-                    message = message,
-                    isBotMessage =  false,
-                    timestamp = System.currentTimeMillis(),
-                    isError = false,
-                    chatId = chatID
-                )
+                messageBody
             )
             _messageCount.value += 1
             resetMessageFeild()
@@ -159,7 +201,7 @@ class chatVM: ViewModel() {
 
             val delayMillis = calculateExponentialBackoff(retryCount)
             val retryMessage= messageEntity(
-                message = "Retrying in ${delayMillis/1000} seconds",
+                message = "Retrying in ${delayMillis/1000} second(s)",
                 isBotMessage = true,
                 timestamp = System.currentTimeMillis(),
                 isError = true,
