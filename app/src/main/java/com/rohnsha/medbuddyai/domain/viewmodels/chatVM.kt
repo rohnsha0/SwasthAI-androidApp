@@ -6,11 +6,13 @@ import com.rohnsha.medbuddyai.api.chatbot.chatbot_obj.chatService
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.io.IOException
+import kotlin.math.pow
 
 class chatVM: ViewModel() {
 
@@ -20,21 +22,62 @@ class chatVM: ViewModel() {
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
 
+    private var retryCount = 0
+
+    suspend fun initializeChat(mode: Int, chatID: Int){
+        if (mode==1){
+            Log.d("chatVM", "symptoms init")
+            _listMessages.emit(
+                messageEntity(
+                    message = "Welcome to AI Symptom checker! Please enter your symptoms.",
+                    isBotMessage = true,
+                    timestamp = System.currentTimeMillis(),
+                    isError = false,
+                    chatId = chatID
+                )
+            )
+            Log.d("chatVM", "symptom done")
+            _messageCount.value += 1
+            Log.d("chatVM", "incremnetd done")
+
+        }
+        Log.d("chatVM", _listMessages.toString())
+    }
+
     suspend fun chat(
         message: String,
         resetMessageFeild: () -> Unit,
         vmChat: chatDB_VM,
         chatID: Int,
+        isRetrying: Boolean= false,
         mode: Int //0 -> qna, 1 -> ai_symptoms_checker
     ){
-
-        vmChat.addMessages(messageEntity(
-            message = message,
-            isBotMessage = false,
-            timestamp = System.currentTimeMillis(),
-            isError = false,
-            chatId = chatID
-        ))
+        if (_messageCount.value==0){
+            vmChat.addChat(
+                chatEntity(timestamp = System.currentTimeMillis())
+            )
+        }
+        if (!isRetrying){
+            val messageBody= messageEntity(
+                message = message,
+                isBotMessage =  false,
+                timestamp = System.currentTimeMillis(),
+                isError = false,
+                chatId = chatID
+            )
+            vmChat.addMessages(messageBody)
+            _listMessages.emit(
+                messageEntity(
+                    message = message,
+                    isBotMessage =  false,
+                    timestamp = System.currentTimeMillis(),
+                    isError = false,
+                    chatId = chatID
+                )
+            )
+            _messageCount.value += 1
+            resetMessageFeild()
+        }
 
         val dynamicURL= when(mode){
             0 -> {
@@ -47,15 +90,7 @@ class chatVM: ViewModel() {
                 "https://api-jjtysweprq-el.a.run.app/chat/$message"
             }
         }
-        if (_messageCount.value==0){
-            vmChat.addChat(
-                chatEntity(timestamp = System.currentTimeMillis())
-            )
-        }
         try {
-            _listMessages.emit(messageEntity(message = message, isBotMessage =  false, timestamp = System.currentTimeMillis(), isError = false, chatId = chatID))
-            _messageCount.value += 1
-            resetMessageFeild()
             val response= chatService.getChatReply(dynamicURL)
             val resultAPI= messageEntity(
                 message = response.message,
@@ -121,7 +156,27 @@ class chatVM: ViewModel() {
                 }
             }
             _messageCount.value += 1
+
+            val delayMillis = calculateExponentialBackoff(retryCount)
+            val retryMessage= messageEntity(
+                message = "Retrying in ${delayMillis/1000} seconds",
+                isBotMessage = true,
+                timestamp = System.currentTimeMillis(),
+                isError = true,
+                chatId = chatID
+            )
+            _listMessages.emit(retryMessage)
+            vmChat.addMessages(retryMessage)
+            delay(delayMillis)
+            chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode, isRetrying = true)
         }
+    }
+
+    private fun calculateExponentialBackoff(retryCount: Int): Long {
+        // Exponential backoff formula: base * 2^retryCount
+        val base = 1000L // Base delay in milliseconds (1 second)
+        val delayMillis = base * (2.0).pow(retryCount.toDouble()).toLong()
+        return delayMillis.coerceAtMost(30000L) // Cap the maximum delay to 30 seconds
     }
 
 }

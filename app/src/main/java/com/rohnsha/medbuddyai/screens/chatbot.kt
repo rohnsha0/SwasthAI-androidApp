@@ -25,10 +25,12 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Send
+import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -75,13 +77,17 @@ fun ChatBotScreen(
     chatID: Int,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker
 ) {
+    Log.d("chatDB", chatID.toString())
     val scope= rememberCoroutineScope()
     val chatbotViewModel= viewModel<chatVM>()
 
     val messageFieldState= remember {
-        mutableStateOf(true)
+        mutableStateOf(mode==0)
     }
 
+    val bomState= remember {
+        mutableStateOf(false)
+    }
 
     val messageField= remember {
         mutableStateOf("")
@@ -89,6 +95,13 @@ fun ChatBotScreen(
 
     val messaageList= remember {
         mutableListOf<messageEntity>()
+    }
+    val collectingSymptoms= remember {
+        mutableStateOf(true)
+    }
+
+    val detectedSymptom= remember {
+        mutableListOf<String>()
     }
 
     LaunchedEffect(key1 = true) {
@@ -101,6 +114,7 @@ fun ChatBotScreen(
 
     LaunchedEffect(chatbotViewModel.messageCount.collectAsState().value) {
         chatbotViewModel.messagesList.collect{ message ->
+            Log.d("chatList", message.toString())
             messaageList.add(message)
         }
     }
@@ -108,7 +122,7 @@ fun ChatBotScreen(
     Log.d("chatList", messaageList.toString())
     LaunchedEffect(key1 = chatbotViewModel.messageCount.collectAsState().value) {
         val count= chatbotViewModel.messageCount
-        Log.d("sizes", "vm: ${count}, size: ${messaageList.size}")
+        Log.d("sizes", "vm: ${count.value}, size: ${messaageList.size}")
     }
     val scrollState = rememberLazyListState()
 
@@ -118,13 +132,16 @@ fun ChatBotScreen(
         }
     }
 
-
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Chat - QnA",
+                        text = when(mode){
+                            0 -> "QnA"
+                            1 -> "Symptom Checker"
+                            else -> { "Undetected categorization of chat mode" }
+                        },
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -139,6 +156,16 @@ fun ChatBotScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ){ values ->
+        if (bomState.value){
+            ModalBottomSheet(onDismissRequest = { bomState.value= false }) {
+                ChatBOM(context = {
+                    detectedSymptom.add(it)
+                    messageField.value= detectedSymptom.joinToString(", ")
+                                  },
+                    state = { bomState.value= it }
+                )
+            }
+        }
         Column(
             modifier = Modifier
                 .padding(values)
@@ -218,7 +245,17 @@ fun ChatBotScreen(
                     onValueChange = { messageField.value= it },
                     modifier = Modifier
                         .weight(1f)
-                        .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(color = ViewDash)
+                        .then(
+                            if (!messageFieldState.value) {
+                                Modifier.clickable {
+                                    bomState.value = true
+                                }
+                            } else {
+                                Modifier
+                            }
+                        ),
                     shape= RoundedCornerShape(16.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = ViewDash,
@@ -227,7 +264,15 @@ fun ChatBotScreen(
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
                     ),
-                    placeholder = { Text(text = "Enter your query", color= lightTextAccent) }
+                    placeholder = { Text(
+                        text = if(messageFieldState.value){
+                                                        "Enter your query"
+                                                            } else{
+                                                                 "Select relevant option"
+                                                                 },
+                        fontFamily = fontFamily,
+                        color= lightTextAccent) },
+                    enabled = messageFieldState.value
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Icon(
@@ -333,6 +378,56 @@ fun Messages(
             if (messageInfo.isBotMessage){
                 Spacer(modifier = Modifier.weight(1f))
             }
+        }
+    }
+}
+
+@Composable
+fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit) {
+    val content= remember {
+        mutableStateOf("")
+    }
+    LazyColumn(
+        modifier = Modifier
+            .padding(horizontal = 24.dp)
+    ) {
+        item {
+            Row {
+                Text(
+                    modifier = Modifier,
+                    text = "Symptom Search",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier
+                        .clickable {
+                            context(content.value)
+                            state(false)
+                        },
+                    text = "Save",
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        item {
+            TextInputThemed(
+                value = content.value,
+                onValueChanged = { content.value= it },
+                label = "Enter contents",
+                icon = Icons.Outlined.ShortText,
+                isNumKey = false,
+                onClose = { content.value = "" },
+                singleLine = false
+            )
+        }
+        item {
+            Spacer(modifier = Modifier.height(45.dp))
         }
     }
 }
