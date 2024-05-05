@@ -3,7 +3,6 @@ package com.rohnsha.medbuddyai.screens
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -239,7 +238,7 @@ fun ChatBotScreen(
                 }
             }
             val listGreet= listOf(
-                moreActions("Yes") {
+                moreActions("Yes, I have symptoms") {
                     detectedSymptom.add(responseSymptom.value)
                     val formattedSymptoms= detectedSymptom.joinToString(", ")
                     messageField.value= "I am having $formattedSymptoms"
@@ -262,10 +261,23 @@ fun ChatBotScreen(
             Spacer(modifier = Modifier.height(10.dp))
             AnimatedVisibility(visible = optionEnabled.value) {
                 LazyRow(
-                    Modifier.padding(start = 7.dp)
+                    Modifier.padding(start = 6.dp)
                 ) {
+                    item { Spacer(modifier = Modifier.width(6.dp)) }
                     items(listGreet){
-                        ChatStarters(text = it.title) { it.onClick() }
+                        Text(
+                            text = it.title,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily,
+                            color = customBlue,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp, vertical = 10.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(ViewDash)
+                                .clickable { it.onClick() }
+                                .padding(vertical = 3.dp, horizontal = 14.dp)
+                        )
                     }
                 }
             }
@@ -326,7 +338,7 @@ fun ChatBotScreen(
                                         },
                                         vmChat = chatdbVm, chatID = chatID, mode = mode
                                     )
-                                    optionEnabled.value= false
+                                    optionEnabled.value = false
                                 } else {
                                     snackBarToggleVM.SendToast(
                                         message = "Enter a message to be sent",
@@ -343,21 +355,6 @@ fun ChatBotScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun ChatStarters(text: String, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 6.dp, vertical = 6.dp)
-            .border(width = 2.dp, color = ViewDash, shape = RoundedCornerShape(16.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clickable { onClick() }
-    ){
-        Text(
-            text = text
-        )
     }
 }
 

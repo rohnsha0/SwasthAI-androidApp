@@ -6,7 +6,6 @@ data class Post(
     val author: String? = null,
     val content: String? = null,
     val timestamp: String? = null,
-    val domain: String? = null,
 )
 
 data class Reply(

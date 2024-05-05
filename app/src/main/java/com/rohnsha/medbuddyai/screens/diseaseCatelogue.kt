@@ -2,7 +2,10 @@ package com.rohnsha.medbuddyai.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -16,17 +19,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Book
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -39,7 +44,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -171,9 +178,10 @@ fun DiseasesCatelogue(
         }
 
         if (bomState.value){
-            ModalBottomSheet(onDismissRequest = { bomState.value= false }) {
+            ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 RadioButtonList(items = listItem, selectedItem = selectedDomain.value) {
                     selectedDomain.value= it
+                    bomState.value= false
                 }
             }
         }
@@ -293,24 +301,100 @@ fun RadioButtonList(
     selectedItem: Int,
     onItemSelected: (Int) -> Unit
 ) {
-    Column {
-        items.forEachIndexed { index, item ->
+
+    val itemSelected= remember {
+        mutableStateOf(selectedItem)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp)
+    ) {
+        Row(
+            Modifier.padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = "Choose disease category",
+                fontSize = 18.sp,
+                fontWeight = FontWeight(600),
+                fontFamily = fontFamily
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = "Done",
+                fontSize = 18.sp,
+                fontWeight = FontWeight(600),
+                fontFamily = fontFamily,
+                color = customBlue,
+                modifier = Modifier.clickable { onItemSelected(itemSelected.value) }
+            )
+        }
+        Text(
+            text = "Clear all",
+            fontSize = 14.sp,
+            fontWeight = FontWeight(600),
+            fontFamily = fontFamily,
+            color = customBlue,
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .background(ViewDash)
+                .clickable { }
+                .padding(vertical = 3.dp, horizontal = 14.dp)
+        )
+        items.forEachIndexed { index, data ->
             Row(
-                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        onItemSelected(index)
-                    }
-                    .padding(16.dp)
+                    .padding(vertical = 12.dp)
+                    .pointerInput(key1 = true) {
+                        detectTapGestures {
+                            itemSelected.value= index
+                        }
+                    },
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                RadioButton(
-                    selected = selectedItem == index,
-                    onClick = { onItemSelected(index) },
-                    modifier = Modifier.padding(end = 8.dp)
+                Image(
+                    imageVector = Icons.Outlined.MedicalInformation,
+                    contentDescription = "options pre",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(ViewDash, RoundedCornerShape(16.dp))
+                        .padding(10.dp)
                 )
-                Text(text = item.title)
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(
+                    text = data.title,
+                    fontFamily = fontFamily,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                val checkStat= itemSelected.value==index
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .then(
+                            if (!checkStat) Modifier.border(
+                                width = 1.dp,
+                                color = Color(0xFFD4D4D4),
+                                shape = CircleShape
+                            ) else Modifier
+                        )
+                ){
+                    if (checkStat){
+                        Image(
+                            imageVector = Icons.Outlined.Check,
+                            contentDescription = "options",
+                            modifier = Modifier
+                                .background(customBlue, CircleShape)
+                                .padding(3.dp),
+                            colorFilter = ColorFilter.tint(color = Color.White)
+                        )
+                    }
+                }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }

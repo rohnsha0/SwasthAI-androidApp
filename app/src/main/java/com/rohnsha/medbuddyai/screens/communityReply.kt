@@ -179,10 +179,11 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                                         replyContent = messageField.value,
                                         postID = postID,
                                         onCompleteLambda = {
-                                            replies.add(it)
+                                            val reply= it
                                             messageField.value = ""
+                                            replies.add(reply)
                                             snackBarToggleVM.SendToast(
-                                                message = "Post was uploaded successfully",
+                                                message = "Reply was uploaded successfully",
                                                 indicator_color = customGreen,
                                                 padding = PaddingValues(2.dp)
                                             )

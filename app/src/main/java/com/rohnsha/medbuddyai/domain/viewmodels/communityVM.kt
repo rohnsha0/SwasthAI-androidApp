@@ -77,7 +77,6 @@ class communityVM: ViewModel() {
     fun post(
         title: String,
         content: String,
-        domainIndex: Int,
         onCompleteLambda: () -> Unit
     ){
         viewModelScope.launch {
@@ -98,7 +97,6 @@ class communityVM: ViewModel() {
                     title = title,
                     content = content,
                     timestamp = System.currentTimeMillis().toString(),
-                    domain = returnDomain(domainIndex)
                 )
                 Log.d("authUserAction", newPost.toString())
                 _postRef.child("posts").child(username).child(postID).setValue(newPost)
@@ -130,7 +128,6 @@ class communityVM: ViewModel() {
                                 val title = postData?.get("title") ?: "No title"
                                 val content = postData?.get("content") ?: "No content"
                                 val timestamp= postData?.get("timestamp") ?: "Unnoticed"
-                                val domain = postData?.get("domain") ?: "Unspecified"
                                 val id= postData?.get("id") ?: "null"
 
                                 val post = Post(
@@ -139,7 +136,6 @@ class communityVM: ViewModel() {
                                     title = title,
                                     content = content,
                                     timestamp = timestamp,
-                                    domain = domain
                                 )
                                 posts.add(post)
                             }
@@ -203,7 +199,6 @@ class communityVM: ViewModel() {
 
     fun mergePostReplies(postData: List<Post> = _postFeed.value, replyData: List<Reply> = _replyFeed.value, postID: String? = null): MutableList<postWithReply> {
         val postsWithReplies = mutableListOf<postWithReply>()
-
         for (post in postData) {
             val postReplies = if (postID == null) {
                 replyData.filter { it.id?.contains(post.id ?: "") ?: false }

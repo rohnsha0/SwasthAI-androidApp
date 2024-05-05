@@ -24,24 +24,18 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.CloseFullscreen
 import androidx.compose.material.icons.outlined.FeaturedPlayList
-import androidx.compose.material.icons.outlined.Female
-import androidx.compose.material.icons.outlined.Male
 import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material.icons.outlined.Quickreply
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material.icons.outlined.Title
-import androidx.compose.material.icons.outlined.Transgender
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -110,12 +104,6 @@ fun CommunityScreen(
         val content= remember {
             mutableStateOf("")
         }
-        val domainExpanded= remember {
-            mutableStateOf(false)
-        }
-        val domain= remember {
-            mutableIntStateOf(0)
-        }
         LazyColumn(
             modifier = Modifier
                 .padding(values)
@@ -144,11 +132,10 @@ fun CommunityScreen(
                         weight = if (isCreateExpanded.value) .56f else .49f,
                         onClickListener = { 
                             if (isCreateExpanded.value) {
-                                if (title.value!="" && content.value!="" && domain.intValue!=0){
+                                if (title.value!="" && content.value!=""){
                                     communityViewModel.post(
                                         title = title.value,
                                         content= content.value,
-                                        domainIndex = domain.intValue,
                                         onCompleteLambda = {
                                             isCreateExpanded.value= false
                                             title.value= ""
@@ -205,40 +192,6 @@ fun CommunityScreen(
                             onClose = { content.value = "" },
                             singleLine = false
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        ExposedDropdownMenuBox(
-                            expanded = domainExpanded.value,
-                            onExpandedChange = { domainExpanded.value = it },
-                        ) {
-                            TextInputThemed(
-                                value = communityViewModel.returnDomain(domain.intValue),
-                                onValueChanged = {  },
-                                icon = when(domain.intValue){
-                                    1 -> Icons.Outlined.Male
-                                    2 -> Icons.Outlined.Female
-                                    else -> Icons.Outlined.Transgender
-                                },
-                                label = "Select Domain",
-                                onClose = {  },
-                                isNumKey = true,
-                                readOnly = true,
-                                modifier = Modifier.menuAnchor()
-                            )
-
-                            ExposedDropdownMenu(
-                                expanded = domainExpanded.value,
-                                onDismissRequest = { domainExpanded.value = false },
-                            ) {
-                                DropdownMenuItem(text = { Text(text = "Lungs") }, onClick = {
-                                    domain.intValue= 1
-                                    domainExpanded.value = false
-                                })
-                                DropdownMenuItem(text = { Text(text = "Brain") }, onClick = {
-                                    domain.intValue= 2
-                                    domainExpanded.value = false
-                                })
-                            }
-                        }
                     }
                 }
                 Text(
