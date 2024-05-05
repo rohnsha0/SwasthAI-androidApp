@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "1c5bac8601af02ca6fe03d6a6c66c6af",
+    "identityHash": "716f0fcf2acd5e631818c9102163db7d",
     "entities": [
       {
         "tableName": "scan_history",
@@ -113,7 +113,7 @@
       },
       {
         "tableName": "chats",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL, `mode` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -124,6 +124,12 @@
           {
             "fieldPath": "timestamp",
             "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mode",
+            "columnName": "mode",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -191,7 +197,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1c5bac8601af02ca6fe03d6a6c66c6af')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '716f0fcf2acd5e631818c9102163db7d')"
     ]
   }
 }

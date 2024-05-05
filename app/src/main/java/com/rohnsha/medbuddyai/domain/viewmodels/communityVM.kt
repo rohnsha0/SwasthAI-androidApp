@@ -36,7 +36,8 @@ class communityVM: ViewModel() {
 
     fun addReply(
         replyContent: String,
-        postID: String
+        postID: String,
+        onCompleteLambda: (Reply) -> Unit
     ){
         viewModelScope.launch {
             if (_auth.currentUser!=null){
@@ -62,6 +63,7 @@ class communityVM: ViewModel() {
                             .setValue(reply)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    onCompleteLambda(reply)
                                     Log.d("authUserAction", "Reply successful")
                                 } else {
                                     Log.e("authUserAction", "Reply unsuccessful", task.exception)

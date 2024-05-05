@@ -3,10 +3,12 @@ package com.rohnsha.medbuddyai.screens
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,11 +25,14 @@ import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -42,6 +47,7 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
+import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -63,7 +69,7 @@ fun DiseasesCatelogue(
     selectedDomain.value= domainSelection
 
     val isSelected= remember {
-        mutableStateOf(selectedDomain.value!=Int.MAX_VALUE)
+        mutableStateOf(false)
     }
 
     Scaffold(
@@ -115,11 +121,60 @@ fun DiseasesCatelogue(
             mutableStateOf(emptyList<disease_data_dataClass>())
         }
 
-        LaunchedEffect(key1 = true) {
+        LaunchedEffect(key1 = selectedDomain.value) {
+            isSelected.value=selectedDomain.value!=Int.MAX_VALUE
             lists.value= if (selectedDomain.value==Int.MAX_VALUE){
                 diseaseDBviewModel.readDB()
             } else{
                 diseaseDBviewModel.searchByDomain(selectedDomain.value.toString())
+            }
+        }
+        val bomState= remember {
+            mutableStateOf(false)
+        }
+
+        val listItem= remember {
+            mutableStateListOf(
+                rbStructure(
+                    isChecked = selectedDomain.value==0,
+                    title = "Blood & Lymphatics"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==1,
+                    title = "Digestive"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==2,
+                    title = "Hand & Neck"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==3,
+                    title = "Nervous System",
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==4,
+                    title = "Reproductive System"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==6,
+                    title = "Respiratory System"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==8,
+                    title = "Skin"
+                ),
+                rbStructure(
+                    isChecked = selectedDomain.value==11,
+                    title = "Urinary System"
+                )
+            )
+        }
+
+        if (bomState.value){
+            ModalBottomSheet(onDismissRequest = { bomState.value= false }) {
+                RadioButtonList(items = listItem, selectedItem = selectedDomain.value) {
+                    selectedDomain.value= it
+                }
             }
         }
 
@@ -147,7 +202,9 @@ fun DiseasesCatelogue(
                                 fontSize = 14.sp,
                                 color = customBlue,
                                 fontWeight = FontWeight(600),
-                                modifier = Modifier.clickable { isSelected.value= false }
+                                modifier = Modifier.clickable {
+                                    selectedDomain.value=Int.MAX_VALUE
+                                }
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                         }
@@ -155,7 +212,7 @@ fun DiseasesCatelogue(
                             text = "Organ System Type",
                             imageVector = Icons.Outlined.ArrowDropDown,
                             onClickListener = {
-                                isSelected.value= !isSelected.value
+                                bomState.value= true
                             },
                             state = isSelected.value
                         )
@@ -227,5 +284,33 @@ fun OptionsFilter(text: String, imageVector: ImageVector, onClickListener: () ->
                 .size(18.dp),
             tint = if (state) Color.White else lightTextAccent
         )
+    }
+}
+
+@Composable
+fun RadioButtonList(
+    items: List<rbStructure>,
+    selectedItem: Int,
+    onItemSelected: (Int) -> Unit
+) {
+    Column {
+        items.forEachIndexed { index, item ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onItemSelected(index)
+                    }
+                    .padding(16.dp)
+            ) {
+                RadioButton(
+                    selected = selectedItem == index,
+                    onClick = { onItemSelected(index) },
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(text = item.title)
+            }
+        }
     }
 }

@@ -52,7 +52,7 @@ class chatVM: ViewModel() {
     ){
         if (_messageCount.value==0){
             vmChat.addChat(
-                chatEntity(timestamp = System.currentTimeMillis())
+                chatEntity(timestamp = System.currentTimeMillis(), mode = 1, id = chatID)
             )
         }
         if (!isRetrying){
@@ -102,7 +102,7 @@ class chatVM: ViewModel() {
     ){
         if (_messageCount.value==0){
             vmChat.addChat(
-                chatEntity(timestamp = System.currentTimeMillis())
+                chatEntity(timestamp = System.currentTimeMillis(), mode = mode, id = chatID)
             )
         }
         if (!isRetrying){

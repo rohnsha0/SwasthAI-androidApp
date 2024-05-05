@@ -6,5 +6,6 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "chats")
 data class chatEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val timestamp: Long
+    val timestamp: Long,
+    val mode: Int
 )

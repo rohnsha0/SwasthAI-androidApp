@@ -18,7 +18,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material.icons.outlined.SmartToy
@@ -146,6 +148,37 @@ fun mAIScreen(
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 1, chatID =  chatCount.value+1))
                     }
                 )
+                Text(
+                    text = "Know Your Product",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+                DataListFull(
+                    title = "Ask SwasthAI Admin",
+                    subtitle = "get more technical info",
+                    imageVector = Icons.Outlined.Info,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        Log.d("logStatus", "clicked")
+                    }
+                )
+                DataListFull(
+                    title = "Download Fine-tuned LLM",
+                    subtitle = "powered by LLAMA3",
+                    imageVector = Icons.Outlined.Download,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        Log.d("logStatus", "clicked")
+                    }
+                )
                 if (chatCount.value>0){
                     Text(
                         text = "Chat History",
@@ -161,12 +194,16 @@ fun mAIScreen(
 
             items(chatHistory.value.take(n = 3)){
                 DataListFull(
-                    title = "QnA",
+                    title = when(it.mode){
+                        0 -> "QnA"
+                        1 -> "Symptom Checker"
+                        else -> "Unknown"
+                                         },
                     colorLogo = customBlue,
                     subtitle = "Chat ID: ${it.id}",
                     imageVector = Icons.Outlined.History,
                     onClickListener = {
-                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID = it.id))
+                        navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = it.mode, chatID = it.id))
                     }
                 )
             }

@@ -44,11 +44,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.rohnsha.medbuddyai.domain.dataclass.Reply
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
@@ -59,8 +61,9 @@ import kotlinx.coroutines.launch
 fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communityVM, snackBarToggleVM:snackBarToggleVM) {
 
     val replyData= communityVM.replyContents.collectAsState().value
-    val replies= replyData.filter { it.id==postID }
-    Log.d("replies", "postID: $postID")
+    val replies = remember {
+        replyData.filter { it.id==postID } as MutableList<Reply>
+    }
     Log.d("replies", "replyData: ${replyData}\nreplies: $replies")
     val messageField= remember {
         mutableStateOf("")
@@ -174,7 +177,16 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                                 if (messageField.value != "") {
                                     communityVM.addReply(
                                         replyContent = messageField.value,
-                                        postID = postID
+                                        postID = postID,
+                                        onCompleteLambda = {
+                                            replies.add(it)
+                                            messageField.value = ""
+                                            snackBarToggleVM.SendToast(
+                                                message = "Post was uploaded successfully",
+                                                indicator_color = customGreen,
+                                                padding = PaddingValues(2.dp)
+                                            )
+                                        }
                                     )
                                 } else {
                                     snackBarToggleVM.SendToast(
