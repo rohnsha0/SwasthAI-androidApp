@@ -6,17 +6,21 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rohnsha.medbuddyai.domain.dataclass.classification
-import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
 import com.rohnsha.medbuddyai.ml.BreastCancerV1
+import com.rohnsha.medbuddyai.ml.BreastSegmentationv1
 import com.rohnsha.medbuddyai.ml.ColonCacnerV1
+import com.rohnsha.medbuddyai.ml.ColonSegmentationv1
 import com.rohnsha.medbuddyai.ml.GiomaTumorv1
+import com.rohnsha.medbuddyai.ml.KidneySegmentationv1
 import com.rohnsha.medbuddyai.ml.KidneyTumorV1
 import com.rohnsha.medbuddyai.ml.LeukEarlyV1
 import com.rohnsha.medbuddyai.ml.LeukProV1
+import com.rohnsha.medbuddyai.ml.LeukemaSegmentationv1
 import com.rohnsha.medbuddyai.ml.LungSccV1
 import com.rohnsha.medbuddyai.ml.LungsActV1
 import com.rohnsha.medbuddyai.ml.MeningiomaTumorv1
 import com.rohnsha.medbuddyai.ml.OralCacnerV1
+import com.rohnsha.medbuddyai.ml.OralSegmentationv1
 import com.rohnsha.medbuddyai.ml.PituitaryTumorv1
 import com.rohnsha.medbuddyai.ml.PneumoniaV4
 import com.rohnsha.medbuddyai.ml.SkinAcneV1
@@ -351,10 +355,15 @@ class classificationVM: ViewModel() {
         Log.d("inputString", "index: $index")
 
         val outputPneumonia= when(index){
-            0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
-            1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            0 -> { LeukemaSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            1 -> { ColonSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            2 -> { OralSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            4 -> { BreastSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            6 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            7 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
             8 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
             9 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+            11 -> { KidneySegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
             else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
         }
         val maxIndexPneumonia= getMaxIndex(outputPneumonia.floatArray)

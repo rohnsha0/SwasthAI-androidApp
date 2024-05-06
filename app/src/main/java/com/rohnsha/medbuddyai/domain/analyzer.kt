@@ -8,6 +8,11 @@ import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.ml.BrainSegmentationv2
+import com.rohnsha.medbuddyai.ml.BreastSegmentationv1
+import com.rohnsha.medbuddyai.ml.ColonSegmentationv1
+import com.rohnsha.medbuddyai.ml.KidneySegmentationv1
+import com.rohnsha.medbuddyai.ml.LeukemaSegmentationv1
+import com.rohnsha.medbuddyai.ml.OralSegmentationv1
 import com.rohnsha.medbuddyai.ml.SkinSegmentationv1
 import com.rohnsha.medbuddyai.ml.XrayClfV1
 import org.tensorflow.lite.DataType
@@ -48,10 +53,16 @@ class analyzer(
             inputFeature0.loadBuffer(tensorImage.buffer)
             Log.d("inputString", "indexAnalyzer: $index")
             val outputFeature0 = when(index){
-                0 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
-                1-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                0 -> { LeukemaSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                1 -> { ColonSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                2 -> { OralSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                3-> { BrainSegmentationv2.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                4 -> { BreastSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                6 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                7 -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
                 8 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
                 9 -> { SkinSegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
+                11 -> { KidneySegmentationv1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
                 else -> { XrayClfV1.newInstance(context).process(inputFeature0).outputFeature0AsTensorBuffer }
             }
             val results= classification(
