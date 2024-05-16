@@ -152,7 +152,6 @@ fun HomeScreen(
         containerColor = BGMain
     ) { values ->
         val scrollState= rememberScrollState()
-        communityViewModel.loginUser()
         LazyColumn(
             modifier = Modifier
                 .padding(values)

@@ -96,7 +96,7 @@ class photoCaptureViewModel: ViewModel() {
             _loadingBoolean.value=false
             _reloadingBoolean.value=false
         } else {
-            _listPrediction.value= rawClassification.filter { it.indexNumber == 1 }
+            _listPrediction.value= rawClassification.filter { it.indexNumber == 1 && it.confident > 0.75 }
             if (_listPrediction.value.isEmpty()){
                 _normalBoolean.value=true
                 _loadingBoolean.value=false

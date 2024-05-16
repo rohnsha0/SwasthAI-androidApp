@@ -20,6 +20,7 @@ const val chatID= "chatID"
 const val postID= "postID"
 const val chatMode= "chatMode"
 const val domainSelection= "domianSelection"
+const val authMode= "authMode"
 
 sealed class bottomNavItems(
     val title: String,
@@ -128,4 +129,22 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Assistant,
         selectedIcon = Icons.Filled.Assistant
     )
+
+    object LogoWelcome: bottomNavItems(
+        title = "logoWelcome",
+        route = "logoWelcome",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    )
+
+    object userAuth: bottomNavItems(
+        title = "userAuth",
+        route = "userAuth/{$authMode}",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    ){
+        fun returnAuthMode(authMode: Int): String{
+            return "userAuth/$authMode"
+        }
+    }
 }

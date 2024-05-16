@@ -615,6 +615,7 @@ fun ScanMainScreen(
                                 .padding(end = 30.dp),
                             text = "Rescan",
                             fontSize = 17.sp,
+                            color = customBlue,
                             fontWeight = FontWeight(600),
                             fontFamily = fontFamily
                         )
@@ -634,6 +635,15 @@ fun ScanMainScreen(
                         fontSize = 14.sp,
                         text = "Please upload correct image type to proceed or rescan?"
                     )
+                    if (index==8 || index==9){
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 30.dp, top = 14.dp, end = 30.dp, bottom = 45.dp),
+                            fontFamily = fontFamily,
+                            fontSize = 14.sp,
+                            text = "Since, "
+                        )
+                    }
                 }
             }
         }

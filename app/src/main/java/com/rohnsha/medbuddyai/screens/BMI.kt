@@ -49,10 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
-import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,12 +116,12 @@ fun BMIScreen(
             TextInputThemed(value = height.value, onValueChanged = { height.value= it },
                 icon = Icons.Outlined.Height, label = "Enter your height",
                 onClose = { height.value= "" }, regex = "^(?:5[6-9]|[6-9]\\d|1\\d\\d|22[0-5])\$\n", suffix = "cm",
-                isNumKey = true
+                //isNumKey = true
             )
             Spacer(modifier = Modifier.height(12.dp))
             TextInputThemed(value = weight.value, onValueChanged = { weight.value= it },
                 icon = Icons.Outlined.Scale, label = "Enter your weight",
-                onClose = { weight.value= "" }, suffix = "kg", isNumKey = true, regex = "\\b(?:[2-9]|[1-9][0-9]|110)\\b\n"
+                onClose = { weight.value= "" }, suffix = "kg", keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), regex = "\\b(?:[2-9]|[1-9][0-9]|110)\\b\n"
             )
             Spacer(modifier = Modifier.height(18.dp))
             Text(
@@ -138,7 +138,7 @@ fun BMIScreen(
                 icon = Icons.Outlined.Add,
                 label = "Enter your age",
                 onClose = { /*TODO*/ },
-                isNumKey = true,
+                //isNumKey = true,
                 suffix = "years"
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -160,7 +160,7 @@ fun BMIScreen(
                         },
                     label = "Select Gender",
                     onClose = {  },
-                    isNumKey = true,
+                    //isNumKey = true,
                     readOnly = true,
                     modifier = Modifier.menuAnchor()
                 )
@@ -205,15 +205,15 @@ fun BMIScreen(
 fun TextInputThemed(
     value: String,
     onValueChanged: (String) -> Unit,
-    icon: ImageVector,
+    icon: ImageVector? = null,
     label: String,
     onClose: () -> Unit,
     regex: String?=null,
     suffix: String? = null,
-    isNumKey: Boolean,
     readOnly: Boolean= false,
     modifier: Modifier= Modifier,
-    singleLine: Boolean= true
+    singleLine: Boolean= true,
+    keyboardOptions: KeyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Text)
 ) {
     val errorState= remember {
         mutableStateOf(false)
@@ -236,17 +236,19 @@ fun TextInputThemed(
         readOnly = readOnly,
         onValueChange = { onValueChanged(it) },
         leadingIcon = {
-            Image(
-                modifier = Modifier
-                    .size(34.dp)
-                    .background(BGMain, CircleShape)
-                    .padding(5.dp),
-                imageVector = icon,
-                contentDescription = null
-            )
+            if (icon!=null){
+                Image(
+                    modifier = Modifier
+                        .size(34.dp)
+                        .background(BGMain, CircleShape)
+                        .padding(5.dp),
+                    imageVector = icon,
+                    contentDescription = null
+                )
+            }
         },
         suffix = { if (suffix!=null) Text(text = suffix) },
-        keyboardOptions = if (isNumKey) KeyboardOptions(keyboardType = KeyboardType.Number) else KeyboardOptions(keyboardType = KeyboardType.Text),
+        keyboardOptions = keyboardOptions,
         trailingIcon = {
             if (value!="" && !readOnly){
                 Image(
@@ -275,7 +277,7 @@ fun TextInputThemed(
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color.White,
             focusedContainerColor = Color.White,
-            focusedIndicatorColor = lightTextAccent,
+            focusedIndicatorColor = customBlue,
             unfocusedIndicatorColor = formAccent,
             errorContainerColor = Color.White,
             errorIndicatorColor = customRed,

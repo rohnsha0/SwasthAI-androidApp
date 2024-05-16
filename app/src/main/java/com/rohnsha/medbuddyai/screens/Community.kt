@@ -180,7 +180,6 @@ fun CommunityScreen(
                             label = "Enter title",
                             icon = Icons.Outlined.Title,
                             onClose = { title.value = "" },
-                            isNumKey = false
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         TextInputThemed(
@@ -188,7 +187,6 @@ fun CommunityScreen(
                             onValueChanged = { content.value= it },
                             label = "Enter contents",
                             icon = Icons.Outlined.ShortText,
-                            isNumKey = false,
                             onClose = { content.value = "" },
                             singleLine = false
                         )

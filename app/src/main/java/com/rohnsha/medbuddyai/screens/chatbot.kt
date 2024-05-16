@@ -455,7 +455,6 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit) {
                 onValueChanged = { content.value= it },
                 label = "Enter contents",
                 icon = Icons.Outlined.ShortText,
-                isNumKey = false,
                 onClose = { content.value = "" },
                 singleLine = false
             )

@@ -14,6 +14,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.firebase.auth.FirebaseAuth
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
@@ -21,6 +22,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
+import com.rohnsha.medbuddyai.domain.viewmodels.userAuthVM
 import com.rohnsha.medbuddyai.screens.BMIScreen
 import com.rohnsha.medbuddyai.screens.ChatBotScreen
 import com.rohnsha.medbuddyai.screens.CommunityReply
@@ -32,6 +34,8 @@ import com.rohnsha.medbuddyai.screens.MoreScreen
 import com.rohnsha.medbuddyai.screens.ScanCategoryScreen
 import com.rohnsha.medbuddyai.screens.ScanResultScreen
 import com.rohnsha.medbuddyai.screens.ScanScreen
+import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
+import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
 import kotlinx.coroutines.delay
 
@@ -45,10 +49,22 @@ fun bottomNavGraph(
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
+    val userAuth= viewModel<userAuthVM>()
+    val _auth= FirebaseAuth.getInstance()
+    userAuth.initialize(_auth)
+    communityVM.initialize(_auth)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
     val chatdbVM= viewModel<chatDB_VM>()
     val context: Context= LocalContext.current
+
+    if (userAuth.isUserUnAuthenticated()){
+        navController.navigate(bottomNavItems.LogoWelcome.route){
+            popUpTo(bottomNavItems.Home.route){
+                inclusive= true
+            }
+        }
+    }
 
     LaunchedEffect(key1 = true){
         scanHistoryviewModel.readScanHistory()
@@ -201,6 +217,23 @@ fun bottomNavGraph(
                 resultsLevel = it.arguments!!.getInt(scanResultKey),
                 indexClassification = it.arguments!!.getInt(scanResultIndex)
             )
+        }
+        composable(
+            route = bottomNavItems.LogoWelcome.route
+        ){
+            WelcomeLogoScreen(
+                navController = navController
+            )
+        }
+        composable(
+            route = bottomNavItems.userAuth.route,
+            arguments = listOf(
+                navArgument(authMode){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            UserAuthScreen(mode = it.arguments!!.getInt(authMode), navController = navController, userAuthVM = userAuth)
         }
     }
 }

@@ -14,7 +14,6 @@ import com.rohnsha.medbuddyai.domain.dataclass.postWithReply
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -24,7 +23,7 @@ import java.util.concurrent.TimeUnit
 
 class communityVM: ViewModel() {
 
-    private val _auth= FirebaseAuth.getInstance()
+    private lateinit var _auth: FirebaseAuth
     private val _database= Firebase.database
     private val _postRef= _database.reference
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
@@ -33,6 +32,10 @@ class communityVM: ViewModel() {
 
     val feedContents= _postFeed.asStateFlow()
     val replyContents= _replyFeed.asStateFlow()
+
+    fun initialize(instance: FirebaseAuth){
+        _auth= instance
+    }
 
     fun addReply(
         replyContent: String,
@@ -208,21 +211,6 @@ class communityVM: ViewModel() {
             postsWithReplies.add(postWithReply(post, postReplies))
         }
         return postsWithReplies
-    }
-
-    fun loginUser(){
-        viewModelScope.launch {
-            try {
-                if (_auth.currentUser==null){
-                    _auth.signInWithEmailAndPassword("test@test.com", "test123456789").await()
-                    Log.d("auth", "auth unsuccessfull")
-                } else{
-                    Log.d("auth", "auth successfull")
-                }
-            } catch (_: Exception){
-
-            }
-        }
     }
 
 }
