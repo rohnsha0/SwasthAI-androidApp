@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a060ec768a041b241800821514859406",
+    "identityHash": "d368da2d3c8b4574b8cff34fc3875604",
     "entities": [
       {
         "tableName": "disease_data",
@@ -71,12 +71,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "symptoms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`symptom` TEXT NOT NULL, `symptomAbbreviation` TEXT NOT NULL, PRIMARY KEY(`symptomAbbreviation`))",
+        "fields": [
+          {
+            "fieldPath": "symptom",
+            "columnName": "symptom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "symptomAbbreviation",
+            "columnName": "symptomAbbreviation",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "symptomAbbreviation"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a060ec768a041b241800821514859406')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd368da2d3c8b4574b8cff34fc3875604')"
     ]
   }
 }

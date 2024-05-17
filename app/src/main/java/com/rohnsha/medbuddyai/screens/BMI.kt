@@ -269,7 +269,6 @@ fun TextInputThemed(
             Text(
                 text = label,
                 fontFamily = fontFamily,
-                fontSize = 14.sp,
                 fontWeight = FontWeight(600),
                 color = formAccent
             )

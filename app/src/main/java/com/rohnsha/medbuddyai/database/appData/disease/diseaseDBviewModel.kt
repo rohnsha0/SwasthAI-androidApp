@@ -9,6 +9,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.database.appData.appDataDB
+import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDAO
+import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
+import com.rohnsha.medbuddyai.database.appData.symptoms.symptomRepo
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.notifications.dbUpdateService
@@ -22,7 +25,11 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val diseaseRepo: diseaseRepo
     private val diseaseDAO: diseaseDAO
 
+    private val symptomRepo: symptomRepo
+    private val symptomDAO: symptomDAO
+
     private val _dataList= MutableStateFlow<List<disease_data_dataClass>>(emptyList())
+    private val _symptomList= MutableStateFlow<List<symptomDC>>(emptyList())
     val notificanService= dbUpdateService(ContextUtill.ContextUtils.getApplicationContext())
 
     private val _processUpdatingDB= MutableStateFlow(false)
@@ -43,6 +50,8 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     init {
         diseaseDAO= appDataDB.getAppDBReference(application).diseaseDAO()
         diseaseRepo= diseaseRepo(diseaseDAO)
+        symptomDAO= appDataDB.getAppDBReference(application).symptomDAO()
+        symptomRepo= symptomRepo(symptomDAO)
     }
 
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
@@ -121,23 +130,27 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         Log.d("dbStatus", "entering fetchDIsease()")
         fetchDiseaseData()
         Log.d("dbStatus", "done fetchDIsease()")
-        if (_dataList.value.isNotEmpty()){
+        try {
             for (data in _dataList.value){
                 Log.d("dbStatus", "attempting to add entries")
                 diseaseRepo.addDisease(data)
                 Log.d("dbStatus", "entries added succesfully")
-                onCompleteLambda()
             }
-        } else {
+            for (data in _symptomList.value){
+                symptomRepo.addSymptom(data)
+            }
+            onCompleteLambda()
+        } catch (e: Exception) {
             Log.d("dbStatus", "entries found")
         }
     }
 
     private suspend fun fetchDiseaseData(){
         val list= mutableListOf<disease_data_dataClass>()
+        val listSymtom= mutableListOf<symptomDC>()
         try {
-            val dataInstance= Firebase.firestore.collection("diseaseData")
-            for (data in dataInstance.get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+            val dataInstance= Firebase.firestore
+            for (data in dataInstance.collection("diseaseData").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
                 Log.d("dbStatus", data.toString())
                 list.add(
                     disease_data_dataClass(
@@ -153,14 +166,23 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                     )
                 )
             }
+            for (data in dataInstance.collection("symptoms").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+                listSymtom.add(
+                    symptomDC(
+                        symptom = data?.get("symptom") as String,
+                        symptomAbbreviation = data["symptomAbbreviation"] as String
+                    )
+                )
+            }
             Log.d("dbStatus", "list: $list")
-            if (list.isEmpty()){
+            if (list.isEmpty() || listSymtom.isEmpty()){
                 notificanService.showNotification(
                     "Database Update Failed",
                     "A database update was triggered but failed unintentionally. We will try again later!"
                 )
             }
             _dataList.value= list
+            _symptomList.value= listSymtom
         } catch (e: Exception){
             Log.d("dbStatus", e.toString())
             notificanService.showNotification(
