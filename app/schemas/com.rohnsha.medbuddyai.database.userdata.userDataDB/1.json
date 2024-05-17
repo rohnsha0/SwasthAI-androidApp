@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "34a1bc16da7867ab866300d435ec760b",
+    "identityHash": "bbf11ed358885a83ad15b0dcdadf15d9",
     "entities": [
       {
         "tableName": "scan_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `title` TEXT NOT NULL, `domain` TEXT NOT NULL, PRIMARY KEY(`timestamp`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `title` TEXT NOT NULL, `domain` TEXT NOT NULL, `confidence` REAL NOT NULL DEFAULT 0.0, PRIMARY KEY(`timestamp`))",
         "fields": [
           {
             "fieldPath": "timestamp",
@@ -25,6 +25,13 @@
             "columnName": "domain",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "confidence",
+            "columnName": "confidence",
+            "affinity": "REAL",
+            "notNull": true,
+            "defaultValue": "0.0"
           }
         ],
         "primaryKey": {
@@ -37,32 +44,82 @@
         "foreignKeys": []
       },
       {
-        "tableName": "intFastingTable",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timeStamp` INTEGER NOT NULL, `targetTime` INTEGER NOT NULL, `isCompleted` INTEGER NOT NULL, PRIMARY KEY(`timeStamp`))",
+        "tableName": "chats",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `timestamp` INTEGER NOT NULL, `mode` INTEGER NOT NULL)",
         "fields": [
           {
-            "fieldPath": "timeStamp",
-            "columnName": "timeStamp",
+            "fieldPath": "id",
+            "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "targetTime",
-            "columnName": "targetTime",
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "isCompleted",
-            "columnName": "isCompleted",
+            "fieldPath": "mode",
+            "columnName": "mode",
             "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
-          "autoGenerate": false,
+          "autoGenerate": true,
           "columnNames": [
-            "timeStamp"
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `message` TEXT NOT NULL, `isBotMessage` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `isError` INTEGER NOT NULL, `chatId` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isBotMessage",
+            "columnName": "isBotMessage",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isError",
+            "columnName": "isError",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chatId",
+            "columnName": "chatId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
           ]
         },
         "indices": [],
@@ -72,7 +129,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '34a1bc16da7867ab866300d435ec760b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bbf11ed358885a83ad15b0dcdadf15d9')"
     ]
   }
 }

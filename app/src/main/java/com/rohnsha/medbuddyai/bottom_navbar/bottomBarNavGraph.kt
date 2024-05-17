@@ -15,8 +15,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
+import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
-import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
@@ -59,11 +59,7 @@ fun bottomNavGraph(
     val context: Context= LocalContext.current
 
     if (userAuth.isUserUnAuthenticated()){
-        navController.navigate(bottomNavItems.LogoWelcome.route){
-            popUpTo(bottomNavItems.Home.route){
-                inclusive= true
-            }
-        }
+        //navController.navigate(bottomNavItems.LogoWelcome.route)
     }
 
     LaunchedEffect(key1 = true){
@@ -80,7 +76,7 @@ fun bottomNavGraph(
 
     NavHost(
         navController = navController,
-        startDestination = bottomNavItems.Home.route
+        startDestination = if (userAuth.isUserUnAuthenticated()) bottomNavItems.LogoWelcome.route else bottomNavItems.Home.route
     ){
         composable(route = bottomNavItems.Home.route){
             HomeScreen(

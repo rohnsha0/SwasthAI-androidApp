@@ -11,7 +11,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
-import com.rohnsha.medbuddyai.database.userdata.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version

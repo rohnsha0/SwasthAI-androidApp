@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.database.userdata.disease
+package com.rohnsha.medbuddyai.database.appData.disease
 
 import androidx.room.Dao
 import androidx.room.Insert

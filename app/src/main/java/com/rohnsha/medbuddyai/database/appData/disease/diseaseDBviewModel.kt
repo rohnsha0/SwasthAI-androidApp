@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.database.userdata.disease
+package com.rohnsha.medbuddyai.database.appData.disease
 
 import android.app.Application
 import android.content.Context
@@ -8,8 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
+import com.rohnsha.medbuddyai.database.appData.appDataDB
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
-import com.rohnsha.medbuddyai.database.userdata.userDataDB
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.notifications.dbUpdateService
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +41,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val _dataCachedReadOnly= MutableStateFlow(disease_data_dataClass())
 
     init {
-        diseaseDAO= userDataDB.getUserDBRefence(application).diseaseDAO()
+        diseaseDAO= appDataDB.getAppDBReference(application).diseaseDAO()
         diseaseRepo= diseaseRepo(diseaseDAO)
     }
 
