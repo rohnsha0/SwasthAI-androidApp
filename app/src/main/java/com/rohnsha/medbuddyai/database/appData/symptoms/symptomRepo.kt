@@ -6,4 +6,8 @@ class symptomRepo(private val symptomDAO: symptomDAO) {
         symptomDAO.addSymptom(symptom)
     }
 
+    suspend fun readSymptoms(): List<symptomDC> {
+        return symptomDAO.getAllSymptoms()
+    }
+
 }

@@ -54,6 +54,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         symptomRepo= symptomRepo(symptomDAO)
     }
 
+    suspend fun readSymptoms(): List<symptomDC>{
+        return withContext(viewModelScope.coroutineContext){
+            symptomRepo.readSymptoms()
+        }
+    }
+
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
         return diseaseRepo.searchDB(domain, indexItem)
     }

@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Merge
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.Warning
@@ -52,6 +53,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
@@ -73,6 +76,7 @@ import java.util.Locale
 fun ChatBotScreen(
     paddingValues: PaddingValues,
     snackBarToggleVM: snackBarToggleVM,
+    diseaseDBviewModel: diseaseDBviewModel,
     chatdbVm: chatDB_VM,
     chatID: Int,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker
@@ -107,6 +111,14 @@ fun ChatBotScreen(
     }
     val optionEnabled= remember {
         mutableStateOf(false)
+    }
+
+    val symptoms= remember {
+        mutableListOf<symptomDC>()
+    }
+
+    LaunchedEffect(key1 = mode == 1) {
+        diseaseDBviewModel.readSymptoms().forEach { symptoms.add(it) }
     }
 
     LaunchedEffect(key1 = true) {
@@ -162,7 +174,7 @@ fun ChatBotScreen(
         containerColor = BGMain
     ){ values ->
         if (bomState.value){
-            ModalBottomSheet(onDismissRequest = { bomState.value= false }) {
+            ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 ChatBOM(context = {
                     detectedSymptom.add(it)
                     val formattedSymptoms= detectedSymptom.joinToString(", ")
@@ -177,7 +189,8 @@ fun ChatBotScreen(
                     }
                     optionEnabled.value= true
                                   },
-                    state = { bomState.value= it }
+                    state = { bomState.value= it },
+                    symptoms = symptoms
                 )
             }
         }
@@ -417,7 +430,7 @@ fun Messages(
 }
 
 @Composable
-fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit) {
+fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>) {
     val content= remember {
         mutableStateOf("")
     }
@@ -458,9 +471,39 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit) {
                 onClose = { content.value = "" },
                 singleLine = false
             )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+        items(symptoms){
+            SymptomsList(title = it.symptom)
         }
         item {
             Spacer(modifier = Modifier.height(45.dp))
         }
+    }
+}
+
+@Composable
+fun SymptomsList(title: String) {
+    Row(
+        modifier= Modifier
+            .fillMaxWidth()
+            .clickable { }
+            .padding(vertical = 9.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Merge,
+            contentDescription = "symptoms",
+            tint = lightTextAccent,
+            modifier = Modifier
+                .size(34.dp)
+                .padding(6.dp)
+        )
+        Text(
+            text = title,
+            fontSize = 14.sp,
+            fontFamily = fontFamily,
+            modifier = Modifier.padding(start = 13.dp)
+        )
     }
 }

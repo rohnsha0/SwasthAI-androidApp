@@ -189,7 +189,8 @@ fun bottomNavGraph(
                 snackBarVM,
                 chatdbVm = chatdbVM,
                 chatID = it.arguments!!.getInt(chatID),
-                mode = it.arguments!!.getInt(chatMode)
+                mode = it.arguments!!.getInt(chatMode),
+                diseaseDBviewModel = diseaseDBviewModel
             )
         }
 
