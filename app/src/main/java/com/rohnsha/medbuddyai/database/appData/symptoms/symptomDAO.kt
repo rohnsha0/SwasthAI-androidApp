@@ -10,6 +10,9 @@ interface symptomDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addSymptom(symptom: symptomDC)
 
-    @Query("SELECT * FROM symptoms order by RANDOM() LIMIT 20")
+    @Query( "SELECT * FROM symptoms WHERE symptom LIKE '%' || :symptom || '%'")
+    suspend fun searchSymptom(symptom: String): List<symptomDC>
+
+    @Query("SELECT * FROM symptoms order by RANDOM()")
     suspend fun getAllSymptoms(): List<symptomDC>
 }

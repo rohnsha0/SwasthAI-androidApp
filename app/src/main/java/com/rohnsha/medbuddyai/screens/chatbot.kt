@@ -184,13 +184,15 @@ fun ChatBotScreen(
                             symptom = formattedSymptoms,
                             vmChat = chatdbVm,
                             chatID = chatID,
-                            outcome = { responseSymptom.value= it }
+                            outcome = {
+                                responseSymptom.value= it
+                                optionEnabled.value= true
+                            }
                         )
-                    }
-                    optionEnabled.value= true
-                                  },
+                    }},
                     state = { bomState.value= it },
-                    symptoms = symptoms
+                    symptoms = symptoms,
+                    diseaseDBviewModel = diseaseDBviewModel
                 )
             }
         }
@@ -430,10 +432,25 @@ fun Messages(
 }
 
 @Composable
-fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>) {
+fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>, diseaseDBviewModel: diseaseDBviewModel) {
     val content= remember {
         mutableStateOf("")
     }
+
+    val listFetched= remember {
+        mutableStateOf(symptoms)
+    }
+
+    LaunchedEffect(key1 = content.value) {
+        if (content.value.isNotEmpty()){
+            val list = diseaseDBviewModel.searchSymptom(content.value)
+            listFetched.value = list
+        } else {
+            listFetched.value= symptoms
+        }
+        Log.d("symptoms", listFetched.toString())
+    }
+
     LazyColumn(
         modifier = Modifier
             .padding(horizontal = 24.dp)
@@ -473,7 +490,7 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<s
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        items(symptoms){
+        items(listFetched.value){
             SymptomsList(title = it.symptom)
         }
         item {

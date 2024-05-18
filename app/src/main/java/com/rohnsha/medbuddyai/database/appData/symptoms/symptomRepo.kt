@@ -10,4 +10,8 @@ class symptomRepo(private val symptomDAO: symptomDAO) {
         return symptomDAO.getAllSymptoms()
     }
 
+    suspend fun searchSymp(symptom: String): List<symptomDC>{
+        return symptomDAO.searchSymptom(symptom)
+    }
+
 }

@@ -60,6 +60,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         }
     }
 
+    suspend fun searchSymptom(symptomDC: String): List<symptomDC>{
+        return withContext(viewModelScope.coroutineContext){
+            symptomRepo.searchSymp(symptomDC)
+        }
+    }
+
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
         return diseaseRepo.searchDB(domain, indexItem)
     }
