@@ -66,6 +66,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         }
     }
 
+    suspend fun searchSymptomByAbbreviation(symptomAbbreviation: String): symptomDC{
+        return withContext(viewModelScope.coroutineContext){
+            symptomRepo.searchSymByAbb(symptomAbbreviation)
+        }
+    }
+
     suspend fun searchDB(domain: String, indexItem: String): disease_data_dataClass {
         return diseaseRepo.searchDB(domain, indexItem)
     }

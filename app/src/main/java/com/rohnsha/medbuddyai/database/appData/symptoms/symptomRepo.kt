@@ -14,4 +14,8 @@ class symptomRepo(private val symptomDAO: symptomDAO) {
         return symptomDAO.searchSymptom(symptom)
     }
 
+    suspend fun searchSymByAbb(symptomAbbreviation: String): symptomDC{
+        return symptomDAO.searchSymptomByAbbrev(symptomAbbreviation)
+    }
+
 }

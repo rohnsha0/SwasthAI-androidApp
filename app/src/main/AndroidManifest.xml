@@ -23,7 +23,6 @@
         android:theme="@style/Theme.DermBuddyAI.Splash"
         tools:targetApi="31">
         <activity
-            android:windowSoftInputMode="adjustResize"
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.DermBuddyAI.Splash">

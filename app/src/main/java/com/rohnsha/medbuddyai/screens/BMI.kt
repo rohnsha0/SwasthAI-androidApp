@@ -235,18 +235,6 @@ fun TextInputThemed(
         value = value,
         readOnly = readOnly,
         onValueChange = { onValueChanged(it) },
-        leadingIcon = {
-            if (icon!=null){
-                Image(
-                    modifier = Modifier
-                        .size(34.dp)
-                        .background(BGMain, CircleShape)
-                        .padding(5.dp),
-                    imageVector = icon,
-                    contentDescription = null
-                )
-            }
-        },
         suffix = { if (suffix!=null) Text(text = suffix) },
         keyboardOptions = keyboardOptions,
         trailingIcon = {

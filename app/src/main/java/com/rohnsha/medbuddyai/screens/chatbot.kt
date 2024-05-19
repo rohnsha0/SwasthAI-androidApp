@@ -107,7 +107,7 @@ fun ChatBotScreen(
         mutableStateOf("")
     }
     val detectedSymptom= remember {
-        mutableListOf<String>()
+        mutableListOf<symptomDC>()
     }
     val optionEnabled= remember {
         mutableStateOf(false)
@@ -177,17 +177,17 @@ fun ChatBotScreen(
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 ChatBOM(context = {
                     detectedSymptom.add(it)
-                    val formattedSymptoms= detectedSymptom.joinToString(", ")
-                    messageField.value= "I am having $formattedSymptoms"
+                    messageField.value= "I am having ${detectedSymptom.joinToString(", ") { it.symptom }.lowercase()}"
                     scope.launch {
                         chatbotViewModel.symptomChat(
-                            symptom = formattedSymptoms,
+                            symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
                             vmChat = chatdbVm,
                             chatID = chatID,
                             outcome = {
-                                responseSymptom.value= it
+                                detectedSymptom.add(it)
                                 optionEnabled.value= true
-                            }
+                            },
+                            diseaseDBviewModel = diseaseDBviewModel,
                         )
                     }},
                     state = { bomState.value= it },
@@ -254,15 +254,14 @@ fun ChatBotScreen(
             }
             val listGreet= listOf(
                 moreActions("Yes, I have symptoms") {
-                    detectedSymptom.add(responseSymptom.value)
-                    val formattedSymptoms= detectedSymptom.joinToString(", ")
-                    messageField.value= "I am having $formattedSymptoms"
+                    messageField.value= "I am having ${ detectedSymptom.joinToString(", ") { it.symptom }.lowercase() }"
                     scope.launch {
                         chatbotViewModel.symptomChat(
-                            symptom = formattedSymptoms,
+                            symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
                             vmChat = chatdbVm,
                             chatID = chatID,
-                            outcome = { responseSymptom.value= it }
+                            outcome = { detectedSymptom.add(it) },
+                            diseaseDBviewModel = diseaseDBviewModel,
                         )
                     }
                 },
@@ -432,9 +431,15 @@ fun Messages(
 }
 
 @Composable
-fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>, diseaseDBviewModel: diseaseDBviewModel) {
+fun ChatBOM(context: (symptomDC) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>, diseaseDBviewModel: diseaseDBviewModel) {
+    val selectedData= remember {
+        mutableStateOf(symptomDC(symptom = "", symptomAbbreviation = ""))
+    }
     val content= remember {
         mutableStateOf("")
+    }
+    LaunchedEffect(key1 = selectedData.value) {
+        content.value= selectedData.value.symptom
     }
 
     val listFetched= remember {
@@ -468,7 +473,7 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<s
                 Text(
                     modifier = Modifier
                         .clickable {
-                            context(content.value)
+                            context(selectedData.value)
                             state(false)
                         },
                     text = "Save",
@@ -491,7 +496,9 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<s
             Spacer(modifier = Modifier.height(16.dp))
         }
         items(listFetched.value){
-            SymptomsList(title = it.symptom)
+            SymptomsList(title = it.symptom, onClickListener = {
+                selectedData.value= it
+            })
         }
         item {
             Spacer(modifier = Modifier.height(45.dp))
@@ -500,11 +507,11 @@ fun ChatBOM(context: (String) -> Unit, state: (Boolean)-> Unit, symptoms: List<s
 }
 
 @Composable
-fun SymptomsList(title: String) {
+fun SymptomsList(title: String, onClickListener: () -> Unit) {
     Row(
         modifier= Modifier
             .fillMaxWidth()
-            .clickable { }
+            .clickable { onClickListener() }
             .padding(vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

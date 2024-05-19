@@ -3,6 +3,8 @@ package com.rohnsha.medbuddyai.domain.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.rohnsha.medbuddyai.api.chatbot.chatbot_obj.chatService
+import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
@@ -48,13 +50,16 @@ class chatVM: ViewModel() {
         symptom: String,
         isRetrying: Boolean= false,
         vmChat: chatDB_VM,
-        chatID: Int, outcome: ((String) -> Unit)? = null
+        diseaseDBviewModel: diseaseDBviewModel,
+        chatID: Int, outcome: ((symptomDC) -> Unit)? = null
     ){
         if (_messageCount.value==0){
             vmChat.addChat(
                 chatEntity(timestamp = System.currentTimeMillis(), mode = 1, id = chatID)
             )
         }
+        Log.d("chatVMSymptom", symptom)
+        Log.d("chatVMSymptom", symptom.substringAfterLast(", ").trim())
         if (!isRetrying){
             val messageBody= messageEntity(
                 message = "Selected symptom: ${symptom.substringAfterLast(", ").trim()}",
@@ -73,22 +78,23 @@ class chatVM: ViewModel() {
         val dynamicURL= "https://api-jjtysweprq-el.a.run.app/next_symptom/$symptom"
         try {
             val response= chatService.getChatReply(dynamicURL)
+            val symptomData= diseaseDBviewModel.searchSymptomByAbbreviation(response.message)
             val resultAPI= messageEntity(
-                message = response.message,
+                message = symptomData.symptom,
                 isBotMessage = true,
                 timestamp = System.currentTimeMillis(),
                 isError = false,
                 chatId = chatID
             )
+            if (outcome != null) {
+                outcome(symptomData)
+            }
             _listMessages.emit(resultAPI)
             _messageCount.value += 1
             vmChat.addMessages(resultAPI)
-            if (outcome != null) {
-                outcome(response.message)
-            }
             Log.d("errorChat", response.message)
         } catch (e: Exception){
-            symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true)
+            symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true, diseaseDBviewModel = diseaseDBviewModel)
         }
     }
 
