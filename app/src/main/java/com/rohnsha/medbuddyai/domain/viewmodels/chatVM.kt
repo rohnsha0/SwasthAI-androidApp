@@ -80,7 +80,7 @@ class chatVM: ViewModel() {
             val response= chatService.getChatReply(dynamicURL)
             val symptomData= diseaseDBviewModel.searchSymptomByAbbreviation(response.message)
             val resultAPI= messageEntity(
-                message = symptomData.symptom,
+                message = "You may also have: ${symptomData.symptom}",
                 isBotMessage = true,
                 timestamp = System.currentTimeMillis(),
                 isError = false,

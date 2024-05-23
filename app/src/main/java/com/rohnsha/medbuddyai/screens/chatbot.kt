@@ -176,15 +176,19 @@ fun ChatBotScreen(
         if (bomState.value){
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 ChatBOM(context = {
-                    detectedSymptom.add(it)
+                    if (it !in detectedSymptom){
+                        detectedSymptom.add(it)
+                    }
                     messageField.value= "I am having ${detectedSymptom.joinToString(", ") { it.symptom }.lowercase()}"
                     scope.launch {
                         chatbotViewModel.symptomChat(
                             symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
                             vmChat = chatdbVm,
                             chatID = chatID,
-                            outcome = {
-                                detectedSymptom.add(it)
+                            outcome = { sym ->
+                                if (sym !in detectedSymptom){
+                                    //detectedSymptom.add(sym)
+                                }
                                 optionEnabled.value= true
                             },
                             diseaseDBviewModel = diseaseDBviewModel,
@@ -254,13 +258,18 @@ fun ChatBotScreen(
             }
             val listGreet= listOf(
                 moreActions("Yes, I have symptoms") {
-                    messageField.value= "I am having ${ detectedSymptom.joinToString(", ") { it.symptom }.lowercase() }"
                     scope.launch {
                         chatbotViewModel.symptomChat(
                             symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
                             vmChat = chatdbVm,
                             chatID = chatID,
-                            outcome = { detectedSymptom.add(it) },
+                            outcome = {
+                                if (it !in detectedSymptom){
+                                    detectedSymptom.add(it)
+                                    messageField.value= "I am having ${ detectedSymptom.joinToString(", ") { it.symptom }.lowercase() }"
+                                }
+                                optionEnabled.value = true
+                                      },
                             diseaseDBviewModel = diseaseDBviewModel,
                         )
                     }
@@ -269,6 +278,7 @@ fun ChatBotScreen(
                     optionEnabled.value = true
                     scope.launch {
                         chatbotViewModel.endSymptomTest(1, chatID)
+                        optionEnabled.value = false
                     }
                 },
             )
@@ -348,6 +358,9 @@ fun ChatBotScreen(
                                     chatbotViewModel.chat(
                                         messageField.value,
                                         resetMessageFeild = {
+                                            if (mode==1){
+                                                detectedSymptom.clear()
+                                            }
                                             messageField.value = ""
                                         },
                                         vmChat = chatdbVm, chatID = chatID, mode = mode
