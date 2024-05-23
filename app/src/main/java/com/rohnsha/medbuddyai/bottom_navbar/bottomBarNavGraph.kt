@@ -15,8 +15,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
@@ -50,17 +53,15 @@ fun bottomNavGraph(
     val classifierVM= viewModel<classificationVM>()
     val communityVM= viewModel<communityVM>()
     val userAuth= viewModel<userAuthVM>()
+    val currentUserVM= viewModel<currentUserDataVM>()
     val _auth= FirebaseAuth.getInstance()
-    userAuth.initialize(_auth)
-    communityVM.initialize(_auth)
+    val dbRef= Firebase.database.reference
+    userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM)
+    communityVM.initialize(instance = _auth, dbReference = dbRef)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
     val chatdbVM= viewModel<chatDB_VM>()
     val context: Context= LocalContext.current
-
-    if (userAuth.isUserUnAuthenticated()){
-        //navController.navigate(bottomNavItems.LogoWelcome.route)
-    }
 
     LaunchedEffect(key1 = true){
         scanHistoryviewModel.readScanHistory()

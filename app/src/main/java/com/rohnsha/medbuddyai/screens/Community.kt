@@ -205,8 +205,8 @@ fun CommunityScreen(
                 items(postsWithReplies){ it ->
                     val data= it.post
                     CommunityPostItem(
-                        title = data.title?: "Unknown",
-                        subtitle = "by ${data.author}",
+                        title = data.author?: "Unknown",
+                        subtitle = data.id?: "Unknown",
                         data = "${it.replies.size} replies",
                         additionData = data.timestamp?.let {
                             communityViewModel.calculateTimeDifference(

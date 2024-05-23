@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "bbf11ed358885a83ad15b0dcdadf15d9",
+    "identityHash": "336bf9b1187bac9362d64f65351a7796",
     "entities": [
       {
         "tableName": "scan_history",
@@ -124,12 +124,38 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "currentUserTable",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`field` TEXT NOT NULL, `value` TEXT NOT NULL, PRIMARY KEY(`field`))",
+        "fields": [
+          {
+            "fieldPath": "field",
+            "columnName": "field",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "field"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'bbf11ed358885a83ad15b0dcdadf15d9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '336bf9b1187bac9362d64f65351a7796')"
     ]
   }
 }

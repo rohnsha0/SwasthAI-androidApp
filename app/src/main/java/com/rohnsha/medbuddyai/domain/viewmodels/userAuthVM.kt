@@ -1,14 +1,29 @@
 package com.rohnsha.medbuddyai.domain.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
+import com.rohnsha.medbuddyai.domain.dataclass.userInfoDC
+import kotlinx.coroutines.launch
 
 class userAuthVM: ViewModel() {
 
     private lateinit var _auth: FirebaseAuth
+    private lateinit var _firestoreRef: DatabaseReference
+    private lateinit var _currentUserVM: currentUserDataVM
 
-    fun initialize(instance: FirebaseAuth){
+    fun initialize(
+        instance: FirebaseAuth,
+        dbReference: DatabaseReference,
+        currentUserVM: currentUserDataVM
+    ){
         _auth = instance
+        _firestoreRef = dbReference
+        _currentUserVM= currentUserVM
     }
 
     fun isUserUnAuthenticated(): Boolean {
@@ -25,11 +40,34 @@ class userAuthVM: ViewModel() {
             }
     }
 
-    fun registerUser(password: String, email: String, onSucess: () -> Unit, name: String) {
+    suspend fun registerUser(password: String, email: String, onSucess: () -> Unit, fname: String, lname: String, username: String) {
         _auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener {
-                onSucess()
+                val userInfo= userInfoDC(
+                    firstName = fname,
+                    lastName = lname,
+                    username = username
+                )
+                _firestoreRef.child("users").child(it.user?.uid.toString()).setValue(userInfo)
+                    .addOnSuccessListener {
+                        viewModelScope.launch {
+                            _currentUserVM.addDataCurrentUser(
+                                fieldValueDC(field = "firstName", value = fname)
+                            )
+                            _currentUserVM.addDataCurrentUser(
+                                fieldValueDC(field = "lastName", value = lname)
+                            )
+                            _currentUserVM.addDataCurrentUser(
+                                fieldValueDC(field = "username", value = username)
+                            )
+                        }
+                        onSucess()
+                    }
+            }
+            .addOnFailureListener {
+                it.printStackTrace()
+                Log.d("loginError", it.printStackTrace().toString())
+                Log.d("loginError", it.message.toString())
             }
     }
-
 }

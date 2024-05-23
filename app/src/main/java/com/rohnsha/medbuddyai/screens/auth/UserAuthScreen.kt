@@ -27,6 +27,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,6 +44,7 @@ import com.rohnsha.medbuddyai.screens.TextInputThemed
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -130,6 +132,10 @@ fun RegisterUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int)
     val password= remember {
         mutableStateOf("")
     }
+    val username= remember {
+        mutableStateOf("")
+    }
+    val scope= rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -161,6 +167,13 @@ fun RegisterUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int)
         )
         Spacer(modifier = Modifier.height(15.dp))
         TextInputThemed(
+            value = username.value,
+            onValueChanged = { username.value = it },
+            label = "Username",
+            onClose = { /*TODO*/ },
+        )
+        Spacer(modifier = Modifier.height(15.dp))
+        TextInputThemed(
             value = password.value,
             onValueChanged = { password.value = it },
             label = "Password",
@@ -168,7 +181,11 @@ fun RegisterUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int)
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
         )
         Spacer(modifier = Modifier.weight(1f))
-        AuthCTA(btnAction = { userAuthVM.registerUser(password.value, mail.value, onSucess, name = "${firstName.value} ${lastName.value}") }) {
+        AuthCTA(btnAction = {
+            scope.launch {
+                userAuthVM.registerUser(password.value, mail.value, onSucess, fname = firstName.value, lname = lastName.value, username = username.value)
+            }
+        }) {
             selectedMode(1)
         }
         Spacer(modifier = Modifier.height(30.dp))

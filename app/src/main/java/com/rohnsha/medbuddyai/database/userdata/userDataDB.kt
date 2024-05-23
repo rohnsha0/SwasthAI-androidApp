@@ -10,11 +10,13 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDAO
+import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryDAO
 
 @Database(
-    entities = [scanHistory::class, chatEntity::class, messageEntity::class],
+    entities = [scanHistory::class, chatEntity::class, messageEntity::class, fieldValueDC::class],
     version = 1,
     exportSchema = true
 )
@@ -23,6 +25,7 @@ abstract class userDataDB: RoomDatabase() {
     abstract fun scanDAO(): scanHistoryDAO
     abstract fun chatDA0(): chatDAO
     abstract fun messageDAO(): messageDAO
+    abstract fun currentUserDAO(): currentUserDAO
 
     companion object{
         @Volatile

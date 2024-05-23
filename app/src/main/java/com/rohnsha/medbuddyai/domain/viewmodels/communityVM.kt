@@ -5,9 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.getValue
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.domain.dataclass.Post
 import com.rohnsha.medbuddyai.domain.dataclass.Reply
 import com.rohnsha.medbuddyai.domain.dataclass.postWithReply
@@ -24,8 +23,7 @@ import java.util.concurrent.TimeUnit
 class communityVM: ViewModel() {
 
     private lateinit var _auth: FirebaseAuth
-    private val _database= Firebase.database
-    private val _postRef= _database.reference
+    private lateinit var _firestoreRef: DatabaseReference
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
     private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
     private val _postCount= MutableStateFlow(0L)
@@ -33,8 +31,10 @@ class communityVM: ViewModel() {
     val feedContents= _postFeed.asStateFlow()
     val replyContents= _replyFeed.asStateFlow()
 
-    fun initialize(instance: FirebaseAuth){
+    fun initialize(instance: FirebaseAuth, dbReference: DatabaseReference){
         _auth= instance
+        _firestoreRef= dbReference
+        Log.d("loginStatus", _auth.currentUser?.uid ?: "nullified")
     }
 
     fun addReply(
@@ -46,7 +46,7 @@ class communityVM: ViewModel() {
             if (_auth.currentUser!=null){
                 val username= postID.substringBefore("_")
 
-                _postRef.child("replies").child(username).child(postID).get()
+                _firestoreRef.child("replies").child(username).child(postID).get()
                     .addOnSuccessListener {
                         val replyCount= it.childrenCount
                         Log.d("authUserActionInner", replyCount.toString())
@@ -58,7 +58,7 @@ class communityVM: ViewModel() {
                             author = username
                         )
 
-                        _postRef
+                        _firestoreRef
                             .child("replies")
                             .child(username)
                             .child(postID)
@@ -87,7 +87,7 @@ class communityVM: ViewModel() {
             if (_auth.currentUser!=null){
                 val username= _auth.currentUser!!.email!!.substringBefore("@")
                 Log.d("authUsername", username)
-                    _postRef.child("posts").child(username).get()
+                    _firestoreRef.child("posts").child(username).get()
                     .addOnSuccessListener {
                         _postCount.value= it.childrenCount+1L
                         Log.d("postCountInner", _postCount.value.toString())
@@ -102,7 +102,7 @@ class communityVM: ViewModel() {
                     timestamp = System.currentTimeMillis().toString(),
                 )
                 Log.d("authUserAction", newPost.toString())
-                _postRef.child("posts").child(username).child(postID).setValue(newPost)
+                _firestoreRef.child("posts").child(username).child(postID).setValue(newPost)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("authUserAction", "Post successful")
@@ -120,7 +120,7 @@ class communityVM: ViewModel() {
             viewModelScope.launch {
                 val posts = mutableListOf<Post>()
                 val replies= mutableListOf<Reply>()
-                _postRef.get()
+                _firestoreRef.get()
                     .addOnSuccessListener {
                         Log.d("dataSnap", it.toString())
                         for (childSnapshot in it.child("posts").children) {
