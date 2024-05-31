@@ -130,8 +130,8 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                 items(replies){
                     Box(modifier = Modifier.padding(horizontal = 20.dp)){
                         CommunityPostItem(
-                            title = it.id.toString(),
-                            subtitle = "by ${it.author}",
+                            title = it.author.toString(),
+                            subtitle = "${it.id}",
                             data = "",
                             colorLogo = customBlue,
                             postData = it.content.toString(),

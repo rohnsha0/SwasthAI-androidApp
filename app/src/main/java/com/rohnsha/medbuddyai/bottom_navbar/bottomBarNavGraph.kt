@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -55,9 +57,22 @@ fun bottomNavGraph(
     val userAuth= viewModel<userAuthVM>()
     val currentUserVM= viewModel<currentUserDataVM>()
     val _auth= FirebaseAuth.getInstance()
+
+    val username = remember {
+        mutableStateOf("")
+    }
+
+    LaunchedEffect(key1 = true) {
+        currentUserVM.getQueryData("username")
+    }
+
+    username.value= currentUserVM.userName.collectAsState().value
+
+    Log.d("username", "bottomNavGraph: ${username.value}")
+
     val dbRef= Firebase.database.reference
     userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM)
-    communityVM.initialize(instance = _auth, dbReference = dbRef)
+    communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
     val chatdbVM= viewModel<chatDB_VM>()

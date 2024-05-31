@@ -24,6 +24,7 @@ class communityVM: ViewModel() {
 
     private lateinit var _auth: FirebaseAuth
     private lateinit var _firestoreRef: DatabaseReference
+    private lateinit var _username: String
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
     private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
     private val _postCount= MutableStateFlow(0L)
@@ -31,10 +32,11 @@ class communityVM: ViewModel() {
     val feedContents= _postFeed.asStateFlow()
     val replyContents= _replyFeed.asStateFlow()
 
-    fun initialize(instance: FirebaseAuth, dbReference: DatabaseReference){
+    fun initialize(instance: FirebaseAuth, dbReference: DatabaseReference, username: String){
         _auth= instance
         _firestoreRef= dbReference
         Log.d("loginStatus", _auth.currentUser?.uid ?: "nullified")
+        _username= username
     }
 
     fun addReply(
@@ -44,25 +46,24 @@ class communityVM: ViewModel() {
     ){
         viewModelScope.launch {
             if (_auth.currentUser!=null){
-                val username= postID.substringBefore("_")
-
-                _firestoreRef.child("replies").child(username).child(postID).get()
+                _firestoreRef.child("replies").child(_username).child(postID).get()
                     .addOnSuccessListener {
                         val replyCount= it.childrenCount
+                        val replyID= "${postID}: ${replyCount+1}"
                         Log.d("authUserActionInner", replyCount.toString())
                         Log.d("authUserAction", replyCount.toString())
                         val reply= Reply(
-                            id = postID,
+                            id = replyID,
                             content = replyContent,
                             timestamp = System.currentTimeMillis().toString(),
-                            author = username
+                            author = _username
                         )
 
                         _firestoreRef
                             .child("replies")
-                            .child(username)
+                            .child(_username)
                             .child(postID)
-                            .child("${postID}_reply${replyCount+1}")
+                            .child(replyID)
                             .setValue(reply)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
@@ -85,24 +86,23 @@ class communityVM: ViewModel() {
         viewModelScope.launch {
             Log.d("authUserAction", "post invoked")
             if (_auth.currentUser!=null){
-                val username= _auth.currentUser!!.email!!.substringBefore("@")
-                Log.d("authUsername", username)
-                    _firestoreRef.child("posts").child(username).get()
+                Log.d("authUsername", _username)
+                    _firestoreRef.child("posts").child(_username).get()
                     .addOnSuccessListener {
                         _postCount.value= it.childrenCount+1L
                         Log.d("postCountInner", _postCount.value.toString())
                     }
                 Log.d("postCount", _postCount.value.toString())
-                val postID= "${username}_${_postCount.value}"
+                val postID= "${_username}: ${_postCount.value}"
                 val newPost= Post(
                     id = postID,
-                    author = username,
+                    author = _username,
                     title = title,
                     content = content,
                     timestamp = System.currentTimeMillis().toString(),
                 )
                 Log.d("authUserAction", newPost.toString())
-                _firestoreRef.child("posts").child(username).child(postID).setValue(newPost)
+                _firestoreRef.child("posts").child(_username).child(postID).setValue(newPost)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("authUserAction", "Post successful")

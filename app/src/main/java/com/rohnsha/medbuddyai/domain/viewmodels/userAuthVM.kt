@@ -19,7 +19,7 @@ class userAuthVM: ViewModel() {
     fun initialize(
         instance: FirebaseAuth,
         dbReference: DatabaseReference,
-        currentUserVM: currentUserDataVM
+        currentUserVM: currentUserDataVM,
     ){
         _auth = instance
         _firestoreRef = dbReference
@@ -36,7 +36,17 @@ class userAuthVM: ViewModel() {
     fun loginUser(password: String, email: String, onSuccess: () -> Unit) {
         _auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
-                onSuccess()
+                _firestoreRef.child("users").child(it.user?.uid.toString()).get()
+                    .addOnSuccessListener {
+                        viewModelScope.launch {
+                            for(values in it.children){
+                                _currentUserVM.addDataCurrentUser(
+                                    fieldValueDC(field = values.key.toString(), value = values.value.toString())
+                                )
+                            }
+                            onSuccess()
+                        }
+                    }
             }
     }
 
