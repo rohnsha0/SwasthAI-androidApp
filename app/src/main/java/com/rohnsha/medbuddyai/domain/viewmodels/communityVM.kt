@@ -79,7 +79,6 @@ class communityVM: ViewModel() {
     }
 
     fun post(
-        title: String,
         content: String,
         onCompleteLambda: () -> Unit
     ){
@@ -97,7 +96,6 @@ class communityVM: ViewModel() {
                 val newPost= Post(
                     id = postID,
                     author = _username,
-                    title = title,
                     content = content,
                     timestamp = System.currentTimeMillis().toString(),
                 )
@@ -128,7 +126,6 @@ class communityVM: ViewModel() {
                                 val postData = postSnapshot.getValue<Map<String, String>>()
 
                                 val author = postData?.get("author") ?: "Unknown"
-                                val title = postData?.get("title") ?: "No title"
                                 val content = postData?.get("content") ?: "No content"
                                 val timestamp= postData?.get("timestamp") ?: "Unnoticed"
                                 val id= postData?.get("id") ?: "null"
@@ -136,7 +133,6 @@ class communityVM: ViewModel() {
                                 val post = Post(
                                     id = id,
                                     author = author,
-                                    title = title,
                                     content = content,
                                     timestamp = timestamp,
                                 )

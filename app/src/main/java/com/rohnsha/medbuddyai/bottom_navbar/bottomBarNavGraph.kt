@@ -62,11 +62,14 @@ fun bottomNavGraph(
         mutableStateOf("")
     }
 
-    LaunchedEffect(key1 = true) {
-        currentUserVM.getQueryData("username")
-    }
+    Log.d("username", "topNavGraph: ${_auth.currentUser!=null}")
 
-    username.value= currentUserVM.userName.collectAsState().value
+    if (_auth.currentUser!=(null)){
+        LaunchedEffect(key1 = true) {
+            currentUserVM.getQueryData("username")
+        }
+        username.value= currentUserVM.userName.collectAsState().value
+    }
 
     Log.d("username", "bottomNavGraph: ${username.value}")
 

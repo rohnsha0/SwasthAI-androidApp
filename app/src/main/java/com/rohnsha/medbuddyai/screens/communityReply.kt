@@ -61,8 +61,9 @@ import kotlinx.coroutines.launch
 fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communityVM, snackBarToggleVM:snackBarToggleVM) {
 
     val replyData= communityVM.replyContents.collectAsState().value
+    Log.d("replies", replyData.toString())
     val replies = remember {
-        replyData.filter { it.id==postID } as MutableList<Reply>
+        replyData.filter { it.id?.substringBeforeLast(": ") == postID } as MutableList<Reply>
     }
     Log.d("replies", "replyData: ${replyData}\nreplies: $replies")
     val messageField= remember {
@@ -119,7 +120,7 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                 item {
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
                         Text(
-                            text = "Viewing replies to ${postDetails.author}'s post about ${postDetails.title}",
+                            text = "Viewing replies to ${postDetails.author}'s post",
                             color = lightTextAccent,
                             fontFamily = fontFamily,
                             fontSize = 13.sp,

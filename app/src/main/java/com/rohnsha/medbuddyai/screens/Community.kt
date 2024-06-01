@@ -28,7 +28,6 @@ import androidx.compose.material.icons.outlined.PostAdd
 import androidx.compose.material.icons.outlined.Quickreply
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.TaskAlt
-import androidx.compose.material.icons.outlined.Title
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -132,9 +131,8 @@ fun CommunityScreen(
                         weight = if (isCreateExpanded.value) .56f else .49f,
                         onClickListener = { 
                             if (isCreateExpanded.value) {
-                                if (title.value!="" && content.value!=""){
+                                if (content.value!=""){
                                     communityViewModel.post(
-                                        title = title.value,
                                         content= content.value,
                                         onCompleteLambda = {
                                             isCreateExpanded.value= false
@@ -148,7 +146,7 @@ fun CommunityScreen(
                                         }
                                     )
                                 } else snackBarViewModel.SendToast(
-                                    "One of more field is empty!",
+                                    "Content field cannot be empty",
                                     customRed,
                                     PaddingValues(0.dp)
                                 )
@@ -175,17 +173,9 @@ fun CommunityScreen(
                     Column {
                         Spacer(modifier = Modifier.height(12.dp))
                         TextInputThemed(
-                            value = title.value,
-                            onValueChanged = { title.value= it },
-                            label = "Enter title",
-                            icon = Icons.Outlined.Title,
-                            onClose = { title.value = "" },
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        TextInputThemed(
                             value = content.value,
                             onValueChanged = { content.value= it },
-                            label = "Enter contents",
+                            label = "Contents",
                             icon = Icons.Outlined.ShortText,
                             onClose = { content.value = "" },
                             singleLine = false
