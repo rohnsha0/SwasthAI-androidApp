@@ -29,17 +29,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.outlined.AdminPanelSettings
-import androidx.compose.material.icons.outlined.Air
 import androidx.compose.material.icons.outlined.Biotech
-import androidx.compose.material.icons.outlined.Calculate
 import androidx.compose.material.icons.outlined.CameraAlt
 import androidx.compose.material.icons.outlined.EmojiPeople
 import androidx.compose.material.icons.outlined.Engineering
+import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material.icons.outlined.SmartToy
-import androidx.compose.material.icons.outlined.Speed
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -76,8 +74,6 @@ import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
-import com.rohnsha.medbuddyai.ui.theme.customGreen
-import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
@@ -163,7 +159,7 @@ fun HomeScreen(
         ) {
             item {
                 Text(
-                    text = "Health Dashboard",
+                    text = "Patient Profile(s)",
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600),
                     fontSize = 15.sp,
@@ -172,28 +168,12 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 DataListFull(
-                    title = "Air Quality Index",
-                    subtitle = "in Kolkata",
-                    data = "254 PM2.5",
-                    additionData = "Severe",
-                    imageVector = Icons.Outlined.Air,
-                    colorLogo = customRed
-                )
-                DataListFull(
-                    title = "BMI",
-                    subtitle = "Body Mass Index",
-                    data = "18.34",
-                    additionData = "Normal",
-                    imageVector = Icons.Outlined.Calculate,
-                    colorLogo = customGreen
-                )
-                DataListFull(
-                    title = "mPoints",
-                    subtitle = "Fit Score",
-                    data = "54",
-                    additionData = "Imbalanced",
-                    imageVector = Icons.Outlined.Speed,
-                    colorLogo = customRed
+                    title = "Rohan Shaw",
+                    subtitle = "default",
+                    imageVector = Icons.Outlined.MedicalInformation,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black
                 )
                 AddMoreDashWidget()
             }
@@ -276,7 +256,7 @@ fun HomeScreen(
                     imageVector = Icons.Filled.History,
                     colorLogo = customBlue,
                     additionalDataColor = lightTextAccent,
-                    colorLogoTint = Color.Black,
+                    colorLogoTint = Color.White,
                     onClickListener = {
                         diseaseDBviewModel.inputNameToSearch(data) {
                             navController.navigate(
@@ -307,7 +287,7 @@ fun HomeScreen(
                                 .padding(top = 14.dp)
                                 .clickable {
                                 },
-                            color = customBlue
+                            color = customBlue,
                         )
                     }
                 }
@@ -338,7 +318,7 @@ fun AddMoreDashWidget() {
         contentAlignment = Alignment.Center
     ){
         Text(
-            text = "+ Add More",
+            text = "+ Add More Profile",
             fontWeight = FontWeight(600),
             fontFamily = fontFamily,
             fontSize = 19.sp,
