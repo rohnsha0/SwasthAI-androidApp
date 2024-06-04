@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.Merge
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ShortText
@@ -30,6 +31,7 @@ import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -53,12 +55,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
+import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -79,6 +83,7 @@ fun ChatBotScreen(
     diseaseDBviewModel: diseaseDBviewModel,
     chatdbVm: chatDB_VM,
     chatID: Int,
+    sideStateVM: sideStateVM,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker
 ) {
     Log.d("chatDB", chatID.toString())
@@ -164,13 +169,24 @@ fun ChatBotScreen(
                         fontSize = 26.sp
                     )
                 },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        sideStateVM.toggleState()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu Icon"
+                        )
+                    }
+                },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = BGMain
                 )
             )
         },
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){ values ->
         if (bomState.value){
@@ -358,7 +374,7 @@ fun ChatBotScreen(
                                     chatbotViewModel.chat(
                                         messageField.value,
                                         resetMessageFeild = {
-                                            if (mode==1){
+                                            if (mode == 1) {
                                                 detectedSymptom.clear()
                                             }
                                             messageField.value = ""

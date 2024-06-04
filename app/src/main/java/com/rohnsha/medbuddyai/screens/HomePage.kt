@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material.icons.outlined.CameraAlt
@@ -41,6 +42,7 @@ import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,10 +68,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
+import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -94,7 +98,8 @@ fun HomeScreen(
     scanHistoryVM: scanHistoryViewModel,
     diseaseDBviewModel: diseaseDBviewModel,
     chatdbVm: chatDB_VM,
-    snackBarToggleVM: snackBarToggleVM
+    snackBarToggleVM: snackBarToggleVM,
+    sideStateVM: sideStateVM
 ) {
 
     val chatCount= remember {
@@ -126,6 +131,16 @@ fun HomeScreen(
                         )
                     }
                         },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        sideStateVM.toggleState()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Menu Icon"
+                        )
+                    }
+                },
                 actions = {
                     Image(
                         imageVector = Icons.Outlined.AdminPanelSettings,
@@ -144,7 +159,9 @@ fun HomeScreen(
             )
         },
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(Color.White)
+            .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ) { values ->
         val scrollState= rememberScrollState()
@@ -371,7 +388,11 @@ fun explore_diseases(
                 .padding(top = 20.dp)
                 .align(Alignment.CenterHorizontally)
                 .clickable {
-                    navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(Int.MAX_VALUE))
+                    navController.navigate(
+                        bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(
+                            Int.MAX_VALUE
+                        )
+                    )
                 }
         )
     }

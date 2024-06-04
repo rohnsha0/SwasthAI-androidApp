@@ -26,6 +26,7 @@ import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewMode
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.domain.viewmodels.userAuthVM
 import com.rohnsha.medbuddyai.screens.BMIScreen
@@ -50,6 +51,7 @@ fun bottomNavGraph(
     padding: PaddingValues,
     snackBarVM: snackBarToggleVM,
     packageInfo: PackageInfo,
+    sideDrawerState: sideStateVM
 ) {
     val savePhotoViewModel= viewModel<photoCaptureViewModel>()
     val classifierVM= viewModel<classificationVM>()
@@ -102,7 +104,7 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 communityViewModel = communityVM,
-                scanHistoryviewModel, diseaseDBviewModel, chatdbVM, snackBarVM
+                scanHistoryviewModel, diseaseDBviewModel, chatdbVM, snackBarVM, sideStateVM = sideDrawerState
             )
         }
         composable(route = bottomNavItems.Community.route){
@@ -209,7 +211,8 @@ fun bottomNavGraph(
                 chatdbVm = chatdbVM,
                 chatID = it.arguments!!.getInt(chatID),
                 mode = it.arguments!!.getInt(chatMode),
-                diseaseDBviewModel = diseaseDBviewModel
+                diseaseDBviewModel = diseaseDBviewModel,
+                sideStateVM = sideDrawerState
             )
         }
 
