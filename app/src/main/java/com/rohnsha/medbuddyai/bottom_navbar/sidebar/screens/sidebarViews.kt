@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -51,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.bottom_navbar.sidebar.domain.NavItemSidebar
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import kotlin.math.roundToInt
 
 
@@ -87,7 +89,8 @@ fun CustomDrawer(
         Image(
             modifier = Modifier.size(100.dp),
             painter = painterResource(id = R.drawable.logo_welcme),
-            contentDescription = "Zodiac Image"
+            contentDescription = "Zodiac Image",
+            colorFilter = ColorFilter.tint(customBlue)
         )
         Spacer(modifier = Modifier.height(40.dp))
 
@@ -169,7 +172,7 @@ fun Modifier.coloredShadow(
 
 @Composable
 fun sideBarModifier(
-    sideStateVM: sideStateVM, // Replace with your actual type
+    sideStateVM: sideStateVM,
     configuration: Configuration = LocalConfiguration.current,
     density: Float = LocalDensity.current.density
 ): Modifier {
@@ -177,7 +180,7 @@ fun sideBarModifier(
         derivedStateOf { (configuration.screenWidthDp * density).roundToInt() }
     }
 
-    val offsetValue by remember { derivedStateOf { (screenWidth.value / 4.5).dp } }
+    val offsetValue by remember { derivedStateOf { -(screenWidth.value / 4.5).dp } }
     val animatedOffset by animateDpAsState(
         targetValue = if (sideStateVM.isOpened()) offsetValue else 0.dp,
         label = "Animated Offset"

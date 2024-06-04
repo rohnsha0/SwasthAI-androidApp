@@ -143,7 +143,8 @@ fun bottomNavGraph(
                 navController = navController,
                 photoCaptureVM = savePhotoViewModel,
                 classifierVM = classifierVM,
-                index = it.arguments!!.getInt(scanIndexKey)
+                index = it.arguments!!.getInt(scanIndexKey),
+                sideStateVM = sideDrawerState
             )
         }
 
@@ -152,7 +153,8 @@ fun bottomNavGraph(
                 padding = padding,
                 navController,
                 photoCaptureViewModel = savePhotoViewModel,
-                snackBarViewModel = snackBarVM
+                snackBarViewModel = snackBarVM,
+                sideStateVM = sideDrawerState
             )
         }
 

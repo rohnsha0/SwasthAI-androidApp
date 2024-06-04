@@ -42,8 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.domain.dataclass.modelMarketPlace
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
@@ -58,6 +60,7 @@ fun ScanCategoryScreen(
     navController: NavHostController,
     photoCaptureViewModel: photoCaptureViewModel,
     snackBarViewModel: snackBarToggleVM,
+    sideStateVM: sideStateVM
     ) {
     Scaffold(
         topBar = {
@@ -81,7 +84,7 @@ fun ScanCategoryScreen(
                             .padding(end = 16.dp)
                             .size(24.dp)
                             .clickable {
-
+                                sideStateVM.toggleState()
                             }
                     )
                 },
@@ -101,7 +104,8 @@ fun ScanCategoryScreen(
             )
         },
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){ value ->
         LaunchedEffect(key1 = true, block = {

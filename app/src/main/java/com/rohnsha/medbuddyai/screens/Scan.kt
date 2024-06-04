@@ -92,10 +92,12 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
+import com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -112,7 +114,8 @@ fun ScanScreen(
     navController: NavHostController,
     photoCaptureVM: photoCaptureViewModel,
     classifierVM: classificationVM,
-    index: Int
+    index: Int,
+    sideStateVM: sideStateVM
 ) {
     viewModelPhotoSave = photoCaptureVM
     viewModelClassification = classifierVM
@@ -151,7 +154,7 @@ fun ScanScreen(
                             .padding(end = 16.dp)
                             .size(24.dp)
                             .clickable {
-
+                                sideStateVM.toggleState()
                             }
                     )
                 },
@@ -171,7 +174,8 @@ fun ScanScreen(
             )
         },
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ) { value ->
         Column(
