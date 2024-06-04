@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens
+package com.rohnsha.medbuddyai.navigation.sidebar.screens
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
@@ -50,8 +50,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rohnsha.medbuddyai.R
-import com.rohnsha.medbuddyai.bottom_navbar.sidebar.domain.NavItemSidebar
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
+import com.rohnsha.medbuddyai.navigation.sidebar.domain.NavItemSidebar
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import kotlin.math.roundToInt
 

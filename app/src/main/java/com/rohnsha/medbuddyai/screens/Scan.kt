@@ -91,13 +91,13 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.ContextUtill
-import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
-import com.rohnsha.medbuddyai.bottom_navbar.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
+import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily

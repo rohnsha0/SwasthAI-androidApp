@@ -38,8 +38,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.R
-import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.userAuthVM
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.TextInputThemed
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -106,8 +106,10 @@ fun UserAuthScreen(
             Spacer(modifier = Modifier.height(48.dp))
             Image(painter = painterResource(id = R.drawable.login), contentDescription = null, modifier= Modifier.padding(horizontal = 25.dp))
             when (selectedMode.value) {
-                0 -> { RegisterUI(userAuthVM = userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(bottomNavItems.Home.route) })  }
-                1 -> { LoginUI(userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(bottomNavItems.Home.route) }) }
+                0 -> { RegisterUI(userAuthVM = userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(
+                    bottomNavItems.Home.route) })  }
+                1 -> { LoginUI(userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(
+                    bottomNavItems.Home.route) }) }
             }
 
         }

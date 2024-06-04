@@ -2,7 +2,7 @@ package com.rohnsha.medbuddyai.domain.viewmodels
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.rohnsha.medbuddyai.bottom_navbar.sidebar.domain.customDrawerState
+import com.rohnsha.medbuddyai.navigation.sidebar.domain.customDrawerState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 

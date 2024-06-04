@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.bottom_navbar
+package com.rohnsha.medbuddyai.navigation.bottombar
 
 import android.content.Context
 import android.content.pm.PackageInfo
@@ -166,7 +166,9 @@ fun bottomNavGraph(
                 }
             )
         ){
-            DiseasesCatelogue(padding, diseaseDBviewModel, navController, it.arguments!!.getInt(domainSelection))
+            DiseasesCatelogue(padding, diseaseDBviewModel, navController, it.arguments!!.getInt(
+                domainSelection
+            ))
         }
 
         composable(

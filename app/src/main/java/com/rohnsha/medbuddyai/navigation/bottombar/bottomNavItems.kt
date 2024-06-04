@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.bottom_navbar
+package com.rohnsha.medbuddyai.navigation.bottombar
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings

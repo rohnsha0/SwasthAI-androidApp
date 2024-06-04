@@ -47,9 +47,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.rohnsha.medbuddyai.bottom_navbar.bottomNavItems
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -207,7 +207,8 @@ fun CommunityScreen(
                         postData = data.content?: "Unknown",
                         onClickListener = {
                             it.post.id?.let { it1 -> Log.d("repliesID", it1) }
-                            navController.navigate(bottomNavItems.CommunityReply.returnPostID(
+                            navController.navigate(
+                                bottomNavItems.CommunityReply.returnPostID(
                             it.post.id!!
                         )) }
                     )

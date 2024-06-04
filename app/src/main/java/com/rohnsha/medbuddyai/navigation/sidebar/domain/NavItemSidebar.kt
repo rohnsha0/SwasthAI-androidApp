@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.bottom_navbar.sidebar.domain
+package com.rohnsha.medbuddyai.navigation.sidebar.domain
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Book
