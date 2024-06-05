@@ -8,20 +8,24 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 enum class NavItemSidebar(
     val title: String,
-    val imageVector: ImageVector
+    val imageVector: ImageVector,
+    val onclick: () -> Unit
 ) {
 
     Home(
         title = "Home",
-        imageVector = Icons.Outlined.Home
+        imageVector = Icons.Outlined.Home,
+        onclick = {}
     ),
     Search(
         title = "Search",
-        imageVector = Icons.Outlined.Search
+        imageVector = Icons.Outlined.Search,
+        onclick = {}
     ),
     Library(
         title = "Library",
-        imageVector = Icons.Outlined.Book
+        imageVector = Icons.Outlined.Book,
+        onclick = {}
     ),
 
 

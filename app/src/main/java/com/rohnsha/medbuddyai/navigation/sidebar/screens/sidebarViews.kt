@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,15 +17,12 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -44,15 +40,15 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.navigation.sidebar.domain.NavItemSidebar
-import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
 import kotlin.math.roundToInt
 
 
@@ -69,9 +65,10 @@ fun CustomDrawer(
             .fillMaxHeight()
             .fillMaxWidth(fraction = 0.6f)
             .padding(horizontal = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-        Box(
+        Spacer(modifier = Modifier.height(94.dp))
+        /*Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 24.dp)
@@ -85,15 +82,54 @@ fun CustomDrawer(
                 )
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(24.dp))*/
         Image(
-            modifier = Modifier.size(100.dp),
-            painter = painterResource(id = R.drawable.logo_welcme),
-            contentDescription = "Zodiac Image",
-            colorFilter = ColorFilter.tint(customBlue)
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .size(68.dp)
+                .clip(CircleShape)
+                .background(ViewDash)
+                .padding(10.dp),
+            imageVector = Icons.Outlined.Person,
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(Color.Black),
+            alignment = Alignment.CenterStart,
         )
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(15.dp))
+        Text(
+            text = "Rohan Shaw",
+            fontSize = 19.sp,
+            fontFamily = fontFamily,
+            modifier = Modifier.padding(horizontal = 12.dp),
+            color = Color.Black,//if (selected) MaterialTheme.colorScheme.primary
+            //else MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight(600),//if (selected) FontWeight.Bold else FontWeight.Normal,
+        )
+        Spacer(modifier = Modifier.height(72.dp)) //45dp if bottom text
+        NavItemSidebar.values().forEach { navigationItem ->
+            NavigationItemView(
+                navigationItem = navigationItem,
+                selected = navigationItem == selectedNavigationItem,
+                onClick = { navigationItem.onclick() }
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+        }
+        Spacer(modifier = Modifier.weight(1f))
+        NavItemSidebar.values().takeLast(1).forEach { navigationItem ->
+            NavigationItemView(
+                navigationItem = navigationItem,
+                selected = false,
+                onClick = {
+                    when (navigationItem) {
+                        NavItemSidebar.Home -> {
+                            //onNavigationItemClick(NavigationItem.Settings)
+                        }
 
+                        else -> {}
+                    }
+                }
+            )
+        }
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
@@ -110,26 +146,29 @@ fun NavigationItemView(
             .fillMaxWidth()
             .clip(RoundedCornerShape(size = 99.dp))
             .clickable { onClick() }
-            .background(
-                color = if (selected) MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
-                else Color.Unspecified,
-                shape = RoundedCornerShape(99.dp)
-            )
+            //.background(
+            //color = if (selected) MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
+            //else Color.Unspecified,
+            //shape = RoundedCornerShape(99.dp)
+            //)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Outlined.ArrowBackIosNew,
+            imageVector = navigationItem.imageVector,
+            modifier = Modifier.size(28.dp),
             contentDescription = "Navigation Item Icon",
-            tint = if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurface
+            tint = formAccent //if (selected) MaterialTheme.colorScheme.primary
+            //else MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = navigationItem.title,
-            color = if (selected) MaterialTheme.colorScheme.primary
-            else MaterialTheme.colorScheme.onSurface,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+            fontSize = 19.sp,
+            fontFamily = fontFamily,
+            color = Color.Black,//if (selected) MaterialTheme.colorScheme.primary
+            //else MaterialTheme.colorScheme.onSurface,
+            fontWeight = FontWeight(400),//if (selected) FontWeight.Bold else FontWeight.Normal,
             lineHeight = 20.sp
         )
     }
@@ -186,7 +225,7 @@ fun sideBarModifier(
         label = "Animated Offset"
     )
     val animatedScale by animateFloatAsState(
-        targetValue = if (sideStateVM.isOpened()) 0.9f else 1f,
+        targetValue = if (sideStateVM.isOpened()) 0.75f else 1f,
         label = "Animated Scale"
     )
 
