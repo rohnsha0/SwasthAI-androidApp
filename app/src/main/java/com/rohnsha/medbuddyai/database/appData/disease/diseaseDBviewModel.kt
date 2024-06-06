@@ -4,11 +4,14 @@ import android.app.Application
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.database.appData.appDataDB
+import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
+import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDAO
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomRepo
@@ -30,6 +33,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
 
     private val _dataList= MutableStateFlow<List<disease_data_dataClass>>(emptyList())
     private val _symptomList= MutableStateFlow<List<symptomDC>>(emptyList())
+    private val _questionsLists= MutableStateFlow<List<questions>>(emptyList())
     val notificanService= dbUpdateService(ContextUtill.ContextUtils.getApplicationContext())
 
     private val _processUpdatingDB= MutableStateFlow(false)
@@ -46,6 +50,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
 
     private val _dataCached= MutableStateFlow(scanHistory(0L, "", "", 0f))
     private val _dataCachedReadOnly= MutableStateFlow(disease_data_dataClass())
+
+    private val questionVM= ViewModelProvider.AndroidViewModelFactory
+        .getInstance(ContextUtill.ContextUtils.getApplicationContext() as Application)
+        .create(
+            questionVM::class.java
+        )
 
     init {
         diseaseDAO= appDataDB.getAppDBReference(application).diseaseDAO()
@@ -157,7 +167,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             for (data in _symptomList.value){
                 symptomRepo.addSymptom(data)
             }
-            onCompleteLambda()
+            for (data in _questionsLists.value){
+                questionVM.insert(data)
+            }
+            if (_symptomList.value.isNotEmpty() && _questionsLists.value.isNotEmpty() && _dataList.value.isNotEmpty()){
+                onCompleteLambda()
+            }
         } catch (e: Exception) {
             Log.d("dbStatus", "entries found")
         }
@@ -166,6 +181,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private suspend fun fetchDiseaseData(){
         val list= mutableListOf<disease_data_dataClass>()
         val listSymtom= mutableListOf<symptomDC>()
+        val questionsList= mutableListOf<questions>()
         try {
             val dataInstance= Firebase.firestore
             for (data in dataInstance.collection("diseaseData").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
@@ -192,8 +208,17 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                     )
                 )
             }
+            for (data in dataInstance.collection("disease_questions").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+                questionsList.add(
+                    questions(
+                        question = data?.get("question") as String,
+                        domain = data["options"] as Long,
+                        index = data["answer"] as Long
+                    )
+                )
+            }
             Log.d("dbStatus", "list: $list")
-            if (list.isEmpty() || listSymtom.isEmpty()){
+            if (list.isEmpty() || listSymtom.isEmpty() || questionsList.isEmpty()){
                 notificanService.showNotification(
                     "Database Update Failed",
                     "A database update was triggered but failed unintentionally. We will try again later!"
@@ -201,6 +226,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             }
             _dataList.value= list
             _symptomList.value= listSymtom
+            _questionsLists.value= questionsList
         } catch (e: Exception){
             Log.d("dbStatus", e.toString())
             notificanService.showNotification(

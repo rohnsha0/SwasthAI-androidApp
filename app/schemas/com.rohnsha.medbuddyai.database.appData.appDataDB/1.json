@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "d368da2d3c8b4574b8cff34fc3875604",
+    "identityHash": "82246214b89c96cf625fc9519a080ef9",
     "entities": [
       {
         "tableName": "disease_data",
@@ -97,12 +97,44 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "questions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`question` TEXT NOT NULL, `domain` INTEGER NOT NULL, `index` INTEGER NOT NULL, PRIMARY KEY(`question`))",
+        "fields": [
+          {
+            "fieldPath": "question",
+            "columnName": "question",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "domain",
+            "columnName": "domain",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "index",
+            "columnName": "index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "question"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd368da2d3c8b4574b8cff34fc3875604')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '82246214b89c96cf625fc9519a080ef9')"
     ]
   }
 }
