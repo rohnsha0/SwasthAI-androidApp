@@ -2,6 +2,7 @@ package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Merge
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ShortText
@@ -171,13 +173,25 @@ fun ChatBotScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        sideStateVM.toggleState()
+
                     }) {
                         Icon(
                             imageVector = Icons.Default.Menu,
                             contentDescription = "Menu Icon"
                         )
                     }
+                },
+                actions = {
+                    Image(
+                        imageVector = Icons.Outlined.BlurOn,
+                        contentDescription = "Show accuracy button",
+                        modifier = Modifier
+                            .padding(end = 16.dp)
+                            .size(24.dp)
+                            .clickable {
+                                sideStateVM.toggleState()
+                            }
+                    )
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = BGMain

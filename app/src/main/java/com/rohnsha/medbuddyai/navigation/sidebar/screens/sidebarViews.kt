@@ -52,7 +52,6 @@ import com.rohnsha.medbuddyai.ui.theme.formAccent
 import kotlin.math.roundToInt
 
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun CustomDrawer(
     selectedNavigationItem: NavItemSidebar,
@@ -64,25 +63,10 @@ fun CustomDrawer(
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth(fraction = 0.6f)
-            .padding(horizontal = 12.dp),
+            .padding(start = 34.dp, end = 12.dp),
         horizontalAlignment = Alignment.Start
     ) {
         Spacer(modifier = Modifier.height(94.dp))
-        /*Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 24.dp)
-        ) {
-            IconButton(onClick = onCloseClick) {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back Arrow Icon",
-                    tint = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.clickable { sideStateVM.toggleState() }
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(24.dp))*/
         Image(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
