@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.screens
+package com.rohnsha.medbuddyai.screens.scan
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

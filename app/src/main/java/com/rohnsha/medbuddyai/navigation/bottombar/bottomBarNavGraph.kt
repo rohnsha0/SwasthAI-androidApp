@@ -37,12 +37,12 @@ import com.rohnsha.medbuddyai.screens.DiseasesCatelogue
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
 import com.rohnsha.medbuddyai.screens.MoreScreen
-import com.rohnsha.medbuddyai.screens.ScanCategoryScreen
-import com.rohnsha.medbuddyai.screens.ScanResultScreen
-import com.rohnsha.medbuddyai.screens.ScanScreen
 import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
+import com.rohnsha.medbuddyai.screens.scan.ScanCategoryScreen
+import com.rohnsha.medbuddyai.screens.scan.ScanResultScreen
+import com.rohnsha.medbuddyai.screens.scan.ScanScreen
 import kotlinx.coroutines.delay
 
 @Composable

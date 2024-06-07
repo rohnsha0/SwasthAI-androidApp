@@ -1,4 +1,4 @@
-package com.rohnsha.medbuddyai.screens
+package com.rohnsha.medbuddyai.screens.scan
 
 import android.Manifest
 import android.app.Activity
