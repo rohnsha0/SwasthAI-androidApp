@@ -20,6 +20,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
@@ -41,6 +42,7 @@ import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanCategoryScreen
+import com.rohnsha.medbuddyai.screens.scan.ScanQuestions
 import com.rohnsha.medbuddyai.screens.scan.ScanResultScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanScreen
 import kotlinx.coroutines.delay
@@ -58,6 +60,7 @@ fun bottomNavGraph(
     val communityVM= viewModel<communityVM>()
     val userAuth= viewModel<userAuthVM>()
     val currentUserVM= viewModel<currentUserDataVM>()
+    val questionVM= viewModel<questionVM>()
     val _auth= FirebaseAuth.getInstance()
 
     val username = remember {
@@ -145,6 +148,21 @@ fun bottomNavGraph(
                 classifierVM = classifierVM,
                 index = it.arguments!!.getInt(scanIndexKey),
                 sideStateVM = sideDrawerState
+            )
+        }
+
+        composable(
+            route = bottomNavItems.ScanQA.route,
+            arguments = listOf(
+                navArgument(scanIndexKey){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            ScanQuestions(
+                indexClassification = it.arguments!!.getInt(scanIndexKey),
+                photoCaptureViewModel = savePhotoViewModel,
+                questionVM = questionVM
             )
         }
 

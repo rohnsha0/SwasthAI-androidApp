@@ -80,6 +80,17 @@ sealed class bottomNavItems(
         }
     }
 
+    object ScanQA: bottomNavItems(
+        title = "scanQA",
+        route = "scanQA/{$scanIndexKey}",
+        unselectedIcon = Icons.Outlined.AdminPanelSettings,
+        selectedIcon = Icons.Filled.AdminPanelSettings
+    ){
+        fun returnScanIndex(index: Int): String{
+            return this.route.replace(oldValue = "{$scanIndexKey}", newValue = index.toString())
+        }
+    }
+
     object ScanCategory: bottomNavItems(
         title = "scanCategory",
         route = "scanCategory",
