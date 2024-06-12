@@ -162,7 +162,9 @@ fun bottomNavGraph(
             ScanQuestions(
                 indexClassification = it.arguments!!.getInt(scanIndexKey),
                 photoCaptureViewModel = savePhotoViewModel,
-                questionVM = questionVM
+                questionVM = questionVM,
+                sideStateVM = sideDrawerState,
+                padding = padding
             )
         }
 
