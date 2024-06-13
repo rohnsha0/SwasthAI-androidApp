@@ -164,7 +164,8 @@ fun bottomNavGraph(
                 photoCaptureViewModel = savePhotoViewModel,
                 questionVM = questionVM,
                 sideStateVM = sideDrawerState,
-                padding = padding
+                padding = padding,
+                navHostController = navController
             )
         }
 

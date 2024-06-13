@@ -5,7 +5,9 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -15,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -24,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -32,17 +36,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
+import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
+import com.rohnsha.medbuddyai.screens.Messages
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
-import org.tensorflow.lite.schema.Padding
 
 private lateinit var otherDiseaseData: List<disease_version>
 private lateinit var disease_results: MutableState<disease_data_dataClass>
@@ -56,7 +62,8 @@ fun ScanQuestions(
     photoCaptureViewModel: photoCaptureViewModel,
     questionVM: questionVM,
     sideStateVM: sideStateVM,
-    padding: PaddingValues
+    padding: PaddingValues,
+    navHostController: NavHostController
 ) {
 
     val context= LocalContext.current
@@ -65,6 +72,13 @@ fun ScanQuestions(
     }
     val qList= remember {
         mutableListOf<questions>()
+    }
+
+    val questions= remember {
+        mutableListOf<questions>()
+    }
+    val index= remember {
+        mutableIntStateOf(0)
     }
 
     LaunchedEffect(key1 = true){
@@ -85,9 +99,14 @@ fun ScanQuestions(
                 index = disease_results.value.diseaseIndex.toLong()
             )
         }
-        for (question in questionVM.questionList.collectAsState().value) {
-            qList.add(question)
+        val q= questionVM.questionList.collectAsState().value.take(5)
+        LaunchedEffect(key1 = true) {
+            for (question in q) {
+                qList.add(question)
+            }
         }
+        if (qList.size!=0){
+            questions.add(qList[index.intValue])        }
     }
 
     Log.d("ScanQuestions", "scanMainQuwstion: ${qList}")
@@ -138,7 +157,7 @@ fun ScanQuestions(
             .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){value->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .padding(value)
                 .padding(padding)
@@ -147,8 +166,24 @@ fun ScanQuestions(
                 .background(color = Color.White, shape = RoundedCornerShape(20.dp))
                 .padding(top = 26.dp, start = 24.dp, end = 24.dp)
         ) {
-            items(qList){
-                Text(text = it.question, modifier = Modifier.padding(vertical = 9.dp))
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+            ) {
+                items(questions){
+                    Messages(messageInfo = messageEntity(
+                        message = it.question,
+                        isError =  false,
+                        isBotMessage = true,
+                        chatId = Int.MAX_VALUE,
+                        timestamp = System.currentTimeMillis()
+                    ))
+                }
+            }
+            Row {
+                Button(onClick = { index.intValue++ }) {
+                    Text(text = "click me")
+                }
             }
         }
     }
