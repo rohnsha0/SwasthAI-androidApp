@@ -10,3 +10,8 @@ data class questions(
     val domain: Long,
     val index: Long
 )
+
+data class questionMsg(
+    val questions: questions,
+    val isSystemMsg: Boolean
+)

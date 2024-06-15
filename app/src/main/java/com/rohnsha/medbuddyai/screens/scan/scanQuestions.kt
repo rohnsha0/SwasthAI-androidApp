@@ -7,17 +7,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOn
-import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -31,6 +35,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -42,11 +47,14 @@ import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
+import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.screens.Messages
 import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
 
@@ -74,10 +82,10 @@ fun ScanQuestions(
         mutableListOf<questions>()
     }
 
-    val questions= remember {
-        mutableListOf<questions>()
-    }
     val index= remember {
+        mutableIntStateOf(0)
+    }
+    val yesCount= remember {
         mutableIntStateOf(0)
     }
 
@@ -99,24 +107,57 @@ fun ScanQuestions(
                 index = disease_results.value.diseaseIndex.toLong()
             )
         }
-        val q= questionVM.questionList.collectAsState().value.take(5)
-        LaunchedEffect(key1 = true) {
-            for (question in q) {
-                qList.add(question)
-            }
-        }
-        if (qList.size!=0){
-            questions.add(qList[index.intValue])        }
     }
+    val q= questionVM.questionList.collectAsState().value.take(5)
+    Log.d("ScanQuestions", "q: ${q}")
+    val questions= remember {
+        mutableListOf<questions>()
+    }
+    if (q.isNotEmpty() && !questions.contains(q[index.intValue])){
+        questions.add(q[index.intValue])
+    }
+    /*LaunchedEffect(key1 = index.intValue, key2 = true) {
+        if (q.isNotEmpty()){
+            questions.add(q[index.intValue])
+        }
+    }*/
 
     Log.d("ScanQuestions", "scanMainQuwstion: ${qList}")
+
+    val listGreet= listOf(
+        moreActions("Yes, I have symptoms") {
+            questions.add(questions(
+                domain = Int.MAX_VALUE.toLong(),
+                index = Int.MAX_VALUE.toLong(),
+                question = "Yes"
+            ))
+            yesCount.intValue++
+        },
+        moreActions("No") {
+            questions.add(questions(
+                domain = Int.MAX_VALUE.toLong(),
+                index = Int.MAX_VALUE.toLong(),
+                question = "No"
+            ))
+        },
+    )
+
+    Log.d("ScanQuestions", "scanMainQuwstionYESCount: ${yesCount.intValue}, index: ${index.intValue}")
+
+    val scrollState= rememberLazyListState()
+
+    LaunchedEffect(key1 = questions.size) {
+        if (questions.isNotEmpty()){
+            scrollState.animateScrollToItem(questions.size-1)
+        }
+    }
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Select AI Model",
+                        text = "Self Declaration",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -168,7 +209,8 @@ fun ScanQuestions(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
+                    .weight(1f),
+                state = scrollState
             ) {
                 items(questions){
                     Messages(messageInfo = messageEntity(
@@ -180,9 +222,47 @@ fun ScanQuestions(
                     ))
                 }
             }
-            Row {
-                Button(onClick = { index.intValue++ }) {
-                    Text(text = "click me")
+            Spacer(modifier = Modifier.height(10.dp))
+            if (q.size > (questions.size/2) && q.isNotEmpty()){
+                LazyRow(
+                    Modifier.offset(x= (-4).dp)
+                ) {
+                    item { Spacer(modifier = Modifier.width(6.dp)) }
+                    items(listGreet){
+                        Text(
+                            text = it.title,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily,
+                            color = customBlue,
+                            modifier = Modifier
+                                .padding(horizontal = 4.dp, vertical = 10.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(ViewDash)
+                                .clickable {
+                                    Log.d("ScanQuestions", "scanMainQuwstion: clicked")
+                                    it.onClick()
+                                    Log.d(
+                                        "ScanQuestions",
+                                        "scanMainQuwstionBoolean: ${q.size != (index.intValue - 1)}, index: ${index.intValue}, q.size: ${q.size}"
+                                    )
+                                    if (q.size != (index.intValue + 1)) {
+                                        Log.d("ScanQuestions", "scanMainQuwstion: emterted")
+                                        index.intValue++
+                                    } else {
+                                        questions.add(
+                                            questions(
+                                                domain = Int.MAX_VALUE.toLong(),
+                                                index = Int.MAX_VALUE.toLong(),
+                                                question = "You are done with the self declaration. Navigating to main menu"
+                                            )
+                                        )
+                                        Log.d("ScanQuestions", "scanMainQuwstion: navigation initiated")
+                                    }
+                                }
+                                .padding(vertical = 3.dp, horizontal = 14.dp)
+                        )
+                    }
                 }
             }
         }
