@@ -42,6 +42,8 @@ class photoCaptureViewModel: ViewModel() {
     private val _classificationData = MutableStateFlow(disease_data_dataClass())
     val classificationData = _classificationData.asStateFlow()
 
+    private val _updatedClassificationData= MutableStateFlow(disease_data_dataClass())
+
     private val _maxIndex= MutableStateFlow(
         classification(confident = 0f, indexNumber = 404, parentIndex = 404)
     )
@@ -162,6 +164,13 @@ class photoCaptureViewModel: ViewModel() {
         _notMaxElements.value= notMaxElements
         Log.d("classificationDataHighest", _maxIndex.value.toString())
         Log.d("classificationDataSorted", _notMaxElements.value.toString())
+    }
+
+    fun updateConfidence(confidence: Float){
+        Log.d("percecntagesScan", "initla: ${_maxIndex.value.confident}, conf: $confidence")
+        val updatedConfidence= (_maxIndex.value.confident + confidence)/2
+        Log.d("percecntagesScan", "final: $updatedConfidence")
+        _maxIndex.value= _maxIndex.value.copy(confident = updatedConfidence)
     }
 
     fun getDiseaseVersionData(

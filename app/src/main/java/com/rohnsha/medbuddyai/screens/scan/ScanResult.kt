@@ -132,7 +132,7 @@ fun ScanResultScreen(
             isErrored = photoCaptureViewModel.isErroredBoolean.collectAsState().value
             LaunchedEffect(key1 = true){
                 delay(500L)
-                photoCaptureViewModel.onClassify(context, index = indexClassification)
+                //photoCaptureViewModel.onClassify(context, index = indexClassification)
             }
             disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
             otherDiseaseData = photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
@@ -468,7 +468,7 @@ fun ScanResultsSuccess(
                         DataListFull(
                             title =data.disease_name,
                             subtitle =data.version,
-                            data ="${String.format(" % .2f", data.confidence)}%",
+                            data ="X + ${String.format("%.2f", data.confidence)}%",
                             imageVector = Icons.Outlined.JoinLeft,
                             colorLogo = dashBG
                         )

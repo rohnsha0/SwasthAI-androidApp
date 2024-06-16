@@ -34,6 +34,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -50,6 +51,7 @@ import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.screens.Messages
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -57,6 +59,7 @@ import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 private lateinit var otherDiseaseData: List<disease_version>
 private lateinit var disease_results: MutableState<disease_data_dataClass>
@@ -145,6 +148,7 @@ fun ScanQuestions(
     Log.d("ScanQuestions", "scanMainQuwstionYESCount: ${yesCount.intValue}, index: ${index.intValue}")
 
     val scrollState= rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = questions.size) {
         if (questions.isNotEmpty()){
@@ -257,7 +261,16 @@ fun ScanQuestions(
                                                 question = "You are done with the self declaration. Navigating to main menu"
                                             )
                                         )
-                                        Log.d("ScanQuestions", "scanMainQuwstion: navigation initiated")
+                                        scope.launch {
+                                            delay(1500L)
+                                            Log.d(
+                                                "ScanQuestions",
+                                                "scanMainQuwstion: navigation initiated"
+                                            )
+                                            Log.d("percecntagesScan", "scanMainQuwstion: ${(yesCount.intValue/index.intValue.toFloat())*100}")
+                                            photoCaptureViewModel.updateConfidence((yesCount.intValue/(index.intValue+1).toFloat())*100)
+                                            navHostController.navigate(bottomNavItems.ScanResult.returnScanResIndex(level = 0, index = indexClassification))
+                                        }
                                     }
                                 }
                                 .padding(vertical = 3.dp, horizontal = 14.dp)
