@@ -92,6 +92,9 @@ fun ScanQuestions(
         mutableIntStateOf(0)
     }
 
+    val isStillLoading = photoCaptureViewModel.isLoadingBoolean.collectAsState().value
+    val isNormal = photoCaptureViewModel.isNormalBoolean.collectAsState().value
+    val isErrored = photoCaptureViewModel.isErroredBoolean.collectAsState().value
     LaunchedEffect(key1 = true){
         delay(500L)
         photoCaptureViewModel.onClassify(context, index = indexClassification)
@@ -158,128 +161,150 @@ fun ScanQuestions(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Self Declaration",
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(600),
-                        fontSize = 26.sp
-                    )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = BGMain
-                ),
-                actions = {
-                    Image(
-                        imageVector = Icons.Outlined.BlurOn,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(24.dp)
-                            .clickable {
-                                sideStateVM.toggleState()
-                            }
-                    )
-                },
-                navigationIcon = {
-                    Image(
-                        imageVector = Icons.Outlined.ArrowBackIosNew,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .size(24.dp)
-                            .padding(2.dp)
-                            .clickable {
+            if (!isStillLoading && !isErrored && !isNormal){
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "Self Declaration",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 26.sp
+                        )
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = BGMain
+                    ),
+                    actions = {
+                        Image(
+                            imageVector = Icons.Outlined.BlurOn,
+                            contentDescription = "Show accuracy button",
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .size(24.dp)
+                                .clickable {
+                                    sideStateVM.toggleState()
+                                }
+                        )
+                    },
+                    navigationIcon = {
+                        Image(
+                            imageVector = Icons.Outlined.ArrowBackIosNew,
+                            contentDescription = "Show accuracy button",
+                            modifier = Modifier
+                                .padding(start = 16.dp)
+                                .size(24.dp)
+                                .padding(2.dp)
+                                .clickable {
 
-                            }
-                    )
-                }
-            )
+                                }
+                        )
+                    }
+                )
+            }
         },
         modifier = Modifier
             .fillMaxSize()
             .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){value->
-        Column(
-            modifier = Modifier
-                .padding(value)
-                .padding(padding)
-                .padding(top = 20.dp)
-                .fillMaxSize()
-                .background(color = Color.White, shape = RoundedCornerShape(20.dp))
-                .padding(top = 26.dp, start = 24.dp, end = 24.dp)
-        ) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f),
-                state = scrollState
-            ) {
-                items(questions){
-                    Messages(messageInfo = messageEntity(
-                        message = it.question,
-                        isError =  false,
-                        isBotMessage = true,
-                        chatId = Int.MAX_VALUE,
-                        timestamp = System.currentTimeMillis()
-                    ))
+        if (!isStillLoading){
+            if (isNormal){
+                Column {
+                    Text(text = "isNormal")
                 }
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            if (q.size > (questions.size/2) && q.isNotEmpty()){
-                LazyRow(
-                    Modifier.offset(x= (-4).dp)
+                Log.d("loggingStatus", "normal")
+            } else if (isErrored){
+                Column {
+                    Text(text = "isErrrored")
+                }
+                Log.d("loggingStatus", "errored")
+            } else{
+                Column(
+                    modifier = Modifier
+                        .padding(value)
+                        .padding(padding)
+                        .padding(top = 20.dp)
+                        .fillMaxSize()
+                        .background(color = Color.White, shape = RoundedCornerShape(20.dp))
+                        .padding(top = 26.dp, start = 24.dp, end = 24.dp)
                 ) {
-                    item { Spacer(modifier = Modifier.width(6.dp)) }
-                    items(listGreet){
-                        Text(
-                            text = it.title,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight(600),
-                            fontFamily = fontFamily,
-                            color = customBlue,
-                            modifier = Modifier
-                                .padding(horizontal = 4.dp, vertical = 10.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(ViewDash)
-                                .clickable {
-                                    Log.d("ScanQuestions", "scanMainQuwstion: clicked")
-                                    it.onClick()
-                                    Log.d(
-                                        "ScanQuestions",
-                                        "scanMainQuwstionBoolean: ${q.size != (index.intValue - 1)}, index: ${index.intValue}, q.size: ${q.size}"
-                                    )
-                                    if (q.size != (index.intValue + 1)) {
-                                        Log.d("ScanQuestions", "scanMainQuwstion: emterted")
-                                        index.intValue++
-                                    } else {
-                                        questions.add(
-                                            questions(
-                                                domain = Int.MAX_VALUE.toLong(),
-                                                index = Int.MAX_VALUE.toLong(),
-                                                question = "You are done with the self declaration. Navigating to main menu"
-                                            )
-                                        )
-                                        scope.launch {
-                                            delay(1500L)
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f),
+                        state = scrollState
+                    ) {
+                        items(questions){
+                            Messages(messageInfo = messageEntity(
+                                message = it.question,
+                                isError =  false,
+                                isBotMessage = true,
+                                chatId = Int.MAX_VALUE,
+                                timestamp = System.currentTimeMillis()
+                            ))
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                    if (q.size > (questions.size/2) && q.isNotEmpty()){
+                        LazyRow(
+                            Modifier.offset(x= (-4).dp)
+                        ) {
+                            item { Spacer(modifier = Modifier.width(6.dp)) }
+                            items(listGreet){
+                                Text(
+                                    text = it.title,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight(600),
+                                    fontFamily = fontFamily,
+                                    color = customBlue,
+                                    modifier = Modifier
+                                        .padding(horizontal = 4.dp, vertical = 10.dp)
+                                        .clip(RoundedCornerShape(16.dp))
+                                        .background(ViewDash)
+                                        .clickable {
+                                            Log.d("ScanQuestions", "scanMainQuwstion: clicked")
+                                            it.onClick()
                                             Log.d(
                                                 "ScanQuestions",
-                                                "scanMainQuwstion: navigation initiated"
+                                                "scanMainQuwstionBoolean: ${q.size != (index.intValue - 1)}, index: ${index.intValue}, q.size: ${q.size}"
                                             )
-                                            Log.d("percecntagesScan", "scanMainQuwstion: ${(yesCount.intValue/index.intValue.toFloat())*100}")
-                                            photoCaptureViewModel.updateConfidence((yesCount.intValue/(index.intValue+1).toFloat())*100)
-                                            navHostController.navigate(bottomNavItems.ScanResult.returnScanResIndex(level = 0, index = indexClassification))
+                                            if (q.size != (index.intValue + 1)) {
+                                                Log.d("ScanQuestions", "scanMainQuwstion: emterted")
+                                                index.intValue++
+                                            } else {
+                                                questions.add(
+                                                    questions(
+                                                        domain = Int.MAX_VALUE.toLong(),
+                                                        index = Int.MAX_VALUE.toLong(),
+                                                        question = "You are done with the self declaration. Navigating to main menu"
+                                                    )
+                                                )
+                                                scope.launch {
+                                                    delay(1500L)
+                                                    Log.d(
+                                                        "ScanQuestions",
+                                                        "scanMainQuwstion: navigation initiated"
+                                                    )
+                                                    Log.d("percecntagesScan", "scanMainQuwstion: ${(yesCount.intValue/index.intValue.toFloat())*100}")
+                                                    photoCaptureViewModel.updateConfidence((yesCount.intValue/(index.intValue+1).toFloat())*100)
+                                                    navHostController.navigate(bottomNavItems.ScanResult.returnScanResIndex(level = 0, index = indexClassification))
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                                .padding(vertical = 3.dp, horizontal = 14.dp)
-                        )
+                                        .padding(vertical = 3.dp, horizontal = 14.dp)
+                                )
+                            }
+                        }
                     }
                 }
             }
+        } else {
+            LoadingLayout(
+                titleList = listOf(
+                    "Charting a Course to Health Discovery", "Preparing to Enlighten and Empower",
+                    "Loading the Canvas of Your Health Journey", "Awaiting Your Arrival in the Health Universe",
+                    "Elevating Your Health IQ One Byte at a Time", "Stepping into the Digital Library of Wellness",
+                    "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
+            ))
         }
     }
-
-
 }
