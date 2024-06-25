@@ -54,6 +54,8 @@ import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.screens.Messages
+import com.rohnsha.medbuddyai.screens.misc.LoadingLayout
+import com.rohnsha.medbuddyai.screens.misc.NormalErrorStateLayout
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -209,14 +211,10 @@ fun ScanQuestions(
     ){value->
         if (!isStillLoading){
             if (isNormal){
-                Column {
-                    Text(text = "isNormal")
-                }
+                NormalErrorStateLayout(state = 0)
                 Log.d("loggingStatus", "normal")
             } else if (isErrored){
-                Column {
-                    Text(text = "isErrrored")
-                }
+                NormalErrorStateLayout(state = 1)
                 Log.d("loggingStatus", "errored")
             } else{
                 Column(
@@ -284,9 +282,17 @@ fun ScanQuestions(
                                                         "ScanQuestions",
                                                         "scanMainQuwstion: navigation initiated"
                                                     )
-                                                    Log.d("percecntagesScan", "scanMainQuwstion: ${(yesCount.intValue/index.intValue.toFloat())*100}")
-                                                    photoCaptureViewModel.updateConfidence((yesCount.intValue/(index.intValue+1).toFloat())*100)
-                                                    navHostController.navigate(bottomNavItems.ScanResult.returnScanResIndex(level = 0, index = indexClassification))
+                                                    Log.d(
+                                                        "percecntagesScan",
+                                                        "scanMainQuwstion: ${(yesCount.intValue / index.intValue.toFloat()) * 100}"
+                                                    )
+                                                    photoCaptureViewModel.updateConfidence((yesCount.intValue / (index.intValue + 1).toFloat()) * 100)
+                                                    navHostController.navigate(
+                                                        bottomNavItems.ScanResult.returnScanResIndex(
+                                                            level = 0,
+                                                            index = indexClassification
+                                                        )
+                                                    )
                                                 }
                                             }
                                         }

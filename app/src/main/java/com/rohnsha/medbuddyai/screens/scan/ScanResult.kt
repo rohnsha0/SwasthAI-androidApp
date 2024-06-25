@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -82,18 +81,18 @@ import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.screens.misc.LoadingLayout
+import com.rohnsha.medbuddyai.screens.misc.NormalErrorStateLayout
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.dashBG
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
-import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
-import kotlin.random.Random
 
 private lateinit var disease_results: MutableState<disease_data_dataClass>
 private lateinit var photoCaptureViewModel: photoCaptureViewModel
@@ -247,14 +246,10 @@ fun ScanResultScreen(
         val scope= rememberCoroutineScope()
         if (!isStillLoading){
             if (isNormal){
-                Column {
-                    Text(text = "isNormal")
-                }
+                NormalErrorStateLayout(state = 0)
                 Log.d("loggingStatus", "normal")
             } else if (isErrored){
-                Column {
-                    Text(text = "isErrrored")
-                }
+                NormalErrorStateLayout(state = 1)
                 Log.d("loggingStatus", "errored")
             } else {
                 ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification)
@@ -306,42 +301,6 @@ fun ScanResultScreen(
                     "Elevating Your Health IQ One Byte at a Time", "Stepping into the Digital Library of Wellness",
                     "Welcome to the Wonderland of Health Wisdom", "Fueling Curiosity for a Healthier Tomorrow"
             ))
-        }
-    }
-}
-
-@Composable
-fun LoadingLayout(
-    titleList: List<String>
-) {
-    val random = Random(System.currentTimeMillis())
-    val title= titleList[random.nextInt(0, (titleList.size-1))]
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(BGMain)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(.95f)
-        ){
-
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            Alignment.BottomCenter
-        ){
-            Text(
-                modifier = Modifier.padding(bottom = 20.dp),
-                text = title,
-                fontWeight = FontWeight(600),
-                fontFamily = fontFamily,
-                color = formAccent,
-                fontSize = 14.sp
-            )
         }
     }
 }
