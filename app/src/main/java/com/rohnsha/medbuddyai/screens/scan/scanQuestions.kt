@@ -114,7 +114,7 @@ fun ScanQuestions(
             )
         }
     }
-    val q= questionVM.questionList.collectAsState().value.take(5)
+    val q= questionVM.questionList.collectAsState().value.shuffled().take(10)
     Log.d("ScanQuestions", "q: ${q}")
     val questions= remember {
         mutableListOf<questions>()

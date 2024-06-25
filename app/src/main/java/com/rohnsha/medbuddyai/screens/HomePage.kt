@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.screens
 
+import ApiClient
 import android.util.Log
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -63,10 +64,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
@@ -404,6 +407,7 @@ fun explore_home(
     navController: NavHostController,
     snackBarToggleVM: snackBarToggleVM
 ) {
+    val context= LocalContext.current
     Column(
         modifier = Modifier
             .padding(top = 16.dp, start = 24.dp, end = 24.dp)
@@ -426,6 +430,8 @@ fun explore_home(
                 icon = Icons.Outlined.Biotech,
                 weight = 1f,
                 onClickListener = {
+                    val apiClient = ApiClient(context)
+                    apiClient.uploadImage(context, R.drawable.test)
                     snackBarToggleVM.SendToast(
                         message = "Feature not ready yet!",
                         indicator_color = customYellow,
