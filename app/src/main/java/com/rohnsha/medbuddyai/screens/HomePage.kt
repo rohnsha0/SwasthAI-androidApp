@@ -69,7 +69,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
@@ -430,8 +429,9 @@ fun explore_home(
                 icon = Icons.Outlined.Biotech,
                 weight = 1f,
                 onClickListener = {
-                    val apiClient = ApiClient(context)
-                    apiClient.uploadImage(context, R.drawable.test)
+                    val apiClient = ApiClient()
+                    //apiClient.uploadImage(context, R.drawable.test)
+                    //apiClient.textRecog(context)
                     snackBarToggleVM.SendToast(
                         message = "Feature not ready yet!",
                         indicator_color = customYellow,

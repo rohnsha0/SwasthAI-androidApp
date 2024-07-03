@@ -71,7 +71,7 @@ fun bottomNavGraph(
 
     if (_auth.currentUser!=(null)){
         LaunchedEffect(key1 = true) {
-            currentUserVM.getQueryData("username")
+            currentUserVM.getQueryData(isDefaultUser = true)
         }
         username.value= currentUserVM.userName.collectAsState().value
     }

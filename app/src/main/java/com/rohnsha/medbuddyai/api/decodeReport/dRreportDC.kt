@@ -3,6 +3,11 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import com.rohnsha.medbuddyai.R
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -28,7 +33,7 @@ data class UploadResponse(
     val analysis: String
 )
 
-class ApiClient(context: Context) {
+class ApiClient {
     private val retrofit: Retrofit
     private val service: UploadService
 
@@ -41,6 +46,61 @@ class ApiClient(context: Context) {
 
         service = retrofit.create(UploadService::class.java)
     }
+
+    fun textRecog(context: Context) {
+        val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+
+        try {
+            // Step 3: Load the image from resources
+            val drawable = ContextCompat.getDrawable(context, R.drawable.test2)
+            val bitmap = drawable?.toBitmap()
+
+            if (bitmap!=null){
+                Log.d("UploadResponse", "Image loaded")
+                val img= InputImage.fromBitmap(bitmap, 0)
+                // Step 5: Process the image and extract text
+                recognizer.process(img)
+                    .addOnSuccessListener { visionText ->
+                        // Task completed successfully
+                        val resultText = visionText.text
+                        // Use the extracted text as needed
+                        if (resultText.isNotEmpty()) {
+                            Log.d("UploadResponse", "Extracted text: $resultText")
+                            for (block in visionText.textBlocks) {
+                                Log.d("UploadResponse", "Block text: ${block.text}")
+                                for (line in block.lines) {
+                                    Log.d("UploadResponse", "Line text: ${line.text}")
+                                    for (element in line.elements) {
+                                        Log.d("UploadResponse", "Element text: ${element.text}")
+                                    }
+                                }
+                            }
+                        } else {
+                            Log.d("UploadResponse", "No text detected.")
+                        }
+                        println("Extracted text: $resultText")
+                        Log.d("UploadResponse", "Extracted text: $resultText")
+                    }
+                    .addOnFailureListener { e ->
+                        // Task failed with an exception
+                        println("Text recognition failed: ${e.message}")
+                        Log.d("UploadResponse", "Text recognition failed: ${e.message}")
+                    }
+                    .addOnCompleteListener {
+                        // Log the completion of the task
+                        Log.d("UploadResponse", "Text recognition task completed")
+                    }
+            }
+
+
+        } catch (e: Exception) {
+            Log.e("UploadResponse", "Exception during text recognition: ${e.message}")
+        } finally {
+            // Clean up resources
+            recognizer.close()
+        }
+    }
+
 
     fun uploadImage(context: Context, resourceId: Int) {
         val drawable = ContextCompat.getDrawable(context, resourceId)

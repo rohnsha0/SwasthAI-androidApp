@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.screens.scan
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -72,7 +73,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
@@ -110,7 +111,7 @@ private var mode by Delegates.notNull<Int>()
 fun ScanResultScreen(
     padding: PaddingValues,
     viewModel: photoCaptureViewModel,
-    navController: NavController,
+    navController: NavHostController,
     scanHistoryViewModel: scanHistoryViewModel,
     resultsLevel: Int=1, // 0-> Scan, 1-> Scan History, 2-> Read Only,
     diseaseDBviewModel: diseaseDBviewModel,
@@ -252,7 +253,7 @@ fun ScanResultScreen(
                 NormalErrorStateLayout(state = 1)
                 Log.d("loggingStatus", "errored")
             } else {
-                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification)
+                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification, navController = navController)
                 if (modalState.value){
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -309,7 +310,8 @@ fun ScanResultScreen(
 fun ScanResultsSuccess(
     padding: PaddingValues,
     values: PaddingValues,
-    indexClassification: Int
+    indexClassification: Int,
+    navController: NavHostController
 ) {
     val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
     if (mode ==0){
@@ -321,6 +323,9 @@ fun ScanResultsSuccess(
                 confidence = confidence
             ))
         }
+    }
+    val optionTxtFieldState= remember {
+        mutableStateOf(Int.MAX_VALUE)
     }
     LazyColumn(
         modifier = Modifier
@@ -375,7 +380,15 @@ fun ScanResultsSuccess(
                 Spacer(
                     modifier = Modifier.height(24.dp)
                 )
-                OptionScanResults()
+                OptionScanResults(
+                    navController = navController,
+                    flag = {
+                        optionTxtFieldState.value= it
+                    }
+                )
+                AnimatedVisibility(visible = optionTxtFieldState.value!=Int.MAX_VALUE) {
+                    Box(modifier = Modifier.size(50.dp).background(Color.Cyan))
+                }
                 Spacer(
                     modifier = Modifier.height(30.dp)
                 )
@@ -783,7 +796,10 @@ fun BOMContent(
 }
 
 @Composable
-fun OptionScanResults() {
+fun OptionScanResults(
+    flag: (Int) -> Unit,
+    navController: NavHostController
+) {
     Row(
         modifier = Modifier
             .padding(horizontal = 24.dp)
@@ -794,17 +810,19 @@ fun OptionScanResults() {
         OptionsScanResultUNI(
             title = "Ask mAI",
             icon = Icons.Outlined.QuestionAnswer,
-            onClickListener = {  }
+            onClickListener = { flag(0) }
         )
         OptionsScanResultUNI(
             title = "Compose",
             icon = Icons.Outlined.ConnectWithoutContact,
-            onClickListener = {}
+            onClickListener = {
+                flag(1)
+            }
         )
         OptionsScanResultUNI(
             title = "Doctors",
             icon = Icons.Outlined.VolunteerActivism,
-            onClickListener = {}
+            onClickListener = {  }
         )
         OptionsScanResultUNI(
             title = when(mode){

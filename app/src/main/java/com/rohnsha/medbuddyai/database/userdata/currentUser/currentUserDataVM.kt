@@ -23,8 +23,12 @@ class currentUserDataVM(application: Application): AndroidViewModel(application)
         repo.addUserData(data)
     }
 
-    suspend fun getQueryData(query: String){
-        _userName.value= repo.searchQuery(query).value
+    suspend fun getQueryData(isDefaultUser: Boolean){
+        _userName.value= repo.searchQuery(isDefaultUser).username
+    }
+
+    suspend fun getAllUsers(): List<fieldValueDC>{
+        return repo.getAllUsers()
     }
 
 }

@@ -38,14 +38,25 @@ class userAuthVM: ViewModel() {
             .addOnSuccessListener {
                 _firestoreRef.child("users").child(it.user?.uid.toString()).get()
                     .addOnSuccessListener {
+                        Log.d("loginSuccess", it.toString())
                         viewModelScope.launch {
-                            for(values in it.children){
-                                _currentUserVM.addDataCurrentUser(
-                                    fieldValueDC(field = values.key.toString(), value = values.value.toString())
-                                )
-                            }
+                            val userInfo= fieldValueDC(
+                                username = it.child("username").value.toString(),
+                                fname = it.child("firstName").value.toString(),
+                                lname = it.child("lastName").value.toString(),
+                                isDefaultUser = true
+                            )
+                            Log.d("loginSuccess", userInfo.toString())
+                            _currentUserVM.addDataCurrentUser(
+                                userInfo
+                            )
                             onSuccess()
                         }
+                    }
+                    .addOnFailureListener {
+                        it.printStackTrace()
+                        Log.d("loginError", it.printStackTrace().toString())
+                        Log.d("loginError", it.message.toString())
                     }
             }
     }
@@ -62,16 +73,20 @@ class userAuthVM: ViewModel() {
                     .addOnSuccessListener {
                         viewModelScope.launch {
                             _currentUserVM.addDataCurrentUser(
-                                fieldValueDC(field = "firstName", value = fname)
-                            )
-                            _currentUserVM.addDataCurrentUser(
-                                fieldValueDC(field = "lastName", value = lname)
-                            )
-                            _currentUserVM.addDataCurrentUser(
-                                fieldValueDC(field = "username", value = username)
+                                fieldValueDC(
+                                    username = username,
+                                    fname = fname,
+                                    lname = lname,
+                                    isDefaultUser = true
+                                )
                             )
                         }
                         onSucess()
+                    }
+                    .addOnFailureListener {
+                        it.printStackTrace()
+                        Log.d("loginError", it.printStackTrace().toString())
+                        Log.d("loginError", it.message.toString())
                     }
             }
             .addOnFailureListener {

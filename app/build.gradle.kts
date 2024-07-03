@@ -110,6 +110,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
     implementation(platform("androidx.compose:compose-bom:2023.06.01"))
     implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation("com.google.mlkit:text-recognition:16.0.0")
 
     //viewmodel
     val arch_version = "2.2.0-alpha01"

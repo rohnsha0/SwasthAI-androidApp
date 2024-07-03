@@ -11,6 +11,9 @@ interface currentUserDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(user: fieldValueDC)
 
-    @Query("SELECT * FROM currentUserTable where field like :fieldQuery")
-    suspend fun getFieldData(fieldQuery: String): fieldValueDC
+    @Query("SELECT * FROM currentUserTable where isDefaultUser like :isDefaultUserBool")
+    suspend fun getFieldData(isDefaultUserBool: Boolean): fieldValueDC
+
+    @Query("SELECT * FROM currentUserTable")
+    suspend fun getAllUsers(): List<fieldValueDC>
 }

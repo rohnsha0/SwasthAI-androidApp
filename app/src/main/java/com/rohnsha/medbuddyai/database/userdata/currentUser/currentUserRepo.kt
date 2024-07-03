@@ -6,8 +6,12 @@ class currentUserRepo(private val currentUser: currentUserDAO) {
         currentUser.insert(userData)
     }
 
-    suspend fun searchQuery(query: String): fieldValueDC {
-        return currentUser.getFieldData(query)
+    suspend fun searchQuery(isDefaultUser: Boolean): fieldValueDC {
+        return currentUser.getFieldData(isDefaultUser)
+    }
+
+    suspend fun getAllUsers(): List<fieldValueDC>{
+        return currentUser.getAllUsers()
     }
 
 }
