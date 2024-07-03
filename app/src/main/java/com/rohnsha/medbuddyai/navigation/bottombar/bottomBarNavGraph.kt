@@ -259,7 +259,9 @@ fun bottomNavGraph(
                 scanHistoryViewModel = scanHistoryviewModel,
                 diseaseDBviewModel = diseaseDBviewModel,
                 resultsLevel = it.arguments!!.getInt(scanResultKey),
-                indexClassification = it.arguments!!.getInt(scanResultIndex)
+                indexClassification = it.arguments!!.getInt(scanResultIndex),
+                snackbarHostState = snackBarVM,
+                communityVM = communityVM
             )
         }
         composable(

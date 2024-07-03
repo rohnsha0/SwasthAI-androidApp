@@ -41,6 +41,8 @@ import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.SwitchAccessShortcut
 import androidx.compose.material.icons.outlined.VolunteerActivism
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -81,11 +83,16 @@ import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewMode
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
+import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
+import com.rohnsha.medbuddyai.screens.TextInputThemed
 import com.rohnsha.medbuddyai.screens.misc.LoadingLayout
 import com.rohnsha.medbuddyai.screens.misc.NormalErrorStateLayout
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.dashBG
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -105,6 +112,8 @@ private var isStillLoading by Delegates.notNull<Boolean>()
 private var isNormal by Delegates.notNull<Boolean>()
 private var isErrored by Delegates.notNull<Boolean>()
 private var mode by Delegates.notNull<Int>()
+private lateinit var snackbarControl: snackBarToggleVM
+private lateinit var communityVModel: communityVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -115,10 +124,14 @@ fun ScanResultScreen(
     scanHistoryViewModel: scanHistoryViewModel,
     resultsLevel: Int=1, // 0-> Scan, 1-> Scan History, 2-> Read Only,
     diseaseDBviewModel: diseaseDBviewModel,
-    indexClassification: Int // model to be triggered
+    indexClassification: Int, // model to be triggered
+    snackbarHostState: snackBarToggleVM,
+    communityVM: communityVM
 ) {
     photoCaptureViewModel = viewModel
     diseaseDBvm = diseaseDBviewModel
+    snackbarControl = snackbarHostState
+    communityVModel = communityVM
     mode = resultsLevel
     scanHistoryVM = scanHistoryViewModel
     val context= LocalContext.current
@@ -386,9 +399,7 @@ fun ScanResultsSuccess(
                         optionTxtFieldState.value= it
                     }
                 )
-                AnimatedVisibility(visible = optionTxtFieldState.value!=Int.MAX_VALUE) {
-                    Box(modifier = Modifier.size(50.dp).background(Color.Cyan))
-                }
+                ScanResultActions(optionTxtFieldState = optionTxtFieldState)
                 Spacer(
                     modifier = Modifier.height(30.dp)
                 )
@@ -822,7 +833,7 @@ fun OptionScanResults(
         OptionsScanResultUNI(
             title = "Doctors",
             icon = Icons.Outlined.VolunteerActivism,
-            onClickListener = {  }
+            onClickListener = { flag(Int.MAX_VALUE) }
         )
         OptionsScanResultUNI(
             title = when(mode){
@@ -904,5 +915,66 @@ fun DataBox(
                 .padding(horizontal = 25.dp),
             textAlign = TextAlign.Start
         )
+    }
+}
+
+@Composable
+fun ScanResultActions(optionTxtFieldState: MutableState<Int>) {
+    val textData= remember {
+        mutableStateOf("")
+    }
+    AnimatedVisibility(visible = optionTxtFieldState.value!=Int.MAX_VALUE) {
+        Column(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .padding(horizontal = 25.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .border(
+                    width = 3.dp,
+                    shape = RoundedCornerShape(16.dp),
+                    color = ViewDash
+                )
+                .padding(12.dp)
+        ){
+            //Spacer(modifier = Modifier.height(14.dp))
+            TextInputThemed(
+                value = textData.value,
+                onValueChanged = { textData.value= it },
+                label = "Enter the value",
+                onClose = { textData.value= "" }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = {
+                    when(optionTxtFieldState.value){
+                        1 -> {
+                            communityVModel.post(
+                                content = textData.value,
+                                onCompleteLambda = {
+                                    snackbarControl.SendToast(
+                                        message = "Successfully posted",
+                                        indicator_color = customGreen,
+                                        padding = PaddingValues(),
+                                        icon = Icons.Outlined.Check
+                                    )
+                                }
+                            )
+                        }
+                    }
+                    textData.value= ""
+                    optionTxtFieldState.value = Int.MAX_VALUE
+                          },
+                colors = ButtonDefaults.buttonColors(containerColor = customBlue, contentColor = Color.White),
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(text = when(optionTxtFieldState.value){
+                    0 -> "Start chat"
+                    1 -> "Post on community"
+                    else -> "Submit"
+                })
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
     }
 }
