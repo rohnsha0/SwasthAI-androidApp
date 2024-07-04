@@ -12,6 +12,9 @@ import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.database.appData.appDataDB
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
+import com.rohnsha.medbuddyai.database.appData.doctors.doctor
+import com.rohnsha.medbuddyai.database.appData.doctors.doctorsDAO
+import com.rohnsha.medbuddyai.database.appData.doctors.doctorsRepo
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDAO
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomRepo
@@ -31,9 +34,13 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val symptomRepo: symptomRepo
     private val symptomDAO: symptomDAO
 
+    private val doctorRepo: doctorsRepo
+    private val doctorDAO: doctorsDAO
+
     private val _dataList= MutableStateFlow<List<disease_data_dataClass>>(emptyList())
     private val _symptomList= MutableStateFlow<List<symptomDC>>(emptyList())
     private val _questionsLists= MutableStateFlow<List<questions>>(emptyList())
+    private val _doctorLists= MutableStateFlow<List<doctor>>(emptyList())
     val notificanService= dbUpdateService(ContextUtill.ContextUtils.getApplicationContext())
 
     private val _processUpdatingDB= MutableStateFlow(false)
@@ -62,6 +69,12 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         diseaseRepo= diseaseRepo(diseaseDAO)
         symptomDAO= appDataDB.getAppDBReference(application).symptomDAO()
         symptomRepo= symptomRepo(symptomDAO)
+        doctorDAO= appDataDB.getAppDBReference(application).doctorsDAO()
+        doctorRepo= doctorsRepo(doctorDAO)
+    }
+
+    suspend fun queryDoctors(speciality: String): List<doctor>{
+        return doctorRepo.queryDoctor(speciality = speciality)
     }
 
     suspend fun readSymptoms(): List<symptomDC>{
@@ -170,7 +183,10 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             for (data in _questionsLists.value){
                 questionVM.insert(data)
             }
-            if (_symptomList.value.isNotEmpty() && _questionsLists.value.isNotEmpty() && _dataList.value.isNotEmpty()){
+            for (data in _doctorLists.value){
+                doctorRepo.addDoctor(data)
+            }
+            if (_symptomList.value.isNotEmpty() && _questionsLists.value.isNotEmpty() && _dataList.value.isNotEmpty() && _doctorLists.value.isNotEmpty()){
                 onCompleteLambda()
             }
         } catch (e: Exception) {
@@ -182,6 +198,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         val list= mutableListOf<disease_data_dataClass>()
         val listSymtom= mutableListOf<symptomDC>()
         val questionsList= mutableListOf<questions>()
+        val doctorList= mutableListOf<doctor>()
         try {
             val dataInstance= Firebase.firestore
             for (data in dataInstance.collection("diseaseData").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
@@ -217,8 +234,20 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                     )
                 )
             }
+            for (data in dataInstance.collection("doctors").get().await().documents.map { documentSnapshot -> documentSnapshot.data }){
+                val dataL= doctor(
+                    city = data?.get("city") as? String ?: "",
+                    name = data?.get("name") as? String ?: "",
+                    area = data?.get("area") as? String ?: "",
+                    speciality = data?.get("speciality") as? String ?: "",
+                    experience = data?.get("experience") as? String ?: "",
+                    pricing = data?.get("pricing") as? String ?: ""
+                )
+                Log.d("doctorsList", dataL.toString())
+                doctorList.add(dataL)
+            }
             Log.d("dbStatus", "list: $list")
-            if (list.isEmpty() || listSymtom.isEmpty() || questionsList.isEmpty()){
+            if (list.isEmpty() || listSymtom.isEmpty() || questionsList.isEmpty() || doctorList.isEmpty()){
                 notificanService.showNotification(
                     "Database Update Failed",
                     "A database update was triggered but failed unintentionally. We will try again later!"
@@ -227,6 +256,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
             _dataList.value= list
             _symptomList.value= listSymtom
             _questionsLists.value= questionsList
+            _doctorLists.value= doctorList
         } catch (e: Exception){
             Log.d("dbStatus", e.toString())
             notificanService.showNotification(

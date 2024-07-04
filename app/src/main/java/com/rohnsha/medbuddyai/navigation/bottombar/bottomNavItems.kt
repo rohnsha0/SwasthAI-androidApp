@@ -21,6 +21,7 @@ const val postID= "postID"
 const val chatMode= "chatMode"
 const val domainSelection= "domianSelection"
 const val authMode= "authMode"
+const val domainID= "domainID"
 
 sealed class bottomNavItems(
     val title: String,
@@ -156,6 +157,17 @@ sealed class bottomNavItems(
     ){
         fun returnAuthMode(authMode: Int): String{
             return "userAuth/$authMode"
+        }
+    }
+
+    object DoctorScreen: bottomNavItems(
+        title = "doctorScreen",
+        route = "doctorScreen/{$domainID}",
+        unselectedIcon = Icons.Outlined.AdminPanelSettings,
+        selectedIcon = Icons.Filled.AdminPanelSettings
+    ){
+        fun returnDomainID(domainID: Int): String{
+            return "doctorScreen/$domainID"
         }
     }
 }

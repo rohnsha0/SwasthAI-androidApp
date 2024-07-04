@@ -41,6 +41,7 @@ import com.rohnsha.medbuddyai.screens.MoreScreen
 import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
+import com.rohnsha.medbuddyai.screens.scan.DoctorScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanCategoryScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanQuestions
 import com.rohnsha.medbuddyai.screens.scan.ScanResultScreen
@@ -262,6 +263,20 @@ fun bottomNavGraph(
                 indexClassification = it.arguments!!.getInt(scanResultIndex),
                 snackbarHostState = snackBarVM,
                 communityVM = communityVM
+            )
+        }
+        composable(
+            route = bottomNavItems.DoctorScreen.route,
+            arguments = listOf(
+                navArgument(domainID){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            DoctorScreen(
+                padding = padding,
+                diseaseDBviewModel = diseaseDBviewModel,
+                domain = it.arguments!!.getInt(domainID)
             )
         }
         composable(

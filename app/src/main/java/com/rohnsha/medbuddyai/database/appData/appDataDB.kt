@@ -7,13 +7,15 @@ import androidx.room.RoomDatabase
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDAO
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionDAO
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
+import com.rohnsha.medbuddyai.database.appData.doctors.doctor
+import com.rohnsha.medbuddyai.database.appData.doctors.doctorsDAO
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDAO
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 
 @Database(
-    entities = [disease_data_dataClass::class, symptomDC::class, questions::class],
-    version = 1,
+    entities = [disease_data_dataClass::class, symptomDC::class, questions::class, doctor::class],
+    version = 2,
     exportSchema = true
 )
 abstract class appDataDB: RoomDatabase() {
@@ -21,6 +23,7 @@ abstract class appDataDB: RoomDatabase() {
     abstract fun diseaseDAO(): diseaseDAO
     abstract fun symptomDAO(): symptomDAO
     abstract fun questionsDAO(): questionDAO
+    abstract fun doctorsDAO(): doctorsDAO
 
     companion object{
         @Volatile

@@ -86,6 +86,7 @@ import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.TextInputThemed
 import com.rohnsha.medbuddyai.screens.misc.LoadingLayout
 import com.rohnsha.medbuddyai.screens.misc.NormalErrorStateLayout
@@ -397,7 +398,8 @@ fun ScanResultsSuccess(
                     navController = navController,
                     flag = {
                         optionTxtFieldState.value= it
-                    }
+                    },
+                    indexClassification = indexClassification
                 )
                 ScanResultActions(optionTxtFieldState = optionTxtFieldState)
                 Spacer(
@@ -809,7 +811,8 @@ fun BOMContent(
 @Composable
 fun OptionScanResults(
     flag: (Int) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    indexClassification: Int
 ) {
     Row(
         modifier = Modifier
@@ -833,7 +836,7 @@ fun OptionScanResults(
         OptionsScanResultUNI(
             title = "Doctors",
             icon = Icons.Outlined.VolunteerActivism,
-            onClickListener = { flag(Int.MAX_VALUE) }
+            onClickListener = { navController.navigate(bottomNavItems.DoctorScreen.returnDomainID(indexClassification)) }
         )
         OptionsScanResultUNI(
             title = when(mode){

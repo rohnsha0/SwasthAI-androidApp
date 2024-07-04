@@ -3,7 +3,7 @@ package com.rohnsha.medbuddyai.api
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.rohnsha.medbuddyai.domain.dataclass.doctor
+import com.rohnsha.medbuddyai.database.appData.doctors.doctor
 import com.rohnsha.medbuddyai.domain.dataclass.doctors
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +29,7 @@ class APIViewModel @Inject constructor(
                     val dynamicURL= "https://zmlj5pmmhqmkgnksb23omr5hmy0nprsa.lambda-url.ap-south-1.on.aws/gen"
                     val results= getDiseaseResults(dynamicURL)
                     for (data in results.physical){
-                        lists.add(doctor(data[0], data[1], data[2]))
+                        //lists.add(doctor(data[0], data[1], data[2]))
                     }
                     _doctorsList.value= lists
                 } catch (e: Exception){
