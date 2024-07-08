@@ -294,7 +294,8 @@ fun bottomNavGraph(
                 }
             )
         ){
-            UserAuthScreen(mode = it.arguments!!.getInt(authMode), navController = navController, userAuthVM = userAuth)
+            UserAuthScreen(mode = it.arguments!!.getInt(authMode), navController = navController, userAuthVM = userAuth
+                , snackBarToggleVM = snackBarVM)
         }
     }
 }

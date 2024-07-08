@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.doctors.doctor
-import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customGrey
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -63,7 +62,7 @@ fun DoctorScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = bottomNavItems.DiseaseCatelogue.title,
+                        text = "Doctors Nearby",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp

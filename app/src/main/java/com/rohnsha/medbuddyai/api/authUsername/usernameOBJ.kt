@@ -1,16 +1,16 @@
-package com.rohnsha.medbuddyai.api.chatbot
+package com.rohnsha.medbuddyai.api.authUsername
 
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object chatbot_obj {
+object usernameOBJ {
 
-    val retrofit=Retrofit
+    val retrofit= Retrofit
         .Builder()
         .baseUrl("https://api-jjtysweprq-el.a.run.app/")
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
-    val chatService = retrofit.create(chatbot_interface::class.java)
+    val usernameCheckService = retrofit.create(usernameINTERFACE::class.java)
 
 }

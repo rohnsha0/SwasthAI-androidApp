@@ -1,14 +1,19 @@
 package com.rohnsha.medbuddyai.domain.viewmodels
 
 import android.util.Log
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Warning
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
+import com.rohnsha.medbuddyai.api.authUsername.usernameOBJ.usernameCheckService
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
 import com.rohnsha.medbuddyai.domain.dataclass.userInfoDC
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class userAuthVM: ViewModel() {
 
@@ -24,6 +29,17 @@ class userAuthVM: ViewModel() {
         _auth = instance
         _firestoreRef = dbReference
         _currentUserVM= currentUserVM
+    }
+
+    suspend fun isUsernameValid(username: String): Boolean {
+        if (username==""){
+            return false
+        }
+
+        val dynamicURL= "https://api-jjtysweprq-el.a.run.app/getUsername/$username"
+        return withContext(viewModelScope.coroutineContext){
+            usernameCheckService.getUsernameDetails(dynamicURL).username!=null
+        }
     }
 
     fun isUserUnAuthenticated(): Boolean {
@@ -61,7 +77,15 @@ class userAuthVM: ViewModel() {
             }
     }
 
-    suspend fun registerUser(password: String, email: String, onSucess: () -> Unit, fname: String, lname: String, username: String) {
+    suspend fun registerUser(
+        password: String,
+        email: String,
+        onSucess: () -> Unit,
+        fname: String,
+        lname: String,
+        username: String,
+        snackBarToggleVM: snackBarToggleVM
+    ) {
         _auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 val userInfo= userInfoDC(
@@ -93,6 +117,11 @@ class userAuthVM: ViewModel() {
                 it.printStackTrace()
                 Log.d("loginError", it.printStackTrace().toString())
                 Log.d("loginError", it.message.toString())
+                snackBarToggleVM.SendToast(
+                    message = it.message.toString(),
+                    indicator_color = Color.Red,
+                    icon = Icons.Outlined.Warning,
+                )
             }
     }
 }

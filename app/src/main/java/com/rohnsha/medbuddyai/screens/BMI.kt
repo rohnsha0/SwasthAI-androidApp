@@ -212,6 +212,7 @@ fun TextInputThemed(
     suffix: String? = null,
     readOnly: Boolean= false,
     modifier: Modifier= Modifier,
+    modifier2: Modifier= Modifier,
     singleLine: Boolean= true,
     keyboardOptions: KeyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Text)
 ) {
@@ -224,6 +225,7 @@ fun TextInputThemed(
     TextField(
         modifier = Modifier
             .fillMaxWidth()
+            .then(modifier2)
             .then(
                 if (readOnly) {
                     modifier

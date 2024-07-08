@@ -53,7 +53,7 @@ class snackBarToggleVM: ViewModel() {
     fun SendToast(
         message: String,
         indicator_color: Color,
-        padding: PaddingValues,
+        padding: PaddingValues= PaddingValues(),
         icon: ImageVector? = null
     ){
         viewModelScope.launch {
