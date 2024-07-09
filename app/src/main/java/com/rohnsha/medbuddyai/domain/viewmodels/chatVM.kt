@@ -50,12 +50,13 @@ class chatVM: ViewModel() {
         symptom: String,
         isRetrying: Boolean= false,
         vmChat: chatDB_VM,
+        currentUserIndex: Int,
         diseaseDBviewModel: diseaseDBviewModel,
         chatID: Int, outcome: ((symptomDC) -> Unit)? = null
     ){
         if (_messageCount.value==0){
             vmChat.addChat(
-                chatEntity(timestamp = System.currentTimeMillis(), mode = 1, id = chatID)
+                chatEntity(timestamp = System.currentTimeMillis(), mode = 1, id = chatID, userIndex = currentUserIndex)
             )
         }
         Log.d("chatVMSymptom", symptom)
@@ -94,7 +95,8 @@ class chatVM: ViewModel() {
             vmChat.addMessages(resultAPI)
             Log.d("errorChat", response.message)
         } catch (e: Exception){
-            symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true, diseaseDBviewModel = diseaseDBviewModel)
+            symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true,
+                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUserIndex)
         }
     }
 
@@ -102,15 +104,11 @@ class chatVM: ViewModel() {
         message: String,
         resetMessageFeild: () -> Unit,
         vmChat: chatDB_VM,
+        currentUserIndex: Int,
         chatID: Int,
         isRetrying: Boolean= false,
         mode: Int //0 -> qna, 1 -> ai_symptoms_checker
     ){
-        if (_messageCount.value==0){
-            vmChat.addChat(
-                chatEntity(timestamp = System.currentTimeMillis(), mode = mode, id = chatID)
-            )
-        }
         if (!isRetrying){
             val messageBody= messageEntity(
                 message = message,
@@ -126,6 +124,15 @@ class chatVM: ViewModel() {
             _messageCount.value += 1
             resetMessageFeild()
         }
+        val newChat = chatEntity(
+            timestamp = System.currentTimeMillis(),
+            mode = mode,
+            id = chatID,
+            userIndex = currentUserIndex
+        )
+        Log.d("chatVM", "Adding new chat: $newChat")
+        vmChat.addChat(newChat)
+        Log.d("chatVM", "added new chat: $newChat")
 
         val dynamicURL= when(mode){
             0 -> {
@@ -216,7 +223,8 @@ class chatVM: ViewModel() {
             _listMessages.emit(retryMessage)
             vmChat.addMessages(retryMessage)
             delay(delayMillis)
-            chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode, isRetrying = true)
+            chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode,
+                isRetrying = true, currentUserIndex = currentUserIndex)
         }
     }
 

@@ -26,6 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Merge
 import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ShortText
@@ -43,6 +45,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -56,16 +59,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
+import com.rohnsha.medbuddyai.screens.scan.DataListFull
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -77,6 +82,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+private lateinit var currentUserDataVModel: currentUserDataVM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatBotScreen(
@@ -86,17 +92,23 @@ fun ChatBotScreen(
     chatdbVm: chatDB_VM,
     chatID: Int,
     sideStateVM: sideStateVM,
+    currentUserDataVM: currentUserDataVM,
+    chatVM: chatVM,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker
 ) {
     Log.d("chatDB", chatID.toString())
     val scope= rememberCoroutineScope()
-    val chatbotViewModel= viewModel<chatVM>()
+    val chatbotViewModel= chatVM
+    currentUserDataVModel= currentUserDataVM
 
     val messageFieldState= remember {
         mutableStateOf(mode==0)
     }
 
     val bomState= remember {
+        mutableStateOf(false)
+    }
+    val bomStateDUser= remember {
         mutableStateOf(false)
     }
 
@@ -189,7 +201,7 @@ fun ChatBotScreen(
                             .padding(end = 16.dp)
                             .size(24.dp)
                             .clickable {
-                                sideStateVM.toggleState()
+                                bomStateDUser.value = true
                             }
                     )
                 },
@@ -203,6 +215,20 @@ fun ChatBotScreen(
             .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){ values ->
+        val currentUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
+
+        if (bomStateDUser.value){
+            ModalBottomSheet(
+                onDismissRequest = { bomStateDUser.value = false },
+                containerColor = Color.White
+            ) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                    bomStateDUser.value= false
+                    currentUserDataVM.switchDefafultUser(it)
+                }
+            }
+        }
+
         if (bomState.value){
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 ChatBOM(context = {
@@ -221,7 +247,7 @@ fun ChatBotScreen(
                                 }
                                 optionEnabled.value= true
                             },
-                            diseaseDBviewModel = diseaseDBviewModel,
+                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
                         )
                     }},
                     state = { bomState.value= it },
@@ -299,8 +325,8 @@ fun ChatBotScreen(
                                     messageField.value= "I am having ${ detectedSymptom.joinToString(", ") { it.symptom }.lowercase() }"
                                 }
                                 optionEnabled.value = true
-                                      },
-                            diseaseDBviewModel = diseaseDBviewModel,
+                            },
+                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
                         )
                     }
                 },
@@ -368,10 +394,10 @@ fun ChatBotScreen(
                     ),
                     placeholder = { Text(
                         text = if(messageFieldState.value){
-                                                        "Enter your query"
-                                                            } else{
-                                                                 "Select relevant option"
-                                                                 },
+                            "Enter your query"
+                        } else{
+                            "Select relevant option"
+                        },
                         fontFamily = fontFamily,
                         color= lightTextAccent) },
                     enabled = messageFieldState.value
@@ -393,7 +419,10 @@ fun ChatBotScreen(
                                             }
                                             messageField.value = ""
                                         },
-                                        vmChat = chatdbVm, chatID = chatID, mode = mode
+                                        vmChat = chatdbVm,
+                                        chatID = chatID,
+                                        mode = mode,
+                                        currentUserIndex = currentUser
                                     )
                                     optionEnabled.value = false
                                 } else {
@@ -572,5 +601,67 @@ fun SymptomsList(title: String, onClickListener: () -> Unit) {
             fontFamily = fontFamily,
             modifier = Modifier.padding(start = 13.dp)
         )
+    }
+}
+
+@Composable
+fun BOMChangeDUser(
+    currentUserDataVM: currentUserDataVM,
+    onClickListener: (Int) -> Unit
+) {
+    val users= remember{
+        mutableStateListOf<fieldValueDC>()
+    }
+    val index= currentUserDataVM.defaultUserIndex.collectAsState().value
+    val defUserIndnex= remember {
+        mutableStateOf(index)
+    }
+    LaunchedEffect(key1 = true) {
+        val defUsers= currentUserDataVM.getAllUsers()
+        defUsers.forEach { users.add(it) }
+    }
+    LazyColumn(
+        modifier = Modifier
+    ) {
+        item {
+            Row {
+                Text(
+                    modifier = Modifier
+                        .padding(start = 30.dp),
+                    text = "Type Error",
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    modifier = Modifier
+                        .clickable {
+                            onClickListener(defUserIndnex.value)
+                        }
+                        .padding(end = 30.dp),
+                    text = "Save",
+                    fontSize = 17.sp,
+                    color = customBlue,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+        }
+        items(users){
+            DataListFull(
+                title = "${it.fname} ${it.lname}",
+                subtitle = if (it.isDefaultUser) "default" else "patient:${it.index}",
+                imageVector = if (defUserIndnex.value== it.index)Icons.Outlined.Done else Icons.Outlined.MedicalInformation,
+                colorLogo = Color.White,
+                additionalDataColor = lightTextAccent,
+                colorLogoTint = Color.Black,
+                onClickListener = {
+                    defUserIndnex.value= it.index
+                }
+            )
+        }
+        item { Spacer(modifier = Modifier.height(28.dp)) }
     }
 }

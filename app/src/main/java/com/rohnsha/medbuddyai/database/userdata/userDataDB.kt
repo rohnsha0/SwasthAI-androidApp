@@ -41,7 +41,8 @@ abstract class userDataDB: RoomDatabase() {
                     context.applicationContext,
                     userDataDB::class.java,
                     "userDB"
-                ).build()
+                )
+                    .build()
                 INSTANCE= instanceUserDB
                 return instanceUserDB
             }

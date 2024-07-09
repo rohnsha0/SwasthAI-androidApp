@@ -78,6 +78,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
@@ -127,7 +128,8 @@ fun ScanResultScreen(
     diseaseDBviewModel: diseaseDBviewModel,
     indexClassification: Int, // model to be triggered
     snackbarHostState: snackBarToggleVM,
-    communityVM: communityVM
+    communityVM: communityVM,
+    currentUserDataVM: currentUserDataVM
 ) {
     photoCaptureViewModel = viewModel
     diseaseDBvm = diseaseDBviewModel
@@ -267,7 +269,7 @@ fun ScanResultScreen(
                 NormalErrorStateLayout(state = 1)
                 Log.d("loggingStatus", "errored")
             } else {
-                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification, navController = navController)
+                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification, navController = navController, currentUserDataVM = currentUserDataVM)
                 if (modalState.value){
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -325,16 +327,19 @@ fun ScanResultsSuccess(
     padding: PaddingValues,
     values: PaddingValues,
     indexClassification: Int,
-    navController: NavHostController
+    navController: NavHostController,
+    currentUserDataVM: currentUserDataVM
 ) {
     val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
     if (mode ==0){
+        val defaultUser= currentUserDataVM.defaultUserIndex.collectAsState().value
         LaunchedEffect(key1 = disease_results.value){
             scanHistoryVM.addScanHistory(scanHistory(
                 timestamp = System.currentTimeMillis(),
                 title = disease_results.value.disease_name,
                 domain = disease_results.value.domain,
-                confidence = confidence
+                confidence = confidence,
+                userIndex =defaultUser
             ))
         }
     }

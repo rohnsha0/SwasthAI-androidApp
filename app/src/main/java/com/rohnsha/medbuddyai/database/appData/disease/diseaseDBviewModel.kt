@@ -55,7 +55,7 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
     private val _dataLoaded= MutableStateFlow(disease_data_dataClass())
     val data= _dataLoaded.asStateFlow()
 
-    private val _dataCached= MutableStateFlow(scanHistory(0L, "", "", 0f))
+    private val _dataCached= MutableStateFlow(scanHistory(0L, "", "", 0f, Int.MAX_VALUE))
     private val _dataCachedReadOnly= MutableStateFlow(disease_data_dataClass())
 
     private val questionVM= ViewModelProvider.AndroidViewModelFactory

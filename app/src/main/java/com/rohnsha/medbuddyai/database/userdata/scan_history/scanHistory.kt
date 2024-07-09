@@ -11,5 +11,7 @@ data class scanHistory(
     val title: String,
     val domain: String,
     @ColumnInfo("confidence", defaultValue = 0.0.toString())
-    val confidence: Float
+    val confidence: Float,
+    //@ColumnInfo("userIndex", defaultValue = Int.MAX_VALUE.toString())
+    val userIndex: Int
 )

@@ -39,18 +39,21 @@ import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material.icons.outlined.ReadMore
 import androidx.compose.material.icons.outlined.SelfImprovement
+import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -71,6 +74,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
@@ -101,12 +106,28 @@ fun HomeScreen(
     scanHistoryVM: scanHistoryViewModel,
     diseaseDBviewModel: diseaseDBviewModel,
     chatdbVm: chatDB_VM,
+    currentUserDataVM: currentUserDataVM,
     snackBarToggleVM: snackBarToggleVM,
     sideStateVM: sideStateVM
 ) {
 
     val chatCount= remember {
         mutableStateOf(Int.MAX_VALUE)
+    }
+
+    val bomState= remember {
+        mutableStateOf(false)
+    }
+
+    val userList= remember {
+        mutableStateListOf<fieldValueDC>()
+    }
+
+    LaunchedEffect(key1 = true) {
+        val users= currentUserDataVM.getAllUsers()
+        users.forEach {
+            userList.add(it)
+        }
     }
 
     LaunchedEffect(key1 = true) {
@@ -133,7 +154,7 @@ fun HomeScreen(
                             color = customBlue
                         )
                     }
-                        },
+                },
                 navigationIcon = {
                     IconButton(onClick = {
                         sideStateVM.toggleState()
@@ -168,6 +189,89 @@ fun HomeScreen(
         containerColor = BGMain
     ) { values ->
         val scrollState= rememberScrollState()
+
+        if (bomState.value){
+            ModalBottomSheet(
+                onDismissRequest = { bomState.value= false },
+                containerColor = Color.White
+            ) {
+                val pfname= remember {
+                    mutableStateOf("")
+                }
+                val plname= remember {
+                    mutableStateOf("")
+                }
+                val scope= rememberCoroutineScope()
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 24.dp)
+                ) {
+                    Row {
+                        Text(
+                            modifier = Modifier
+                                .padding(start = 30.dp),
+                            text = "Add User",
+                            fontSize = 19.sp,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily
+                        )
+                        Spacer(modifier = Modifier.weight(1f))
+                        Text(
+                            modifier = Modifier
+                                .clickable {
+                                    bomState.value = false
+                                    if (pfname.value != "" && plname.value != "") {
+                                        scope.launch {
+                                            val data = fieldValueDC(
+                                                fname = pfname.value,
+                                                lname = plname.value,
+                                                username = "addedPatient",
+                                                isDefaultUser = false
+                                            )
+                                            currentUserDataVM.addDataCurrentUser(
+                                                data
+                                            )
+                                            userList.add(data)
+                                        }
+                                    } else {
+                                        snackBarToggleVM.SendToast(
+                                            message = "either of the field is empty",
+                                            indicator_color = customYellow,
+                                            padding = PaddingValues(2.dp),
+                                        )
+                                    }
+                                }
+                                .padding(end = 30.dp),
+                            text = "Save",
+                            fontSize = 17.sp,
+                            color = customBlue,
+                            fontWeight = FontWeight(600),
+                            fontFamily = fontFamily
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
+                    TextInputThemed(
+                        value = pfname.value,
+                        onValueChanged = { pfname.value= it },
+                        label = "Enter patient first name to be monitored",
+                        icon = Icons.Outlined.ShortText,
+                        onClose = { pfname.value = "" },
+                        singleLine = false
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                    TextInputThemed(
+                        value = plname.value,
+                        onValueChanged = { plname.value= it },
+                        label = "Enter patient last name to be monitored",
+                        icon = Icons.Outlined.ShortText,
+                        onClose = { plname.value = "" },
+                        singleLine = false
+                    )
+                    Spacer(modifier = Modifier.height(28.dp))
+                }
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .padding(values)
@@ -187,17 +291,24 @@ fun HomeScreen(
                         .padding(top = 30.dp, start = 24.dp)
                 )
                 Spacer(modifier = Modifier.height(10.dp))
+            }
+            items(userList){
                 DataListFull(
-                    title = "Rohan Shaw",
-                    subtitle = "default",
+                    title = "${it.fname} ${it.lname}",
+                    subtitle = if (it.isDefaultUser) "default" else "patient:${it.index}",
                     imageVector = Icons.Outlined.MedicalInformation,
                     colorLogo = Color.White,
                     additionalDataColor = lightTextAccent,
-                    colorLogoTint = Color.Black
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        navController.navigate(bottomNavItems.userStatScreen.returnUserIndexx(it.index))
+                    }
                 )
-                AddMoreDashWidget()
             }
             item {
+                AddMoreDashWidget {
+                    bomState.value = true
+                }
                 Text(
                     text = "Explore",
                     fontFamily = fontFamily,
@@ -206,7 +317,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .padding(top = 26.dp, start = 24.dp)
                 )
-                explore_home(navController = navController, snackBarToggleVM)
+                explore_home(navController = navController, snackBarToggleVM = snackBarToggleVM)
                 Spacer(modifier = Modifier.height(6.dp))
                 DataListFull(
                     title = "AI Symptom Checker",
@@ -317,7 +428,9 @@ fun HomeScreen(
 }
 
 @Composable
-fun AddMoreDashWidget() {
+fun AddMoreDashWidget(
+    onClickListener: () -> Unit
+) {
     Box(
         modifier = Modifier
             .padding(start = 24.dp, end = 24.dp, top = 8.dp)
@@ -325,7 +438,7 @@ fun AddMoreDashWidget() {
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-
+                onClickListener()
             }
             .drawBehind {
                 drawRoundRect(
@@ -431,7 +544,7 @@ fun explore_home(
                 onClickListener = {
                     val apiClient = ApiClient()
                     //apiClient.uploadImage(context, R.drawable.test)
-                    //apiClient.textRecog(context)
+                    apiClient.textRecog(context)
                     snackBarToggleVM.SendToast(
                         message = "Feature not ready yet!",
                         indicator_color = customYellow,
@@ -592,7 +705,7 @@ fun ScanCard() {
                     fontFamily = fontFamily,
                     letterSpacing = 0.1.sp,
                     fontSize = 15.sp
-                    )
+                )
             }
             Row(
                 modifier = Modifier

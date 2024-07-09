@@ -24,6 +24,7 @@ import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
@@ -38,6 +39,7 @@ import com.rohnsha.medbuddyai.screens.DiseasesCatelogue
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
 import com.rohnsha.medbuddyai.screens.MoreScreen
+import com.rohnsha.medbuddyai.screens.UserStatScreen
 import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
@@ -63,6 +65,7 @@ fun bottomNavGraph(
     val currentUserVM= viewModel<currentUserDataVM>()
     val questionVM= viewModel<questionVM>()
     val _auth= FirebaseAuth.getInstance()
+    val chatVM= viewModel<chatVM>()
 
     val username = remember {
         mutableStateOf("")
@@ -108,7 +111,8 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 communityViewModel = communityVM,
-                scanHistoryviewModel, diseaseDBviewModel, chatdbVM, snackBarVM, sideStateVM = sideDrawerState
+                scanHistoryVM = scanHistoryviewModel, diseaseDBviewModel = diseaseDBviewModel, chatdbVm = chatdbVM, sideStateVM = sideDrawerState,
+                snackBarToggleVM = snackBarVM, currentUserDataVM = currentUserVM
             )
         }
         composable(route = bottomNavItems.Community.route){
@@ -238,7 +242,9 @@ fun bottomNavGraph(
                 chatID = it.arguments!!.getInt(chatID),
                 mode = it.arguments!!.getInt(chatMode),
                 diseaseDBviewModel = diseaseDBviewModel,
-                sideStateVM = sideDrawerState
+                sideStateVM = sideDrawerState,
+                currentUserDataVM = currentUserVM,
+                chatVM = chatVM
             )
         }
 
@@ -262,7 +268,7 @@ fun bottomNavGraph(
                 resultsLevel = it.arguments!!.getInt(scanResultKey),
                 indexClassification = it.arguments!!.getInt(scanResultIndex),
                 snackbarHostState = snackBarVM,
-                communityVM = communityVM
+                communityVM = communityVM, currentUserDataVM = currentUserVM
             )
         }
         composable(
@@ -284,6 +290,20 @@ fun bottomNavGraph(
         ){
             WelcomeLogoScreen(
                 navController = navController
+            )
+        }
+        composable(
+            route = bottomNavItems.userStatScreen.route,
+            arguments = listOf(
+                navArgument(userIndex){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            UserStatScreen(
+                userIndexx = it.arguments!!.getInt(userIndex),
+                navController = navController,padding = padding, scanHistoryViewModel = scanHistoryviewModel, diseaseDBviewModel = diseaseDBviewModel,
+                chatdbVm = chatdbVM
             )
         }
         composable(

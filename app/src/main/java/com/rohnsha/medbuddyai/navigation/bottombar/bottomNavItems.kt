@@ -22,6 +22,7 @@ const val chatMode= "chatMode"
 const val domainSelection= "domianSelection"
 const val authMode= "authMode"
 const val domainID= "domainID"
+const val userIndex= "userIndex"
 
 sealed class bottomNavItems(
     val title: String,
@@ -168,6 +169,16 @@ sealed class bottomNavItems(
     ){
         fun returnDomainID(domainID: Int): String{
             return "doctorScreen/$domainID"
+        }
+    }
+    object userStatScreen: bottomNavItems(
+        title = "userStatScreen",
+        route = "userStatScreen/{$userIndex}",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    ){
+        fun returnUserIndexx(userIndex: Int): String{
+            return "userStatScreen/$userIndex"
         }
     }
 }

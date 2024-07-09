@@ -10,10 +10,10 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chatWithMessage
 @Dao
 interface chatDAO {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addChat(chatEntity: chatEntity)
 
-    @Query("select * from chats")
+    @Query("select * from chats order by timestamp desc")
     suspend fun readChats(): List<chatEntity>
 
     @Transaction

@@ -11,6 +11,9 @@ class currentUserDataVM(application: Application): AndroidViewModel(application)
     private val repo: currentUserRepo
     private val dao: currentUserDAO
 
+    private val _defaultUserIndex= MutableStateFlow(1)
+    val defaultUserIndex= _defaultUserIndex.asStateFlow()
+
     private val _userName= MutableStateFlow("")
     val userName= _userName.asStateFlow()
 
@@ -31,4 +34,7 @@ class currentUserDataVM(application: Application): AndroidViewModel(application)
         return repo.getAllUsers()
     }
 
+    fun switchDefafultUser(index: Int){
+        _defaultUserIndex.value= index
+    }
 }

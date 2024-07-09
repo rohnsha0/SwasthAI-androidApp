@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class chatEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val timestamp: Long,
-    val mode: Int
+    val mode: Int,
+    val userIndex: Int
 )
