@@ -29,6 +29,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -214,7 +215,10 @@ fun TextInputThemed(
     modifier: Modifier= Modifier,
     modifier2: Modifier= Modifier,
     singleLine: Boolean= true,
-    keyboardOptions: KeyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Text)
+    keyboardOptions: KeyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Text),
+    errorBool: Boolean= false,
+    errorText: String= "This is a required filed",
+    regexUnMatchErrorText: String= "Invalid input"
 ) {
     val errorState= remember {
         mutableStateOf(false)
@@ -222,58 +226,68 @@ fun TextInputThemed(
     if (regex!=null){
         errorState.value= !value.matches(Regex(regex)) && value!= ""
     }
-    TextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .then(modifier2)
-            .then(
-                if (readOnly) {
-                    modifier
-                } else {
-                    Modifier
+    Column {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(modifier2)
+                .then(
+                    if (readOnly) {
+                        modifier
+                    } else {
+                        Modifier
+                    }
+                ),
+            textStyle = LocalTextStyle.current.copy(fontFamily = fontFamily, fontSize = 18.sp),
+            value = value,
+            readOnly = readOnly,
+            onValueChange = { onValueChanged(it) },
+            suffix = { if (suffix!=null) Text(text = suffix) },
+            keyboardOptions = keyboardOptions,
+            trailingIcon = {
+                if (value!="" && !readOnly){
+                    Image(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clip(CircleShape)
+                            .clickable {
+                                onClose()
+                            }
+                            .padding(3.dp),
+                        imageVector = Icons.Outlined.Close,
+                        contentDescription = "Close Icon"
+                    )
                 }
-            ),
-        textStyle = LocalTextStyle.current.copy(fontFamily = fontFamily, fontSize = 18.sp),
-        value = value,
-        readOnly = readOnly,
-        onValueChange = { onValueChanged(it) },
-        suffix = { if (suffix!=null) Text(text = suffix) },
-        keyboardOptions = keyboardOptions,
-        trailingIcon = {
-            if (value!="" && !readOnly){
-                Image(
-                    modifier = Modifier
-                        .size(30.dp)
-                        .clip(CircleShape)
-                        .clickable {
-                            onClose()
-                        }
-                        .padding(3.dp),
-                    imageVector = Icons.Outlined.Close,
-                    contentDescription = "Close Icon"
+            },
+            //placeholder = { Text(text = placeholder) },
+            label = {
+                Text(
+                    text = label,
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    color = formAccent
                 )
-            }
-        },
-        //placeholder = { Text(text = placeholder) },
-        label = {
+            },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedIndicatorColor = customBlue,
+                unfocusedIndicatorColor = formAccent,
+                errorContainerColor = Color.White,
+                errorIndicatorColor = customRed,
+                errorSupportingTextColor = customRed,
+            ),
+            isError = errorState.value || errorBool,
+            singleLine = singleLine
+        )
+        if (errorBool || errorState.value && errorText.isNotEmpty()) {
             Text(
-                text = label,
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                color = formAccent
+                text = if (errorBool) errorText else regexUnMatchErrorText,
+                color = customRed,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
             )
-        },
-        colors = TextFieldDefaults.colors(
-            unfocusedContainerColor = Color.White,
-            focusedContainerColor = Color.White,
-            focusedIndicatorColor = customBlue,
-            unfocusedIndicatorColor = formAccent,
-            errorContainerColor = Color.White,
-            errorIndicatorColor = customRed,
-            errorSupportingTextColor = customRed,
-        ),
-        isError = errorState.value,
-        singleLine = singleLine
-    )
+        }
+    }
 }
 

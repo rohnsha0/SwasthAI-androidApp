@@ -49,7 +49,12 @@ class userAuthVM: ViewModel() {
         return false
     }
 
-    fun loginUser(password: String, email: String, onSuccess: () -> Unit) {
+    fun loginUser(
+        password: String,
+        email: String,
+        onSuccess: () -> Unit,
+        snackBarToggleVM: snackBarToggleVM
+        ) {
         _auth.signInWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 _firestoreRef.child("users").child(it.user?.uid.toString()).get()
@@ -74,6 +79,15 @@ class userAuthVM: ViewModel() {
                         Log.d("loginError", it.printStackTrace().toString())
                         Log.d("loginError", it.message.toString())
                     }
+            }
+            .addOnFailureListener { exception ->
+                exception.printStackTrace()
+                Log.d("loginError", exception.message.toString())
+                snackBarToggleVM.SendToast(
+                    message = exception.message.toString(),
+                    indicator_color = Color.Red,
+                    icon = Icons.Outlined.Warning,
+                )
             }
     }
 

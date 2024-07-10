@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,20 +19,31 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
@@ -39,6 +51,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -49,7 +63,9 @@ import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.TextInputThemed
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.formAccent
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +78,7 @@ fun UserAuthScreen(
 ) {
 
     val selectedMode= remember {
-        mutableStateOf(mode)
+        mutableIntStateOf(mode)
     }
 
     Scaffold(
@@ -70,7 +86,7 @@ fun UserAuthScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (selectedMode.value == 0) "Hello" else "Welcome Back",
+                        text = if (selectedMode.value == 0) "Create Account" else "Welcome Back!",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -113,10 +129,10 @@ fun UserAuthScreen(
             Spacer(modifier = Modifier.height(48.dp))
             Image(painter = painterResource(id = R.drawable.login), contentDescription = null, modifier= Modifier.padding(horizontal = 25.dp))
             when (selectedMode.value) {
-                0 -> { RegisterUI(userAuthVM = userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(
+                0 -> { RegisterUI(userAuthVM = userAuthVM, selectedMode = { selectedMode.intValue= it }, onSucess = { navController.navigate(
                     bottomNavItems.Home.route) }, snackBarToggleVM = snackBarToggleVM)  }
-                1 -> { LoginUI(userAuthVM, selectedMode = { selectedMode.value= it }, onSucess = { navController.navigate(
-                    bottomNavItems.Home.route) }) }
+                1 -> { LoginUI(userAuthVM, selectedMode = { selectedMode.intValue= it }, onSucess = { navController.navigate(
+                    bottomNavItems.Home.route) }, snackBarToggleVM = snackBarToggleVM) }
             }
 
         }
@@ -147,6 +163,22 @@ fun RegisterUI(
     val username= remember {
         mutableStateOf("")
     }
+
+    val mailError= remember {
+        mutableStateOf(false)
+    }
+    val passwordError= remember {
+        mutableStateOf(false)}
+    val usernameError= remember {
+        mutableStateOf(false)
+    }
+    val fnameError= remember {
+        mutableStateOf(false)
+    }
+    val lnameError= remember {
+        mutableStateOf(false)
+    }
+
     val scope= rememberCoroutineScope()
     val isUsernameValid= remember {
         mutableStateOf(false)
@@ -169,6 +201,24 @@ fun RegisterUI(
 
     Log.d("Username", "usernmae; ${isUsernameValid.value}")
 
+    val buttonPressedCount= remember {
+        mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(key1 = mail.value, key2 = password.value, key3 = username.value) {
+        if (buttonPressedCount.intValue > 0){
+            mailError.value= isEntryEmpty(mail.value)
+            passwordError.value= isEntryEmpty(password.value)
+            usernameError.value= isEntryEmpty(username.value)
+        }
+    }
+
+    LaunchedEffect(key1 = lastName.value, key2 = firstName.value) {
+        if (buttonPressedCount.intValue > 0){
+            fnameError.value= isEntryEmpty(firstName.value)
+            lnameError.value= isEntryEmpty(lastName.value)
+        }
+    }
 
     LazyColumn {
         item {
@@ -185,6 +235,7 @@ fun RegisterUI(
                     onValueChanged = { firstName.value = it },
                     label = "First name",
                     onClose = { /*TODO*/ },
+                    errorBool = fnameError.value
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 TextInputThemed(
@@ -192,13 +243,17 @@ fun RegisterUI(
                     onValueChanged = { lastName.value = it },
                     label = "Last name",
                     onClose = { /*TODO*/ },
+                    errorBool = lnameError.value
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 TextInputThemed(
                     value = mail.value,
                     onValueChanged = { mail.value = it },
                     label = "Email address",
-                    onClose = { /*TODO*/ },
+                    onClose = { mail.value= "" },
+                    errorBool = mailError.value,
+                    regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$",
+                    regexUnMatchErrorText = "Must be in `__@_._` format"
                 )
                 Spacer(modifier = Modifier.height(15.dp))
                 TextInputThemed(
@@ -224,60 +279,70 @@ fun RegisterUI(
                     onValueChanged = { username.value = it },
                     label = "Username",
                     onClose = { /*TODO*/ },
+                    regex = "^[a-zA-Z0-9_-]{3,16}\$",
+                    regexUnMatchErrorText = "Must be 3-16 chars with lower, uppercase, hyphens, underscores",
+                    errorBool = usernameError.value
                 )
                 Spacer(modifier = Modifier.height(15.dp))
-
-                TextInputThemed(
-                    value = password.value,
-                    onValueChanged = { password.value = it },
-                    label = "Password",
-                    onClose = { /*TODO*/ },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                PasswordTextField(
+                    password = password.value,
+                    onPasswordChanged = { password.value= it },
+                    errorBool = passwordError.value,
+                    regex = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}\$",
+                    regexUnMatchErrorText = "Must be 8+ chars, 1 letter, 1 #"
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 AuthCTA(btnAction = {
                     scope.launch {
-                        if (isUsernameValid.value){
-                            userAuthVM.registerUser(
-                                password.value,
-                                mail.value, onSucess,
-                                fname = firstName.value,
-                                lname = lastName.value,
-                                username = username.value,
-                                snackBarToggleVM = snackBarToggleVM
-                            )
-                        } else {
-                            if (username.value==""){
-                                snackBarToggleVM.SendToast(
-                                    message = "Username cant be empty",
-                                    indicator_color = Color.Red,
-                                    icon = Icons.Outlined.Warning,
+                        mailError.value= isEntryEmpty(mail.value)
+                        passwordError.value= isEntryEmpty(password.value)
+                        usernameError.value= isEntryEmpty(username.value)
+                        fnameError.value= isEntryEmpty(firstName.value)
+                        lnameError.value= isEntryEmpty(lastName.value)
+                        buttonPressedCount.intValue++
+                        if (!(mailError.value || passwordError.value ||  fnameError.value || lnameError.value)){
+                            if (isUsernameValid.value){
+                                userAuthVM.registerUser(
+                                    password.value,
+                                    mail.value, onSucess,
+                                    fname = firstName.value,
+                                    lname = lastName.value,
+                                    username = username.value,
+                                    snackBarToggleVM = snackBarToggleVM
                                 )
                             } else {
-                                val isUsernameTaken = userAuthVM.isUsernameValid(username.value)
-                                if (!isUsernameTaken){
-                                    userAuthVM.registerUser(
-                                        password.value,
-                                        mail.value,
-                                        onSucess,
-                                        fname = firstName.value,
-                                        lname = lastName.value,
-                                        username = username.value,
-                                        snackBarToggleVM = snackBarToggleVM
-                                    )
-                                } else {
+                                if (username.value==""){
                                     snackBarToggleVM.SendToast(
-                                        message = "Username already taken",
+                                        message = "Username cant be empty",
                                         indicator_color = Color.Red,
                                         icon = Icons.Outlined.Warning,
                                     )
+                                } else {
+                                    val isUsernameTaken = userAuthVM.isUsernameValid(username.value)
+                                    if (!isUsernameTaken){
+                                        userAuthVM.registerUser(
+                                            password.value,
+                                            mail.value,
+                                            onSucess,
+                                            fname = firstName.value,
+                                            lname = lastName.value,
+                                            username = username.value,
+                                            snackBarToggleVM = snackBarToggleVM
+                                        )
+                                    } else {
+                                        snackBarToggleVM.SendToast(
+                                            message = "Username already taken",
+                                            indicator_color = Color.Red,
+                                            icon = Icons.Outlined.Warning,
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }, txtAction =  {
                     selectedMode(1)
-                })
+                }, title = "Let's Get Started", subtitle = "Already have an account?", subtitleCTA = "Login")
                 Spacer(modifier = Modifier.height(30.dp))
             }
         }
@@ -285,15 +350,37 @@ fun RegisterUI(
 }
 
 @Composable
-fun LoginUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int) -> Unit) {
+fun LoginUI(
+    userAuthVM: userAuthVM,
+    onSucess: () -> Unit,
+    selectedMode: (Int) -> Unit,
+    snackBarToggleVM: snackBarToggleVM
+) {
 
     val mail= remember {
         mutableStateOf("")
+    }
+    val mailError= remember {
+        mutableStateOf(false)
     }
 
     val password= remember {
         mutableStateOf("")
     }
+    val passwordError= remember {
+        mutableStateOf(false)
+    }
+    val buttonPressedCount= remember {
+        mutableIntStateOf(0)
+    }
+
+    LaunchedEffect(key1 = mail.value, key2 = password.value) {
+        if (buttonPressedCount.intValue > 0){
+            mailError.value= isEntryEmpty(mail.value)
+            passwordError.value= isEntryEmpty(password.value)
+        }
+    }
+    Log.d("Login", "buttonPressedCount: ${buttonPressedCount.intValue}")
 
     Column(
         modifier = Modifier
@@ -307,20 +394,46 @@ fun LoginUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int) ->
             value = mail.value,
             onValueChanged = { mail.value = it },
             label = "Enter your mail",
-            onClose = { /*TODO*/ },
+            onClose = { mail.value= "" },
+            errorBool = mailError.value,
+            regex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}\$",
+            regexUnMatchErrorText = "Must be in `__@_._` format"
         )
         Spacer(modifier = Modifier.height(15.dp))
         TextInputThemed(
             value = password.value,
             onValueChanged = { password.value = it },
             label = "Enter your Password",
-            onClose = { /*TODO*/ },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+            onClose = { password.value= "" },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            errorBool = passwordError.value
         )
+        Spacer(modifier = Modifier.height(24.dp))
+        AuthCTA(
+            btnAction = {
+                mailError.value= isEntryEmpty(mail.value)
+                passwordError.value= isEntryEmpty(password.value)
+                buttonPressedCount.intValue++
+                Log.d("Login", "mailError: ${!(mailError.value || passwordError.value)}")
+                if (!(mailError.value || passwordError.value)){
+                    Log.d("Login", "insideMailError: ${!(mailError.value || passwordError.value)}")
+                    /*snackBarToggleVM.SendToast(
+                        message = "One or more fields are empty",
+                        indicator_color = Color.Red,
+                        icon = Icons.Outlined.Warning,
+                    )*/
+                    userAuthVM.loginUser(
+                        password = password.value,
+                        email = mail.value,
+                        onSuccess = onSucess,
+                        snackBarToggleVM = snackBarToggleVM
+                    )
+                }
+                },
+            txtAction = {
+                selectedMode(0)
+            }, title = "Login", subtitle = "Don't have an account?", subtitleCTA = "Sign up")
         Spacer(modifier = Modifier.weight(1f))
-        AuthCTA(btnAction = { userAuthVM.loginUser(password.value, mail.value, onSucess) }, txtAction = {
-            selectedMode(0)
-        })
         Spacer(modifier = Modifier.height(30.dp))
     }
 }
@@ -329,6 +442,9 @@ fun LoginUI(userAuthVM: userAuthVM, onSucess: () -> Unit, selectedMode: (Int) ->
 fun AuthCTA(
     btnAction: () -> Unit,
     txtAction: () -> Unit,
+    title: String,
+    subtitle: String,
+    subtitleCTA: String
 ) {
     Button(
         onClick = { btnAction() },
@@ -336,13 +452,85 @@ fun AuthCTA(
             containerColor = customBlue
         )
     ) {
-        Text(text = "Login", color = Color.White, fontSize = 18.sp, fontFamily = fontFamily)
+        Text(text = title, color = Color.White, fontSize = 18.sp, fontFamily = fontFamily)
     }
     Spacer(modifier = Modifier.height(16.dp))
     Row {
-        Text(text = "Don't have an account? ", fontSize = 14.sp, fontFamily = fontFamily, color = Color.Black)
-        Text(text = "Sign up", fontSize = 14.sp, fontFamily = fontFamily, color = Color.Black, fontWeight = FontWeight(600),
+        Text(text = subtitle, fontSize = 14.sp, fontFamily = fontFamily, color = Color.Black)
+        Text(text = " ", fontSize = 14.sp, fontFamily = fontFamily, color = Color.Black)
+        Text(text = subtitleCTA, fontSize = 14.sp, fontFamily = fontFamily, color = Color.Black, fontWeight = FontWeight(600),
             modifier = Modifier.clickable { txtAction() })
     }
     Spacer(modifier = Modifier.height(25.dp))
+}
+
+@Composable
+fun PasswordTextField(
+    password: String,
+    onPasswordChanged: (String) -> Unit,
+    errorBool: Boolean= false,
+    errorText: String= "This is a required filed",
+    regexUnMatchErrorText: String= "Invalid input",
+    regex: String?= null
+) {
+    var passwordVisible by remember { mutableStateOf(false) }
+
+    val errorState= remember {
+        mutableStateOf(false)
+    }
+    if (regex!=null){
+        errorState.value= !password.matches(Regex(regex)) && password!= ""
+    }
+
+    Column {
+        TextField(
+            modifier = Modifier
+                .fillMaxWidth(),
+            value = password,
+            onValueChange = { onPasswordChanged(it) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible) {
+                    Icons.Filled.Visibility
+                } else {
+                    Icons.Filled.VisibilityOff
+                }
+                IconButton(onClick = { passwordVisible= !passwordVisible }) {
+                    Icon(imageVector = image, contentDescription = "Toggle Password")
+                }
+            },
+            textStyle = LocalTextStyle.current.copy(fontFamily = fontFamily, fontSize = 18.sp),
+            label = {
+                Text(
+                    text = "Password",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    color = formAccent
+                ) },
+            colors = TextFieldDefaults.colors(
+                unfocusedContainerColor = Color.White,
+                focusedContainerColor = Color.White,
+                focusedIndicatorColor = customBlue,
+                unfocusedIndicatorColor = formAccent,
+                errorContainerColor = Color.White,
+                errorIndicatorColor = customRed,
+                errorSupportingTextColor = customRed,
+            ),
+            isError = errorState.value || errorBool,
+            singleLine = true
+        )
+        if (errorBool || errorState.value && errorText.isNotEmpty()) {
+            Text(
+                text = if (errorBool) errorText else regexUnMatchErrorText,
+                color = customRed,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
+        }
+    }
+}
+
+private fun isEntryEmpty(entry: String): Boolean {
+    return entry==""
 }
