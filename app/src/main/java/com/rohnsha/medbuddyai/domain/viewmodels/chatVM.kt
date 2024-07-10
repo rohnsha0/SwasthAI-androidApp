@@ -48,6 +48,7 @@ class chatVM: ViewModel() {
 
     suspend fun symptomChat(
         symptom: String,
+        selectedDisease: symptomDC,
         isRetrying: Boolean= false,
         vmChat: chatDB_VM,
         currentUserIndex: Int,
@@ -63,7 +64,7 @@ class chatVM: ViewModel() {
         Log.d("chatVMSymptom", symptom.substringAfterLast(", ").trim())
         if (!isRetrying){
             val messageBody= messageEntity(
-                message = "Selected symptom: ${symptom.substringAfterLast(", ").trim()}",
+                message = "Selected symptom: ${selectedDisease.symptomAbbreviation}",
                 isBotMessage =  false,
                 timestamp = System.currentTimeMillis(),
                 isError = true,
@@ -96,7 +97,7 @@ class chatVM: ViewModel() {
             Log.d("errorChat", response.message)
         } catch (e: Exception){
             symptomChat(symptom = symptom, vmChat =  vmChat, chatID =  chatID, isRetrying = true,
-                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUserIndex)
+                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUserIndex, selectedDisease = selectedDisease)
         }
     }
 

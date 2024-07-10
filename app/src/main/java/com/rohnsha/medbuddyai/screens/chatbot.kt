@@ -225,29 +225,38 @@ fun ChatBotScreen(
         }
 
         if (bomState.value){
+            val selectedSymptom= remember {
+                mutableStateOf<symptomDC>(symptomDC("", ""))
+            }
+
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
                 ChatBOM(context = {
+                    selectedSymptom.value= it
                     if (it !in detectedSymptom){
                         detectedSymptom.add(it)
-                    }
-                    messageField.value= "I am having ${detectedSymptom.joinToString(", ") { it.symptom }.lowercase()}"
-                    scope.launch {
-                        chatbotViewModel.symptomChat(
-                            symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
-                            vmChat = chatdbVm,
-                            chatID = chatID,
-                            outcome = { sym ->
-                                if (sym !in detectedSymptom){
-                                    //detectedSymptom.add(sym)
-                                }
-                                optionEnabled.value= true
+                        messageField.value= "I am having ${detectedSymptom.joinToString(", ") { it.symptom }.lowercase()}"
+                        scope.launch {
+                            chatbotViewModel.symptomChat(
+                                symptom = it.symptomAbbreviation,
+                                selectedDisease = selectedSymptom.value,
+                                vmChat = chatdbVm,
+                                chatID = chatID,
+                                outcome = { sym ->
+                                    if (sym !in detectedSymptom){
+                                        //detectedSymptom.add(sym)
+                                    }
+                                    optionEnabled.value= true
+                                },
+                                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
+                            )
+                        }
+                    } },
+                    state = {
+                        bomState.value= it
                             },
-                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
-                        )
-                    }},
-                    state = { bomState.value= it },
                     symptoms = symptoms,
-                    diseaseDBviewModel = diseaseDBviewModel
+                    diseaseDBviewModel = diseaseDBviewModel,
+                    detectedSymp = detectedSymptom
                 )
             }
         }
@@ -309,20 +318,24 @@ fun ChatBotScreen(
             }
             val listGreet= listOf(
                 moreActions("Yes, I have symptoms") {
+                    var selectedSymptom = symptomDC("", "")
                     scope.launch {
                         chatbotViewModel.symptomChat(
                             symptom = detectedSymptom.joinToString(", ") { it.symptomAbbreviation },
                             vmChat = chatdbVm,
                             chatID = chatID,
                             outcome = {
+                                selectedSymptom= it
                                 if (it !in detectedSymptom){
                                     detectedSymptom.add(it)
                                     messageField.value= "I am having ${ detectedSymptom.joinToString(", ") { it.symptom }.lowercase() }"
                                 }
                                 optionEnabled.value = true
                             },
-                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
+                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser,
+                            selectedDisease = selectedSymptom
                         )
+                        Log.d("selectedSymptom", selectedSymptom.toString())
                     }
                 },
                 moreActions("No") {
@@ -498,7 +511,13 @@ fun Messages(
 }
 
 @Composable
-fun ChatBOM(context: (symptomDC) -> Unit, state: (Boolean)-> Unit, symptoms: List<symptomDC>, diseaseDBviewModel: diseaseDBviewModel) {
+fun ChatBOM(
+    context: (symptomDC) -> Unit,
+    state: (Boolean)-> Unit,
+    symptoms: List<symptomDC>,
+    diseaseDBviewModel: diseaseDBviewModel,
+    detectedSymp: MutableList<symptomDC>
+) {
     val selectedData= remember {
         mutableStateOf(symptomDC(symptom = "", symptomAbbreviation = ""))
     }
@@ -522,6 +541,14 @@ fun ChatBOM(context: (symptomDC) -> Unit, state: (Boolean)-> Unit, symptoms: Lis
         }
         Log.d("symptoms", listFetched.toString())
     }
+    val selectedDataInList= remember {
+        mutableStateOf(false)
+    }
+    LaunchedEffect(key1 = content.value) {
+        if (selectedDataInList.value){
+            selectedDataInList.value= false
+        }
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -540,8 +567,11 @@ fun ChatBOM(context: (symptomDC) -> Unit, state: (Boolean)-> Unit, symptoms: Lis
                 Text(
                     modifier = Modifier
                         .clickable {
+                            selectedDataInList.value= selectedData.value in detectedSymp
                             context(selectedData.value)
-                            state(false)
+                            if (!selectedDataInList.value){
+                                state(false)
+                            }
                         },
                     text = "Save",
                     fontSize = 17.sp,
@@ -558,7 +588,9 @@ fun ChatBOM(context: (symptomDC) -> Unit, state: (Boolean)-> Unit, symptoms: Lis
                 label = "Enter contents",
                 icon = Icons.Outlined.ShortText,
                 onClose = { content.value = "" },
-                singleLine = false
+                singleLine = false,
+                errorBool = selectedDataInList.value,
+                errorText = "Symptom already selected"
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
