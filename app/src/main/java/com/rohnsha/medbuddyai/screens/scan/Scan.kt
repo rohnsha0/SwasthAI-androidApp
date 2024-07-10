@@ -43,8 +43,8 @@ import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.MotionPhotosAuto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
+import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Collections
 import androidx.compose.material.icons.outlined.Delete
@@ -57,6 +57,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -91,6 +92,7 @@ import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.ContextUtill
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
@@ -98,6 +100,7 @@ import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
+import com.rohnsha.medbuddyai.screens.BOMChangeDUser
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
@@ -115,7 +118,8 @@ fun ScanScreen(
     photoCaptureVM: photoCaptureViewModel,
     classifierVM: classificationVM,
     index: Int,
-    sideStateVM: sideStateVM
+    sideStateVM: sideStateVM,
+    currentUserDataVM: currentUserDataVM
 ) {
     viewModelPhotoSave = photoCaptureVM
     viewModelClassification = classifierVM
@@ -130,6 +134,10 @@ fun ScanScreen(
             arrayOf(Manifest.permission.CAMERA),
             0
         )
+    }
+
+    val bomStateDUser= remember {
+        mutableStateOf(false)
     }
 
     Scaffold(
@@ -147,16 +155,14 @@ fun ScanScreen(
                     containerColor = BGMain
                 ),
                 actions = {
-                    Image(
-                        imageVector = Icons.Outlined.BlurOn,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(24.dp)
-                            .clickable {
-                                sideStateVM.toggleState()
-                            }
-                    )
+                    IconButton(onClick = {
+                        bomStateDUser.value = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = "Menu Icon"
+                        )
+                    }
                 },
                 navigationIcon = {
                     Image(
@@ -178,6 +184,19 @@ fun ScanScreen(
             .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ) { value ->
+
+        if (bomStateDUser.value){
+            ModalBottomSheet(
+                onDismissRequest = { bomStateDUser.value = false },
+                containerColor = Color.White
+            ) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                    bomStateDUser.value= false
+                    currentUserDataVM.switchDefafultUser(it)
+                }
+            }
+        }
+
         Column(
             modifier = Modifier
                 .padding(value)
@@ -487,10 +506,10 @@ fun ScanMainScreen(
                     .size(24.dp)
                     .padding(2.dp)
                     .clickable {
-                        if (!isConfirming.value){
+                        if (!isConfirming.value) {
 
                         } else {
-                            isConfirming.value= false
+                            isConfirming.value = false
                         }
                     }
             )
@@ -613,7 +632,7 @@ fun ScanMainScreen(
                         Text(
                             modifier = Modifier
                                 .clickable {
-                                    isConfirming.value= false
+                                    isConfirming.value = false
                                     bomError.value = false
                                     isPredictingBool.value = false
                                 }

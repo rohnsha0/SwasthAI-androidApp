@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
+import com.rohnsha.medbuddyai.domain.dataclass.moreActionsWithSubheader
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.scan.DataListFull
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -80,7 +81,7 @@ fun mAIScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "AI Toolkit",
+                        text = bottomNavItems.mAI.title,
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -125,7 +126,7 @@ fun mAIScreen(
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID = chatCount.value+1))
                     }
                 )
-                DataListFull(
+                /*DataListFull(
                     title = "QnA - Specialized Diseases",
                     subtitle = "ai-based specialized advice",
                     imageVector = Icons.Outlined.QuestionMark,
@@ -136,7 +137,7 @@ fun mAIScreen(
                         Log.d("logStatus", "clicked")
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 0, chatID =  chatCount.value+1))
                     }
-                )
+                )*/
                 DataListFull(
                     title = "AI Symptom Checker",
                     subtitle = "check what's wrong",
@@ -149,6 +150,53 @@ fun mAIScreen(
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 1, chatID =  chatCount.value+1))
                     }
                 )
+            }
+
+            val taskSpecificBots= listOf(
+                moreActionsWithSubheader(
+                    title = "QnA - Pathology",
+                    subheader = "Task Specific Chat",
+                    onClick = {}
+                ),
+                moreActionsWithSubheader(
+                    title = "QnA - Medicinology",
+                    subheader = "Task Specific Chat",
+                    onClick = {}
+                ),
+                moreActionsWithSubheader(
+                    title = "QnA - Allergy",
+                    subheader = "Task Specific Chat",
+                    onClick = {}
+                ),
+            )
+            item {
+                Text(
+                    text = "Task Specific Chat",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(top = 26.dp, start = 24.dp)
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+
+            items(taskSpecificBots){
+                DataListFull(
+                    title = it.title,
+                    subtitle = it.subheader,
+                    imageVector = Icons.Outlined.Download,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        it.onClick()
+                        Log.d("logStatus", "clicked")
+                    }
+                )
+            }
+
+            item {
                 Text(
                     text = "Know Your Product",
                     fontFamily = fontFamily,
@@ -189,7 +237,7 @@ fun mAIScreen(
                         modifier = Modifier
                             .padding(top = 18.dp, start = 24.dp)
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                 }
             }
 

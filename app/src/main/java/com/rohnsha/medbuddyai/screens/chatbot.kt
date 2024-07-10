@@ -2,7 +2,6 @@ package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,8 +23,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Merge
@@ -188,22 +187,18 @@ fun ChatBotScreen(
 
                     }) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
+                            imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Menu Icon"
                         )
                     }
                 },
                 actions = {
-                    Image(
-                        imageVector = Icons.Outlined.BlurOn,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(24.dp)
-                            .clickable {
-                                bomStateDUser.value = true
-                            }
-                    )
+                    IconButton(onClick = { bomStateDUser.value = true }) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = "Menu Icon"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = BGMain

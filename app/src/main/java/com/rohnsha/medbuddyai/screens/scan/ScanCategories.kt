@@ -19,18 +19,23 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.AutoMode
-import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -41,12 +46,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.domain.dataclass.modelMarketPlace
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
+import com.rohnsha.medbuddyai.screens.BOMChangeDUser
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customRed
@@ -60,8 +67,14 @@ fun ScanCategoryScreen(
     navController: NavHostController,
     photoCaptureViewModel: photoCaptureViewModel,
     snackBarViewModel: snackBarToggleVM,
-    sideStateVM: sideStateVM
+    sideStateVM: sideStateVM,
+    currentUserDataVM: currentUserDataVM
     ) {
+
+    val bomStateDUser= remember {
+        mutableStateOf(false)
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -77,16 +90,15 @@ fun ScanCategoryScreen(
                     containerColor = BGMain
                 ),
                 actions = {
-                    Image(
-                        imageVector = Icons.Outlined.BlurOn,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(24.dp)
-                            .clickable {
-                                sideStateVM.toggleState()
-                            }
-                    )
+                    IconButton(onClick = {
+                        bomStateDUser.value = true
+                        //sideStateVM.toggleState()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = "Menu Icon"
+                        )
+                    }
                 },
                 navigationIcon = {
                     Image(
@@ -159,6 +171,18 @@ fun ScanCategoryScreen(
             modelMarketPlace("Cervical (Cancerous)", "V2024.06.01",
                 "Cervical Cancer", true, 5)
         )
+
+        if (bomStateDUser.value){
+            ModalBottomSheet(
+                onDismissRequest = { bomStateDUser.value = false },
+                containerColor = Color.White
+            ) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                    bomStateDUser.value= false
+                    currentUserDataVM.switchDefafultUser(it)
+                }
+            }
+        }
 
         LazyColumn(
             modifier = Modifier
