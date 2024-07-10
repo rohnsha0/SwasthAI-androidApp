@@ -167,7 +167,6 @@ fun bottomNavGraph(
             ScanQuestions(
                 indexClassification = it.arguments!!.getInt(scanIndexKey),
                 photoCaptureViewModel = savePhotoViewModel,
-                questionVM = questionVM,
                 sideStateVM = sideDrawerState,
                 padding = padding,
                 navHostController = navController

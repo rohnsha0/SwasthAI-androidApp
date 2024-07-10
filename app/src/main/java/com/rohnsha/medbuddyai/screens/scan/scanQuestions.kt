@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
@@ -73,7 +74,6 @@ private lateinit var disease_results: MutableState<disease_data_dataClass>
 fun ScanQuestions(
     indexClassification: Int,
     photoCaptureViewModel: photoCaptureViewModel,
-    questionVM: questionVM,
     sideStateVM: sideStateVM,
     padding: PaddingValues,
     navHostController: NavHostController
@@ -94,6 +94,8 @@ fun ScanQuestions(
         mutableIntStateOf(0)
     }
 
+    val questionVM= viewModel<questionVM>()
+
     val isStillLoading = photoCaptureViewModel.isLoadingBoolean.collectAsState().value
     val isNormal = photoCaptureViewModel.isNormalBoolean.collectAsState().value
     val isErrored = photoCaptureViewModel.isErroredBoolean.collectAsState().value
@@ -106,7 +108,7 @@ fun ScanQuestions(
     otherDiseaseData = photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
 
     Log.d("ScanQuestions", "scanMainItem: ${disease_results.value}")
-    Log.d("ScanQuestions", "scanMainItem: ${otherDiseaseData}")
+    Log.d("ScanQuestions", "scanMainItem: $otherDiseaseData")
 
     if (disease_results.value.domain != ""){
         LaunchedEffect(key1 = true) {
@@ -117,13 +119,19 @@ fun ScanQuestions(
         }
     }
     val q= questionVM.questionList.collectAsState().value.shuffled().take(10)
-    Log.d("ScanQuestions", "q: ${q}")
+    Log.d("ScanQuestions", "q: $q")
     val questions= remember {
         mutableListOf<questions>()
     }
-    if (q.isNotEmpty() && !questions.contains(q[index.intValue])){
-        questions.add(q[index.intValue])
+    if (q.isNotEmpty()){
+        LaunchedEffect(key1 = Unit) {
+            questions.add(q[index.intValue])
+            index.intValue++
+        }
     }
+    /*if (q.isNotEmpty() && !questions.contains(q[index.intValue])){
+        questions.add(q[index.intValue])
+    }*/
     /*LaunchedEffect(key1 = index.intValue, key2 = true) {
         if (q.isNotEmpty()){
             questions.add(q[index.intValue])
@@ -131,6 +139,9 @@ fun ScanQuestions(
     }*/
 
     Log.d("ScanQuestions", "scanMainQuwstion: ${qList}")
+
+    Log.d("ScanQuestionsDebug", "scanMainQuwstion: ${questions}")
+    Log.d("ScanQuestionsDebug", "scanMainQuwstion: ${q}")
 
     val listGreet= listOf(
         moreActions("Yes, I have symptoms") {
@@ -265,6 +276,7 @@ fun ScanQuestions(
                                                 "ScanQuestions",
                                                 "scanMainQuwstionBoolean: ${q.size != (index.intValue - 1)}, index: ${index.intValue}, q.size: ${q.size}"
                                             )
+                                            questions.add(q[index.intValue])
                                             if (q.size != (index.intValue + 1)) {
                                                 Log.d("ScanQuestions", "scanMainQuwstion: emterted")
                                                 index.intValue++
