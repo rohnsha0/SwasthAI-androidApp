@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.database.appData.disease_questions.questionMsg
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questions
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
@@ -102,7 +103,6 @@ fun ScanQuestions(
     LaunchedEffect(key1 = true){
         delay(500L)
         photoCaptureViewModel.onClassify(context, index = indexClassification)
-
     }
     disease_results.value= photoCaptureViewModel.classificationData.collectAsState().value
     otherDiseaseData = photoCaptureViewModel.getDiseaseVersionData(group_number = indexClassification, isMaxIndex = false)
@@ -121,22 +121,19 @@ fun ScanQuestions(
     val q= questionVM.questionList.collectAsState().value.shuffled().take(10)
     Log.d("ScanQuestions", "q: $q")
     val questions= remember {
-        mutableListOf<questions>()
+        mutableListOf<questionMsg>()
     }
     if (q.isNotEmpty()){
         LaunchedEffect(key1 = Unit) {
-            questions.add(q[index.intValue])
+            questions.add(
+                questionMsg(
+                    questions = q[index.intValue],
+                    isBotMessage = true
+                )
+            )
             index.intValue++
         }
     }
-    /*if (q.isNotEmpty() && !questions.contains(q[index.intValue])){
-        questions.add(q[index.intValue])
-    }*/
-    /*LaunchedEffect(key1 = index.intValue, key2 = true) {
-        if (q.isNotEmpty()){
-            questions.add(q[index.intValue])
-        }
-    }*/
 
     Log.d("ScanQuestions", "scanMainQuwstion: ${qList}")
 
@@ -145,19 +142,29 @@ fun ScanQuestions(
 
     val listGreet= listOf(
         moreActions("Yes, I have symptoms") {
-            questions.add(questions(
-                domain = Int.MAX_VALUE.toLong(),
-                index = Int.MAX_VALUE.toLong(),
-                question = "Yes"
-            ))
+            questions.add(
+                questionMsg(
+                    questions = questions(
+                        domain = Int.MAX_VALUE.toLong(),
+                        index = Int.MAX_VALUE.toLong(),
+                        question = "Yes"
+                    ),
+                    isBotMessage = false
+                )
+            )
             yesCount.intValue++
         },
         moreActions("No") {
-            questions.add(questions(
-                domain = Int.MAX_VALUE.toLong(),
-                index = Int.MAX_VALUE.toLong(),
-                question = "No"
-            ))
+            questions.add(
+                questionMsg(
+                    questions = questions(
+                        domain = Int.MAX_VALUE.toLong(),
+                        index = Int.MAX_VALUE.toLong(),
+                        question = "No"
+                    ),
+                    isBotMessage = false
+                )
+            )
         },
     )
 
@@ -243,13 +250,14 @@ fun ScanQuestions(
                         state = scrollState
                     ) {
                         items(questions){
-                            Messages(messageInfo = messageEntity(
-                                message = it.question,
-                                isError =  false,
-                                isBotMessage = true,
-                                chatId = Int.MAX_VALUE,
-                                timestamp = System.currentTimeMillis()
-                            ))
+                            Messages(
+                                messageInfo = messageEntity(
+                                    message = it.questions.question,
+                                    isError =  false,
+                                    isBotMessage = it.isBotMessage,
+                                    chatId = Int.MAX_VALUE,
+                                    timestamp = System.currentTimeMillis()
+                                ))
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
@@ -276,20 +284,28 @@ fun ScanQuestions(
                                                 "ScanQuestions",
                                                 "scanMainQuwstionBoolean: ${q.size != (index.intValue - 1)}, index: ${index.intValue}, q.size: ${q.size}"
                                             )
-                                            questions.add(q[index.intValue])
+                                            questions.add(
+                                                questionMsg(
+                                                    questions= q[index.intValue],
+                                                    isBotMessage = true
+                                                )
+                                            )
                                             if (q.size != (index.intValue + 1)) {
                                                 Log.d("ScanQuestions", "scanMainQuwstion: emterted")
                                                 index.intValue++
                                             } else {
                                                 questions.add(
-                                                    questions(
-                                                        domain = Int.MAX_VALUE.toLong(),
-                                                        index = Int.MAX_VALUE.toLong(),
-                                                        question = "You are done with the self declaration. Navigating to main menu"
+                                                    questionMsg(
+                                                        questions = questions(
+                                                            domain = Int.MAX_VALUE.toLong(),
+                                                            index = Int.MAX_VALUE.toLong(),
+                                                            question = "You are done with the self declaration. Navigating to main menu"
+                                                        ),
+                                                        isBotMessage = true
                                                     )
                                                 )
                                                 scope.launch {
-                                                    delay(1500L)
+                                                    delay(3000L)
                                                     Log.d(
                                                         "ScanQuestions",
                                                         "scanMainQuwstion: navigation initiated"

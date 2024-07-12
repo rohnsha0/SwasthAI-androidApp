@@ -25,6 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.SettingsSuggest
+import androidx.compose.material.icons.outlined.Attachment
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.Merge
@@ -472,16 +473,46 @@ fun Messages(
                         }
                     )
                     .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-                    .background(color = ViewDash, shape = RoundedCornerShape(16.dp)),
+                    .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
+                    .padding(top = 13.dp),
                 contentAlignment = Alignment.CenterStart
             ){
                 Column {
+                    if (!messageInfo.isBotMessage){
+                        Row(modifier = Modifier
+                            .padding(start = 13.dp, end = 24.dp, bottom = 0.dp)
+                            .clickable {
+
+                            }
+                            .clip(shape = RoundedCornerShape(8.dp))
+                            .background(BGMain)
+                            .padding(vertical = 2.dp, horizontal = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Start
+                        ){
+                            Icon(
+                                imageVector = Icons.Outlined.Attachment,
+                                modifier = Modifier.size(12.dp),
+                                contentDescription = "attachment icon",
+
+                                )
+                            Spacer(modifier = Modifier.width(5.dp))
+                            Text(
+                                text = "Includes Scan Report",
+                                fontSize = 10.sp,
+                                fontFamily = fontFamily,
+                                modifier = Modifier,
+                                color = Color.Black,
+                                //fontWeight = FontWeight(600)
+                            )
+                        }
+                    }
                     Text(
                         text = messageInfo.message,
                         fontSize = 14.sp,
                         fontFamily = fontFamily,
                         modifier = Modifier
-                            .padding(start = 13.dp, end = 24.dp, bottom = 8.dp, top = 13.dp)
+                            .padding(start = 13.dp, end = 24.dp, bottom = 8.dp)
                     )
                     Box(
                         modifier = Modifier

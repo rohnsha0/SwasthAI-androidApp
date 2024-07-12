@@ -13,5 +13,5 @@ data class questions(
 
 data class questionMsg(
     val questions: questions,
-    val isSystemMsg: Boolean
+    val isBotMessage: Boolean
 )
