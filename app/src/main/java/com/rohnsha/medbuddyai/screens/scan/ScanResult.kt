@@ -44,6 +44,8 @@ import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -78,12 +80,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
+import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
@@ -129,6 +134,8 @@ fun ScanResultScreen(
     indexClassification: Int, // model to be triggered
     snackbarHostState: snackBarToggleVM,
     communityVM: communityVM,
+    chatdbVm: chatDB_VM,
+    chatVM: chatVM,
     currentUserDataVM: currentUserDataVM
 ) {
     photoCaptureViewModel = viewModel
@@ -269,7 +276,15 @@ fun ScanResultScreen(
                 NormalErrorStateLayout(state = 1)
                 Log.d("loggingStatus", "errored")
             } else {
-                ScanResultsSuccess(padding = padding, values = values, indexClassification = indexClassification, navController = navController, currentUserDataVM = currentUserDataVM)
+                ScanResultsSuccess(
+                    padding = padding,
+                    values = values,
+                    indexClassification = indexClassification,
+                    navController = navController,
+                    currentUserDataVM = currentUserDataVM,
+                    chatdbVm = chatdbVm,
+                    chatVM = chatVM
+                )
                 if (modalState.value){
                     ModalBottomSheet(
                         onDismissRequest = {
@@ -328,13 +343,18 @@ fun ScanResultsSuccess(
     values: PaddingValues,
     indexClassification: Int,
     navController: NavHostController,
-    currentUserDataVM: currentUserDataVM
+    currentUserDataVM: currentUserDataVM,
+    chatdbVm: chatDB_VM,
+    chatVM: chatVM
 ) {
     val confidence= photoCaptureViewModel.maxIndex.collectAsState().value.confident
+    val isSuccesfful= remember {
+        mutableStateOf(false)
+    }
     if (mode ==0){
         val defaultUser= currentUserDataVM.defaultUserIndex.collectAsState().value
         LaunchedEffect(key1 = disease_results.value){
-            scanHistoryVM.addScanHistory(scanHistory(
+            isSuccesfful.value= scanHistoryVM.addScanHistory(scanHistory(
                 timestamp = System.currentTimeMillis(),
                 title = disease_results.value.disease_name,
                 domain = disease_results.value.domain,
@@ -343,6 +363,7 @@ fun ScanResultsSuccess(
             ))
         }
     }
+    Log.d("isSuccessfull", isSuccesfful.value.toString())
     val optionTxtFieldState= remember {
         mutableStateOf(Int.MAX_VALUE)
     }
@@ -406,7 +427,13 @@ fun ScanResultsSuccess(
                     },
                     indexClassification = indexClassification
                 )
-                ScanResultActions(optionTxtFieldState = optionTxtFieldState)
+                ScanResultActions(
+                    optionTxtFieldState = optionTxtFieldState,
+                    scanHistoryVM = scanHistoryVM,
+                    chatdbVm = chatdbVm,
+                    insertionSuccessToDB = isSuccesfful.value,
+                    chatVM = chatVM, navController = navController
+                )
                 Spacer(
                     modifier = Modifier.height(30.dp)
                 )
@@ -927,10 +954,54 @@ fun DataBox(
 }
 
 @Composable
-fun ScanResultActions(optionTxtFieldState: MutableState<Int>) {
+fun ScanResultActions(
+    optionTxtFieldState: MutableState<Int>,
+    scanHistoryVM: scanHistoryViewModel,
+    insertionSuccessToDB: Boolean,
+    chatdbVm: chatDB_VM,
+    chatVM: chatVM,
+    navController: NavHostController
+) {
     val textData= remember {
         mutableStateOf("")
     }
+    val scan_historyData= remember {
+        mutableStateOf(
+            scanHistory(
+                timestamp = 0L,
+                title = "",
+                domain = 0.toString(),
+                confidence = 0f,
+                userIndex = 0
+            )
+        )
+    }
+    val messageChat= remember {
+        mutableStateOf(
+            messageEntity(
+                message = "",
+                timestamp = 0L,
+                chatId = Int.MAX_VALUE,
+                isBotMessage = false,
+                isError = false
+            )
+        )
+    }
+    Log.d("optionTxtFieldState", "initialMessge: ${messageChat.value}")
+    if (optionTxtFieldState.value==0 && insertionSuccessToDB){
+        LaunchedEffect(key1 = true) {
+            scan_historyData.value= scanHistoryVM.getRecentScan()
+            val chatID= chatdbVm.getChatCounts() + 1
+            messageChat.value= messageChat.value.copy(
+                chatId = chatID,
+                timestamp = System.currentTimeMillis(),
+                message = textData.value
+            )
+        }
+        Log.d("optionTxtFieldState", "lastScan: ${scan_historyData.value}")
+        Log.d("optionTxtFieldState", "updatedMessge: ${messageChat.value}")
+    }
+    val isChecked = remember { mutableStateOf(true) }
     AnimatedVisibility(visible = optionTxtFieldState.value!=Int.MAX_VALUE) {
         Column(
             modifier = Modifier
@@ -952,10 +1023,35 @@ fun ScanResultActions(optionTxtFieldState: MutableState<Int>) {
                 label = "Enter the value",
                 onClose = { textData.value= "" }
             )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Checkbox(
+                    checked = isChecked.value,
+                    onCheckedChange = { isChecked.value = it },
+                    colors = CheckboxDefaults.colors(checkedColor = customBlue)
+                )
+                Text("Include Scan Report", modifier = Modifier.padding(start = 8.dp))
+            }
             Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = {
                     when(optionTxtFieldState.value){
+                        0 -> {
+                            chatVM.importChatWithAttachment(
+                                messageChat.value.copy(
+                                    message = textData.value
+                                )
+                            )
+                            navController.navigate(
+                                bottomNavItems.Chatbot.returnChatID(
+                                    chatID = messageChat.value.chatId,
+                                    chatMode = 2
+                                )
+                            )
+                            Log.d("optionTxtFieldState", "finalMSG: ${messageChat.value}")
+                        }
                         1 -> {
                             communityVModel.post(
                                 content = textData.value,
@@ -968,10 +1064,10 @@ fun ScanResultActions(optionTxtFieldState: MutableState<Int>) {
                                     )
                                 }
                             )
+                            textData.value= ""
+                            optionTxtFieldState.value = Int.MAX_VALUE
                         }
                     }
-                    textData.value= ""
-                    optionTxtFieldState.value = Int.MAX_VALUE
                           },
                 colors = ButtonDefaults.buttonColors(containerColor = customBlue, contentColor = Color.White),
                 modifier = Modifier.align(Alignment.End)

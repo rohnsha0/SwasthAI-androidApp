@@ -94,7 +94,7 @@ fun ChatBotScreen(
     sideStateVM: sideStateVM,
     currentUserDataVM: currentUserDataVM,
     chatVM: chatVM,
-    mode: Int //0 -> qna, 1 -> ai_symptoms_checker
+    mode: Int //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
 ) {
     Log.d("chatDB", chatID.toString())
     val scope= rememberCoroutineScope()
@@ -102,7 +102,7 @@ fun ChatBotScreen(
     currentUserDataVModel= currentUserDataVM
 
     val messageFieldState= remember {
-        mutableStateOf(mode==0)
+        mutableStateOf(mode==0 || mode==2)
     }
 
     val bomState= remember {
@@ -134,6 +134,28 @@ fun ChatBotScreen(
 
     val symptoms= remember {
         mutableListOf<symptomDC>()
+    }
+
+    val currentUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
+    val chatM= chatVM.messageWAttachment.collectAsState().value
+
+    if (mode==2){
+        LaunchedEffect(key1 = true) {
+            if (chatM.message != ""){
+                chatVM.chat(
+                    message = chatM.message,
+                    resetMessageFeild = {
+                        messageField.value = ""
+                        chatVM.resetChatWAttachment()
+                    },
+                    vmChat = chatdbVm,
+                    chatID = chatID,
+                    mode = mode,
+                    currentUserIndex = currentUser
+                )
+            }
+        }
+        Log.d("optionTxtFieldStateChat", chatM.toString())
     }
 
     LaunchedEffect(key1 = mode == 1) {
@@ -174,7 +196,7 @@ fun ChatBotScreen(
                 title = {
                     Text(
                         text = when(mode){
-                            0 -> "QnA"
+                            0, 2 -> "QnA"
                             1 -> "Symptom Checker"
                             else -> { "Undetected categorization of chat mode" }
                         },
@@ -211,7 +233,6 @@ fun ChatBotScreen(
             .then(sideBarModifier(sideStateVM = sideStateVM)),
         containerColor = BGMain
     ){ values ->
-        val currentUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
 
         if (bomStateDUser.value){
             ModalBottomSheet(

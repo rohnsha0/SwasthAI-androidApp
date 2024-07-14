@@ -246,6 +246,7 @@ fun mAIScreen(
                     title = when(it.mode){
                         0 -> "QnA"
                         1 -> "Symptom Checker"
+                        2 -> "Qna w/Attachment(s)"
                         else -> "Unknown"
                                          },
                     colorLogo = customBlue,

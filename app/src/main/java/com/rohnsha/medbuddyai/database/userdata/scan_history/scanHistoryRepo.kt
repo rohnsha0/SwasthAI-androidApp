@@ -10,4 +10,12 @@ class scanHistoryRepo(private val scanHistoryDAO: scanHistoryDAO) {
         scanHistoryDAO.addScanHistory(scanHistory)
     }
 
+    suspend fun getScanHistoryCount(): Int{
+        return scanHistoryDAO.getScanHistoryCounts()
+    }
+
+    suspend fun getRecentEntry(): scanHistory{
+        return scanHistoryDAO.getMostRecentEntry()
+    }
+
 }

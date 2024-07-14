@@ -260,6 +260,7 @@ fun bottomNavGraph(
         ){
             ScanResultScreen(
                 padding = padding,
+                chatVM = chatVM,
                 navController = navController,
                 viewModel = savePhotoViewModel,
                 scanHistoryViewModel = scanHistoryviewModel,
@@ -267,7 +268,9 @@ fun bottomNavGraph(
                 resultsLevel = it.arguments!!.getInt(scanResultKey),
                 indexClassification = it.arguments!!.getInt(scanResultIndex),
                 snackbarHostState = snackBarVM,
-                communityVM = communityVM, currentUserDataVM = currentUserVM
+                communityVM = communityVM,
+                currentUserDataVM = currentUserVM,
+                chatdbVm = chatdbVM
             )
         }
         composable(

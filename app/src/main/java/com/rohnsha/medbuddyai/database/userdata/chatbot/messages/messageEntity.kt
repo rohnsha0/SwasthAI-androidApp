@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.database.userdata.chatbot.messages
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -13,5 +14,7 @@ data class messageEntity(
     val isBotMessage: Boolean,
     val timestamp: Long,
     val isError: Boolean,
-    val chatId: Int
+    val chatId: Int,
+    @ColumnInfo(name = "hasAttachments", defaultValue = "0")
+    val hasAttachments: Int= 0 // contains timestamp as foreign key for retrieving scan_history data
 )

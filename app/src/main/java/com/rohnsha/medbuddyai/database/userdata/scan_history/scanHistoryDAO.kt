@@ -14,4 +14,10 @@ interface scanHistoryDAO {
 
     @Query("SELECT * FROM scan_history ORDER BY timestamp DESC")
     fun readScanHistory(): Flow<List<scanHistory>>
+
+    @Query("select count(*) from scan_history")
+    suspend fun getScanHistoryCounts(): Int
+
+    @Query("SELECT * FROM scan_history ORDER BY timestamp DESC LIMIT 1")
+    suspend fun getMostRecentEntry(): scanHistory
 }

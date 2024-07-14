@@ -24,6 +24,15 @@ class chatVM: ViewModel() {
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
 
+    private val _messageWithAttachment= MutableStateFlow(messageEntity(
+        message = "",
+        isBotMessage = false,
+        timestamp = System.currentTimeMillis(),
+        isError = false,
+        chatId = 0,
+    ))
+    val messageWAttachment= _messageWithAttachment.asStateFlow()
+
     private var retryCount = 0
 
     suspend fun endSymptomTest(mode: Int, chatID: Int){
@@ -108,6 +117,7 @@ class chatVM: ViewModel() {
         currentUserIndex: Int,
         chatID: Int,
         isRetrying: Boolean= false,
+        timeStampAttachment: Int = 0,
         mode: Int //0 -> qna, 1 -> ai_symptoms_checker
     ){
         if (!isRetrying){
@@ -116,7 +126,8 @@ class chatVM: ViewModel() {
                 isBotMessage =  false,
                 timestamp = System.currentTimeMillis(),
                 isError = false,
-                chatId = chatID
+                chatId = chatID,
+                hasAttachments = timeStampAttachment
             )
             vmChat.addMessages(messageBody)
             _listMessages.emit(
@@ -177,7 +188,8 @@ class chatVM: ViewModel() {
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
-                        chatId = chatID
+                        chatId = chatID,
+                        hasAttachments = timeStampAttachment
                     )
                     _listMessages.emit(errorData)
                     vmChat.addMessages(errorData)
@@ -191,7 +203,8 @@ class chatVM: ViewModel() {
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
-                        chatId = chatID
+                        chatId = chatID,
+                        hasAttachments = timeStampAttachment
                     )
                     _listMessages.emit(errorData)
                     vmChat.addMessages(errorData)
@@ -205,7 +218,8 @@ class chatVM: ViewModel() {
                         isBotMessage = true,
                         timestamp = System.currentTimeMillis(),
                         isError = true,
-                        chatId = chatID
+                        chatId = chatID,
+                        hasAttachments = timeStampAttachment
                     )
                     _listMessages.emit(errorData)
                     vmChat.addMessages(errorData)
@@ -219,13 +233,14 @@ class chatVM: ViewModel() {
                 isBotMessage = true,
                 timestamp = System.currentTimeMillis(),
                 isError = true,
-                chatId = chatID
+                chatId = chatID,
+                hasAttachments = timeStampAttachment
             )
             _listMessages.emit(retryMessage)
             vmChat.addMessages(retryMessage)
             delay(delayMillis)
             chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode,
-                isRetrying = true, currentUserIndex = currentUserIndex)
+                isRetrying = true, currentUserIndex = currentUserIndex, timeStampAttachment = timeStampAttachment)
         }
     }
 
@@ -236,4 +251,16 @@ class chatVM: ViewModel() {
         return delayMillis.coerceAtMost(30000L) // Cap the maximum delay to 30 seconds
     }
 
+    fun importChatWithAttachment(messageEntity: messageEntity){
+        _messageWithAttachment.value= messageEntity
+    }
+
+    fun resetChatWAttachment(){
+        _messageWithAttachment.value= _messageWithAttachment.value.copy(
+            message = "",
+            isBotMessage = false,
+            timestamp = System.currentTimeMillis(),
+            isError = false,
+        )
+    }
 }
