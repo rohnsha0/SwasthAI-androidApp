@@ -34,6 +34,10 @@ class scanHistoryViewModel(application: Application): AndroidViewModel(applicati
         return scanHistoryRepo.getRecentEntry()
     }
 
+    suspend fun getScanDataByTimestamp(timeStamp: Long): scanHistory {
+        return scanHistoryRepo.getScanDataByTimeStamp(timeStamp)
+    }
+
     suspend fun readScanHistory(){
         scanHistoryDAO.readScanHistory().collect {
             Log.d("dataDBA", it.toString())

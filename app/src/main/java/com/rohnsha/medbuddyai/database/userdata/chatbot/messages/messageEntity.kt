@@ -16,5 +16,5 @@ data class messageEntity(
     val isError: Boolean,
     val chatId: Int,
     @ColumnInfo(name = "hasAttachments", defaultValue = "0")
-    val hasAttachments: Int= 0 // contains timestamp as foreign key for retrieving scan_history data
+    val hasAttachments: Long= 0L // contains timestamp as foreign key for retrieving scan_history data
 )

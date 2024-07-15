@@ -8,6 +8,7 @@ import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +33,15 @@ class chatVM: ViewModel() {
         chatId = 0,
     ))
     val messageWAttachment= _messageWithAttachment.asStateFlow()
+    val _lastScanAsAttachment= MutableStateFlow(
+        scanHistory(
+            timestamp = 0L,
+            title = "",
+            domain = 0.toString(),
+            confidence = 0f,
+            userIndex = 0
+        )
+    )
 
     private var retryCount = 0
 
@@ -117,7 +127,7 @@ class chatVM: ViewModel() {
         currentUserIndex: Int,
         chatID: Int,
         isRetrying: Boolean= false,
-        timeStampAttachment: Int = 0,
+        timeStampAttachment: Long = 0L,
         mode: Int //0 -> qna, 1 -> ai_symptoms_checker
     ){
         if (!isRetrying){
@@ -152,6 +162,9 @@ class chatVM: ViewModel() {
             }
             1 -> {
                 "https://api-jjtysweprq-el.a.run.app/symptoms/$message"
+            }
+            2 ->{
+                "https://api-jjtysweprq-el.a.run.app/chat/I have been diagnosed with ${_lastScanAsAttachment.value.title} with ${_lastScanAsAttachment.value.confidence}% confidence. ${message}"
             }
             else -> {
                 "https://api-jjtysweprq-el.a.run.app/chat/$message"
@@ -251,7 +264,10 @@ class chatVM: ViewModel() {
         return delayMillis.coerceAtMost(30000L) // Cap the maximum delay to 30 seconds
     }
 
-    fun importChatWithAttachment(messageEntity: messageEntity){
+    fun importChatWithAttachment(
+        lastScanData: scanHistory,
+        messageEntity: messageEntity){
+        _lastScanAsAttachment.value= lastScanData
         _messageWithAttachment.value= messageEntity
     }
 

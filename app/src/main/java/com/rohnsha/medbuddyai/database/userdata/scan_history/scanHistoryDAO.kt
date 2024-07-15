@@ -20,4 +20,7 @@ interface scanHistoryDAO {
 
     @Query("SELECT * FROM scan_history ORDER BY timestamp DESC LIMIT 1")
     suspend fun getMostRecentEntry(): scanHistory
+
+    @Query("SELECT * FROM scan_history WHERE timestamp = :timeStamp")
+    suspend fun getScanDataByTimeStamp(timeStamp: Long): scanHistory
 }

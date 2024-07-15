@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.database.userdata
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.DeleteTable
 import androidx.room.Room
@@ -19,8 +20,11 @@ import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryDAO
 
 @Database(
     entities = [scanHistory::class, chatEntity::class, messageEntity::class, fieldValueDC::class],
-    version = 2,
-    exportSchema = true
+    version = 3,
+    exportSchema = true,
+    autoMigrations = [
+        AutoMigration(from = 2, to = 3)
+    ]
 )
 abstract class userDataDB: RoomDatabase() {
 

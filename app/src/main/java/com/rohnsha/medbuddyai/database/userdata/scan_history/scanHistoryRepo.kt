@@ -18,4 +18,8 @@ class scanHistoryRepo(private val scanHistoryDAO: scanHistoryDAO) {
         return scanHistoryDAO.getMostRecentEntry()
     }
 
+    suspend fun getScanDataByTimeStamp(timeStamp: Long): scanHistory {
+        return  scanHistoryDAO.getScanDataByTimeStamp(timeStamp = timeStamp)
+    }
+
 }

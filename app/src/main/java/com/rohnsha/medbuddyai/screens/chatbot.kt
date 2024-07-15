@@ -65,6 +65,8 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
+import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
@@ -94,6 +96,7 @@ fun ChatBotScreen(
     sideStateVM: sideStateVM,
     currentUserDataVM: currentUserDataVM,
     chatVM: chatVM,
+    scanHistoryViewModel: scanHistoryViewModel,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
 ) {
     Log.d("chatDB", chatID.toString())
@@ -119,6 +122,20 @@ fun ChatBotScreen(
     val messaageList= remember {
         mutableListOf<messageEntity>()
     }
+    val attachmentTimeStamp= remember {
+        mutableStateOf(0L)
+    }
+    val attachmentData= remember {
+        mutableStateOf(
+            scanHistory(
+                timestamp = 0L,
+                title = "",
+                domain = 0.toString(),
+                confidence = 0f,
+                userIndex = 0
+            )
+        )
+    }
     val collectingSymptoms= remember {
         mutableStateOf(true)
     }
@@ -137,21 +154,33 @@ fun ChatBotScreen(
     }
 
     val currentUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
-    val chatM= chatVM.messageWAttachment.collectAsState().value
+    val chatM= remember {
+        mutableStateOf(messageEntity(
+            message = "",
+            timestamp = System.currentTimeMillis(),
+            isBotMessage = false,
+            hasAttachments = 0L,
+            chatId = Int.MAX_VALUE,
+            isError = false
+        ))
+    }
+    chatM.value= chatVM.messageWAttachment.collectAsState().value
+
+    Log.d("chatM", chatM.toString())
 
     if (mode==2){
         LaunchedEffect(key1 = true) {
-            if (chatM.message != ""){
+            if (chatM.value.message != ""){
                 chatVM.chat(
-                    message = chatM.message,
+                    message = chatM.value.message,
                     resetMessageFeild = {
-                        messageField.value = ""
-                        chatVM.resetChatWAttachment()
+
                     },
                     vmChat = chatdbVm,
                     chatID = chatID,
                     mode = mode,
-                    currentUserIndex = currentUser
+                    currentUserIndex = currentUser,
+                    timeStampAttachment = chatM.value.timestamp
                 )
             }
         }
@@ -177,6 +206,16 @@ fun ChatBotScreen(
         }
     }
 
+    if (messaageList.isNotEmpty()){
+        attachmentTimeStamp.value= messaageList[0].hasAttachments
+    }
+
+    if (mode==2 && attachmentTimeStamp.value!=0L){
+        LaunchedEffect(key1 = true) {
+            attachmentData.value= scanHistoryViewModel.getScanDataByTimestamp(attachmentTimeStamp.value)
+        }
+    }
+
     Log.d("chatList", messaageList.toString())
     LaunchedEffect(key1 = chatbotViewModel.messageCount.collectAsState().value) {
         val count= chatbotViewModel.messageCount
@@ -196,8 +235,9 @@ fun ChatBotScreen(
                 title = {
                     Text(
                         text = when(mode){
-                            0, 2 -> "QnA"
+                            0 -> "QnA"
                             1 -> "Symptom Checker"
+                            2 -> "QnA w/Attachment(s)"
                             else -> { "Undetected categorization of chat mode" }
                         },
                         fontFamily = fontFamily,
@@ -211,7 +251,7 @@ fun ChatBotScreen(
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Menu Icon"
+                            contentDescription = "Back Icon"
                         )
                     }
                 },
@@ -243,6 +283,15 @@ fun ChatBotScreen(
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
                 }
+            }
+        }
+
+        val attachmentBOMState= remember {
+            mutableStateOf(false)
+        }
+        if (attachmentBOMState.value){
+            ModalBottomSheet(onDismissRequest = { attachmentBOMState.value= false }) {
+                Text(text = attachmentData.value.toString())
             }
         }
 
@@ -323,7 +372,13 @@ fun ChatBotScreen(
                 }
                 items(messaageList){
                     if (!it.isError){
-                        Messages(messageInfo = it)
+                        Messages(
+                            messageInfo = it,
+                            onClickListenerAttachment = {
+                                attachmentBOMState.value= true
+                            },
+                            timeStamp = attachmentTimeStamp.value
+                        )
                     } else{
                         Spacer(modifier = Modifier.height(6.dp))
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
@@ -452,7 +507,8 @@ fun ChatBotScreen(
                                         vmChat = chatdbVm,
                                         chatID = chatID,
                                         mode = mode,
-                                        currentUserIndex = currentUser
+                                        currentUserIndex = currentUser,
+                                        timeStampAttachment = attachmentTimeStamp.value
                                     )
                                     optionEnabled.value = false
                                 } else {
@@ -477,6 +533,8 @@ fun ChatBotScreen(
 @Composable
 fun Messages(
     messageInfo: messageEntity,
+    onClickListenerAttachment: (() -> Unit)? = null,
+    timeStamp: Long= 0L
 ) {
     if (messageInfo.message!=""){
         Row {
@@ -499,11 +557,11 @@ fun Messages(
                 contentAlignment = Alignment.CenterStart
             ){
                 Column {
-                    if (!messageInfo.isBotMessage){
+                    if (!messageInfo.isBotMessage && timeStamp!=0L){
                         Row(modifier = Modifier
                             .padding(start = 13.dp, end = 24.dp, bottom = 0.dp)
                             .clickable {
-
+                                onClickListenerAttachment?.let { it() }
                             }
                             .clip(shape = RoundedCornerShape(8.dp))
                             .background(BGMain)
@@ -744,3 +802,4 @@ fun BOMChangeDUser(
         item { Spacer(modifier = Modifier.height(28.dp)) }
     }
 }
+

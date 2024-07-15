@@ -994,7 +994,7 @@ fun ScanResultActions(
             val chatID= chatdbVm.getChatCounts() + 1
             messageChat.value= messageChat.value.copy(
                 chatId = chatID,
-                timestamp = System.currentTimeMillis(),
+                timestamp = scan_historyData.value.timestamp,
                 message = textData.value
             )
         }
@@ -1040,9 +1040,10 @@ fun ScanResultActions(
                     when(optionTxtFieldState.value){
                         0 -> {
                             chatVM.importChatWithAttachment(
-                                messageChat.value.copy(
+                                messageEntity = messageChat.value.copy(
                                     message = textData.value
-                                )
+                                ),
+                                lastScanData = scan_historyData.value
                             )
                             navController.navigate(
                                 bottomNavItems.Chatbot.returnChatID(
