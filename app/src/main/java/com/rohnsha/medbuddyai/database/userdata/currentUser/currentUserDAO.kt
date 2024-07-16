@@ -16,4 +16,7 @@ interface currentUserDAO {
 
     @Query("SELECT * FROM currentUserTable")
     suspend fun getAllUsers(): List<fieldValueDC>
+
+    @Query("select * from currentUserTable where `index` like :userIndex")
+    suspend fun getuserInformaton(userIndex: Int): fieldValueDC
 }

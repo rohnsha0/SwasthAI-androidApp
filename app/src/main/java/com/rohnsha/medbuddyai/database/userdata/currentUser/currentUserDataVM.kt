@@ -34,6 +34,10 @@ class currentUserDataVM(application: Application): AndroidViewModel(application)
         return repo.getAllUsers()
     }
 
+    suspend fun getUserInfo(userIndex: Int): fieldValueDC{
+        return repo.getUserInfo(userIndex)
+    }
+
     fun switchDefafultUser(index: Int){
         _defaultUserIndex.value= index
     }

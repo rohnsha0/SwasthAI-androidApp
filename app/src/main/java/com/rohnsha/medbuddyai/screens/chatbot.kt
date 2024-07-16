@@ -69,6 +69,7 @@ import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
+import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
@@ -97,6 +98,7 @@ fun ChatBotScreen(
     currentUserDataVM: currentUserDataVM,
     chatVM: chatVM,
     scanHistoryViewModel: scanHistoryViewModel,
+    communityVM: communityVM,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
 ) {
     Log.d("chatDB", chatID.toString())
@@ -136,6 +138,20 @@ fun ChatBotScreen(
             )
         )
     }
+    val attachmentTimelineFormatted= remember {
+        mutableStateOf("")
+    }
+    val chatUserInfo= remember {
+        mutableStateOf(
+            fieldValueDC(
+                fname = "",
+                lname = "",
+                username = "",
+                index = Int.MAX_VALUE,
+                isDefaultUser = false
+            )
+        )
+    }
     val collectingSymptoms= remember {
         mutableStateOf(true)
     }
@@ -170,11 +186,11 @@ fun ChatBotScreen(
 
     if (mode==2){
         LaunchedEffect(key1 = true) {
-            if (chatM.value.message != ""){
+            if (chatM.value.message != "" && messaageList.size==0 ){
                 chatVM.chat(
                     message = chatM.value.message,
                     resetMessageFeild = {
-
+                        chatVM.resetChatWAttachment()
                     },
                     vmChat = chatdbVm,
                     chatID = chatID,
@@ -213,6 +229,8 @@ fun ChatBotScreen(
     if (mode==2 && attachmentTimeStamp.value!=0L){
         LaunchedEffect(key1 = true) {
             attachmentData.value= scanHistoryViewModel.getScanDataByTimestamp(attachmentTimeStamp.value)
+            chatUserInfo.value= currentUserDataVM.getUserInfo(attachmentData.value.userIndex)
+            attachmentTimelineFormatted.value= communityVM.calculateTimeDifference(attachmentData.value.timestamp)
         }
     }
 
@@ -291,7 +309,11 @@ fun ChatBotScreen(
         }
         if (attachmentBOMState.value){
             ModalBottomSheet(onDismissRequest = { attachmentBOMState.value= false }) {
-                Text(text = attachmentData.value.toString())
+                attachmentBOM(
+                    scanHistory = attachmentData.value,
+                    chatUserInfo = chatUserInfo.value,
+                    timeFormatted = attachmentTimelineFormatted.value
+                )
             }
         }
 
@@ -803,3 +825,62 @@ fun BOMChangeDUser(
     }
 }
 
+@Composable
+fun attachmentBOM(
+    scanHistory: scanHistory,
+    timeFormatted: String,
+    chatUserInfo: fieldValueDC
+) {
+    Text(
+        text = "Attached Info(s)",
+        fontSize = 18.sp,
+        fontWeight = FontWeight(600),
+        fontFamily = fontFamily,
+        modifier = Modifier
+            .padding(start = 30.dp)
+    )
+    Spacer(modifier = Modifier.height(24.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        ColHeadSubHeead(title = "Disease Name", data = scanHistory.title)
+        ColHeadSubHeead(title = "Confidence", data = "${String.format("%.2f", scanHistory.confidence)}%")
+    }
+    Spacer(modifier = Modifier.height(12.dp))
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+
+    ) {
+        ColHeadSubHeead(title = "Scan Date", data = timeFormatted)
+        ColHeadSubHeead(title = "Patient Name", data = "${chatUserInfo.fname} ${chatUserInfo.lname}")
+    }
+    Spacer(modifier = Modifier.height(28.dp))
+}
+
+@Composable
+fun ColHeadSubHeead(
+    title: String,
+    data: String
+) {
+    Column {
+        Text(
+            text = title,
+            fontFamily = fontFamily,
+            fontSize = 14.sp,
+            color = Color(0xFFB5BBC9),
+            fontWeight = FontWeight(600)
+        )
+        Text(
+            text = data,
+            fontFamily = fontFamily,
+            fontSize = 18.sp,
+            color = Color.Black
+        )
+    }
+}

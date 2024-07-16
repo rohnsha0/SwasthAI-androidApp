@@ -237,6 +237,7 @@ fun bottomNavGraph(
             ChatBotScreen(
                 paddingValues = padding,
                 snackBarVM,
+                communityVM = communityVM,
                 scanHistoryViewModel = scanHistoryviewModel,
                 chatdbVm = chatdbVM,
                 chatID = it.arguments!!.getInt(chatID),

@@ -45,8 +45,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.BrowseGallery
 import androidx.compose.material.icons.outlined.CenterFocusWeak
-import androidx.compose.material.icons.outlined.Collections
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.FlashAuto
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
@@ -600,16 +600,12 @@ fun ScanMainScreen(
                         }
                     }
                 }
-                Image(
-                    imageVector = Icons.Outlined.Collections,
-                    contentDescription = "Import from Gallery icon",
-                    modifier = Modifier
-                        .size(24.dp)
-                        .padding(2.dp)
-                        .clickable {
-                            getImageFromGallery.launch("image/*")
-                        }
-                )
+                IconButton(onClick = { getImageFromGallery.launch("image/*") }) {
+                    Icon(
+                        imageVector = Icons.Outlined.BrowseGallery,
+                        contentDescription = "import from gallery"
+                    )
+                }
             } else {
                 Spacer(modifier = Modifier.width(24.dp))
             }

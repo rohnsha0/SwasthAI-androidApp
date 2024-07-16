@@ -14,4 +14,8 @@ class currentUserRepo(private val currentUser: currentUserDAO) {
         return currentUser.getAllUsers()
     }
 
+    suspend fun getUserInfo(userIndex: Int): fieldValueDC{
+        return  currentUser.getuserInformaton(userIndex)
+    }
+
 }

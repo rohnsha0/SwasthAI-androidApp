@@ -18,8 +18,8 @@ android {
         applicationId = "com.rohnsha.medbuddyai"
         minSdk = 26
         targetSdk = 34
-        versionCode = 20
-        versionName = "2024.06.01.36"
+        versionCode = 21
+        versionName = "2024.07.01.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
