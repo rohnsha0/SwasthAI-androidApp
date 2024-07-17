@@ -77,6 +77,10 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
         return doctorRepo.queryDoctor(speciality = speciality)
     }
 
+    suspend fun getUniqueDeptList(): List<String> {
+        return doctorRepo.getUniqueDept()
+    }
+
     suspend fun readSymptoms(): List<symptomDC>{
         return withContext(viewModelScope.coroutineContext){
             symptomRepo.readSymptoms()

@@ -1,38 +1,63 @@
 package com.rohnsha.medbuddyai.screens.scan
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.outlined.ArrowDropDown
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.doctors.doctor
+import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
+import com.rohnsha.medbuddyai.screens.OptionsFilter
 import com.rohnsha.medbuddyai.ui.theme.BGMain
+import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customGrey
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
@@ -44,17 +69,48 @@ fun DoctorScreen(
     diseaseDBviewModel: diseaseDBviewModel,
     domain: Int
 ) {
-    val dept= when(domain){
-        8, 9 -> "Dermatologist"
-        else -> "General Physician"
+    Log.d("selectedDep", "domain: $domain")
+    val dept= remember {
+        mutableStateOf(
+            returnSpeciality(domain = domain)
+        )
     }
+    val lockedDept= returnSpeciality(domain = domain)
+
+    Log.d("selectedDep", "dept: $dept")
+    Log.d("selectedDep", "lockedDept: $lockedDept")
+
     val doctorList= remember {
         mutableStateListOf<doctor>()
     }
 
-    LaunchedEffect(key1 = true) {
-        val data= diseaseDBviewModel.queryDoctors(speciality = dept)
+    val isSelected= remember {
+        mutableStateOf(false)
+    }
+    isSelected.value= dept.value!=lockedDept
+    val uniqueDept= remember {
+        mutableStateListOf<rbStructure>()
+    }
+
+    LaunchedEffect(key1 = dept.value) {
+        doctorList.clear()
+        val data= diseaseDBviewModel.queryDoctors(speciality = dept.value)
         data.forEach { doctorList.add(it) }
+    }
+
+    Log.d("selectedDep", "Dep: $dept")
+
+    LaunchedEffect(key1 = true) {
+        val uniqueDeptData= diseaseDBviewModel.getUniqueDeptList()
+        Log.d("selectedDep", "uniqueDeptData: $uniqueDeptData")
+        uniqueDeptData.forEachIndexed { _, s ->
+            uniqueDept.add(
+                rbStructure(
+                    isChecked = dept.value==s,
+                    title = s
+                )
+            )
+        }
     }
 
     Scaffold(
@@ -72,16 +128,9 @@ fun DoctorScreen(
                     containerColor = BGMain
                 ),
                 actions = {
-                    Image(
-                        imageVector = Icons.Outlined.BlurOn,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(end = 16.dp)
-                            .size(24.dp)
-                            .clickable {
-
-                            }
-                    )
+                    IconButton(onClick = { /*TODO*/ }) {
+                        Icon(imageVector = Icons.Outlined.LocationOn, contentDescription = "location button")
+                    }
                 },
                 navigationIcon = {
                     Image(
@@ -102,6 +151,27 @@ fun DoctorScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ){ value ->
+
+        val bomState = remember {
+            mutableStateOf(false)
+        }
+        val selectedDomain= remember {
+            mutableIntStateOf(Int.MAX_VALUE)
+        }
+
+        if (bomState.value){
+            ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
+                BOMDoctorFilter(
+                    items = uniqueDept,
+                    selectedDept = dept.value,
+                    onItemSelected = {
+                        dept.value= it
+                        bomState.value= false
+                    }
+                )
+            }
+        }
+
         LazyColumn(
             modifier = Modifier
                 .padding(value)
@@ -110,12 +180,44 @@ fun DoctorScreen(
                 .fillMaxSize()
                 .background(color = Color.White, shape = RoundedCornerShape(20.dp))
         ){
-            item { Spacer(modifier = Modifier.height(24.dp)) }
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                LazyRow(
+                    modifier = Modifier
+                        .padding(start = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    item {
+                        if (isSelected.value){
+                            Text(
+                                text = "Clear all",
+                                fontFamily = fontFamily,
+                                fontSize = 14.sp,
+                                color = customBlue,
+                                fontWeight = FontWeight(600),
+                                modifier = Modifier.clickable {
+                                    dept.value= returnSpeciality(domain)
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        OptionsFilter(
+                            text = "Department",
+                            imageVector = Icons.Outlined.ArrowDropDown,
+                            onClickListener = {
+                                bomState.value= true
+                            },
+                            state = isSelected.value
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
             items(doctorList){
                 DataListFull(
                     imageVector = Icons.Outlined.Link,
                     title = it.name,
-                    subtitle = it.experience,
+                    subtitle = "${extractYears(it.experience)}+ years",
                     additionalDataColor = lightTextAccent,
                     colorLogo = Color.White,
                     data = it.pricing,
@@ -126,4 +228,130 @@ fun DoctorScreen(
         }
     }
 
+}
+
+fun extractYears(input: String): Int? {
+    val regex = Regex("""(\d+)\s+years""")
+    val matchResult = regex.find(input)
+    return matchResult?.groups?.get(1)?.value?.toInt()
+}
+
+@Composable
+fun BOMDoctorFilter(
+    items: List<rbStructure>,
+    selectedDept: String,
+    onItemSelected: (String) -> Unit
+) {
+
+    val selectedDep= remember {
+        mutableStateOf(selectedDept)
+    }
+
+    Log.d("selectedDep", "selectedDep: $selectedDep")
+
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 30.dp)
+    ) {
+        item {
+            Row(
+                Modifier.padding(bottom = 16.dp)
+            ) {
+                Text(
+                    text = "Choose disease category",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    text = "Done",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600),
+                    fontFamily = fontFamily,
+                    color = customBlue,
+                    modifier = Modifier.clickable { onItemSelected(selectedDep.value) }
+                )
+            }
+        }
+        item {
+            Text(
+                text = "Clear all",
+                fontSize = 14.sp,
+                fontWeight = FontWeight(600),
+                fontFamily = fontFamily,
+                color = customBlue,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(ViewDash)
+                    .clickable { }
+                    .padding(vertical = 3.dp, horizontal = 14.dp)
+            )
+        }
+        items(items){ data ->
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 12.dp)
+                    .pointerInput(key1 = true) {
+                        detectTapGestures {
+                            selectedDep.value = data.title
+                        }
+                    },
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    imageVector = Icons.Outlined.MedicalInformation,
+                    contentDescription = "options pre",
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(ViewDash, RoundedCornerShape(16.dp))
+                        .padding(10.dp)
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(
+                    text = if (data.title!="") data.title else "Unspecified",
+                    fontFamily = fontFamily,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                val checkStat= selectedDep.value==data.title
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .then(
+                            if (!checkStat) Modifier.border(
+                                width = 1.dp,
+                                color = Color(0xFFD4D4D4),
+                                shape = CircleShape
+                            ) else Modifier
+                        )
+                ){
+                    if (checkStat){
+                        Image(
+                            imageVector = Icons.Outlined.Check,
+                            contentDescription = "options",
+                            modifier = Modifier
+                                .background(customBlue, CircleShape)
+                                .padding(3.dp),
+                            colorFilter = ColorFilter.tint(color = Color.White)
+                        )
+                    }
+                }
+            }
+        }
+        item {
+            Spacer(modifier = Modifier.height(20.dp))
+        }
+    }
+
+}
+
+private fun returnSpeciality(domain: Int): String {
+    return when(domain){
+        8, 9 -> "Dermatologist"
+        else -> "General Physician"
+    }
 }

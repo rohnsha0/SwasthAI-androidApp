@@ -29,6 +29,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AltRoute
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.BlurOff
@@ -39,15 +40,13 @@ import androidx.compose.material.icons.outlined.ConnectWithoutContact
 import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.QuestionAnswer
-import androidx.compose.material.icons.outlined.SwitchAccessShortcut
 import androidx.compose.material.icons.outlined.VolunteerActivism
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -184,6 +183,7 @@ fun ScanResultScreen(
         }
     }
 
+    Log.d("selectedDep", indexClassification.toString())
     modalState = rememberSaveable {
         mutableStateOf(false)
     }
@@ -868,19 +868,32 @@ fun OptionScanResults(
         OptionsScanResultUNI(
             title = "Doctors",
             icon = Icons.Outlined.VolunteerActivism,
-            onClickListener = { navController.navigate(bottomNavItems.DoctorScreen.returnDomainID(indexClassification)) }
+            onClickListener = {
+                navController.navigate(
+                    bottomNavItems.DoctorScreen.returnDomainID(
+                        disease_results.value.domain.toInt()
+                    )) }
         )
         OptionsScanResultUNI(
             title = when(mode){
-                0 -> { "Domains" }
-                1 -> { "Recheck" }
+                0 -> { "Verify" }
+                1 -> { "Scan" }
                 else -> { "" }
             },
             icon = when(mode){
-                0 -> { Icons.Outlined.SwitchAccessShortcut }
+                0 -> { Icons.Outlined.AltRoute }
                 else -> { Icons.Outlined.Camera }
             },
-            onClickListener = { modalState.value= true }
+            onClickListener = {
+                when(mode){
+                    0 -> {
+                        modalState.value= true
+                    }
+                    1 -> {
+                        navController.navigate(bottomNavItems.Scan.returnScanIndex(disease_results.value.domain.toInt()))
+                    }
+                }
+            }
         )
     }
 }
@@ -1001,7 +1014,6 @@ fun ScanResultActions(
         Log.d("optionTxtFieldState", "lastScan: ${scan_historyData.value}")
         Log.d("optionTxtFieldState", "updatedMessge: ${messageChat.value}")
     }
-    val isChecked = remember { mutableStateOf(true) }
     AnimatedVisibility(visible = optionTxtFieldState.value!=Int.MAX_VALUE) {
         Column(
             modifier = Modifier
@@ -1023,17 +1035,22 @@ fun ScanResultActions(
                 label = "Enter the value",
                 onClose = { textData.value= "" }
             )
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Checkbox(
-                    checked = isChecked.value,
-                    onCheckedChange = { isChecked.value = it },
-                    colors = CheckboxDefaults.colors(checkedColor = customBlue)
-                )
-                Text("Include Scan Report", modifier = Modifier.padding(start = 8.dp))
-            }
+            Text(
+                text = when (optionTxtFieldState.value){
+                    0 -> {
+                        "Report is attached to chat for reference"
+                    }
+                    1 ->{
+                        "Report is not attached to posts for user privacy"
+                    }
+                    else -> {
+                        ""
+                    }
+                },
+                color = lightTextAccent,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
             Spacer(modifier = Modifier.height(12.dp))
             Button(
                 onClick = {

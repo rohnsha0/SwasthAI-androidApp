@@ -10,4 +10,8 @@ class doctorsRepo(private val doctorsDAO: doctorsDAO) {
         return doctorsDAO.queryDoctor(speciality)
     }
 
+    suspend fun getUniqueDept(): List<String>{
+        return doctorsDAO.getUniqueDept()
+    }
+
 }
