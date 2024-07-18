@@ -517,9 +517,9 @@ fun ChatBotScreen(
                         .clip(CircleShape)
                         .clickable {
                             scope.launch {
-                                if (messageField.value != "") {
+                                if (messageField.value != "" && !messageField.value.matches(Regex("^\\s+$"))) {
                                     chatbotViewModel.chat(
-                                        messageField.value,
+                                        message = messageField.value.trim(),
                                         resetMessageFeild = {
                                             if (mode == 1) {
                                                 detectedSymptom.clear()
