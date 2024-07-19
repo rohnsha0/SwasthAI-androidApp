@@ -33,9 +33,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -46,6 +48,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
+import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithReply
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
@@ -56,6 +60,7 @@ import com.rohnsha.medbuddyai.ui.theme.customGreen
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +68,8 @@ fun CommunityScreen(
     padding: PaddingValues,
     navController: NavHostController,
     snackBarViewModel: snackBarToggleVM,
-    communityViewModel: communityVM
+    communityViewModel: communityVM,
+    communityDBVM: communityDBVM
 ) {
     Scaffold(
         topBar = {
@@ -85,13 +91,33 @@ fun CommunityScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
-        communityViewModel.getFeed()
-        val postData= communityViewModel.feedContents.collectAsState().value
-        val replyData= communityViewModel.replyContents.collectAsState().value
-        Log.d("dataSnapCOmmPost", postData.toString())
-        Log.d("dataSnapCOmmReply", replyData.toString())
-        val postsWithReplies = communityViewModel.mergePostReplies()
+        val postsWithReplies = remember {
+            mutableStateListOf<postWithReply>()
+        }
+
+        val feed= remember {
+            mutableStateListOf<postWithReply>()
+        }
+
+        LaunchedEffect(key1 = postsWithReplies) {
+            communityDBVM.mergePostReplies()
+            for (data in communityDBVM.feed.value){
+                feed.add(data)
+            }
+        }
+
+        LaunchedEffect(key1 = postsWithReplies) {
+            for (data in communityDBVM.mergePostReplies()){
+                if (!postsWithReplies.contains(data)){
+                    postsWithReplies.add(data)
+                }
+            }
+            postsWithReplies.sortByDescending { it.post.timestamp }
+        }
+
         Log.d("dataSnapCOmmPostReply", postsWithReplies.toString())
+        Log.d("dataSnapCOmmPostReply", feed.toString())
+        Log.d("dataSnapCOmmPostReply", feed.size.toString())
 
         val isCreateExpanded= remember {
             mutableStateOf(false)
@@ -102,6 +128,7 @@ fun CommunityScreen(
         val content= remember {
             mutableStateOf("")
         }
+        val scope= rememberCoroutineScope()
         LazyColumn(
             modifier = Modifier
                 .padding(values)
@@ -137,6 +164,15 @@ fun CommunityScreen(
                                             isCreateExpanded.value= false
                                             title.value= ""
                                             content.value= ""
+                                            scope.launch {
+                                                postsWithReplies.add(
+                                                    postWithReply(
+                                                        post = it,
+                                                        replies = emptyList()
+                                                    )
+                                                )
+                                                postsWithReplies.sortByDescending { it.post.timestamp }
+                                            }
                                             snackBarViewModel.SendToast(
                                                 message = "Post was uploaded successfully",
                                                 indicator_color = customGreen,
@@ -155,7 +191,7 @@ fun CommunityScreen(
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     explore_tabs(
-                        title = if (isCreateExpanded.value) "Close" else "From Records",
+                        title = if (isCreateExpanded.value) "Close" else "Activity",
                         icon = if (isCreateExpanded.value) Icons.Outlined.CloseFullscreen else Icons.Outlined.FeaturedPlayList,
                         weight = 1f,
                         onClickListener = {
@@ -190,7 +226,7 @@ fun CommunityScreen(
                         .padding(bottom = 6.dp, top = 18.dp)
                 )
             }
-            if (postData.isNotEmpty()){
+            if (postsWithReplies.isNotEmpty()){
                 items(postsWithReplies){ it ->
                     val data= it.post
                     CommunityPostItem(
@@ -205,10 +241,10 @@ fun CommunityScreen(
                         colorLogo = customBlue,
                         postData = data.content?: "Unknown",
                         onClickListener = {
-                            it.post.id?.let { it1 -> Log.d("repliesID", it1) }
+                            it.post.id.let { it1 -> Log.d("repliesID", it1) }
                             navController.navigate(
                                 bottomNavItems.CommunityReply.returnPostID(
-                            it.post.id!!
+                                    data.id
                         )) }
                     )
                 }

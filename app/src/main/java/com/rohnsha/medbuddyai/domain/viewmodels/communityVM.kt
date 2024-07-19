@@ -7,9 +7,10 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.getValue
-import com.rohnsha.medbuddyai.domain.dataclass.Post
-import com.rohnsha.medbuddyai.domain.dataclass.Reply
-import com.rohnsha.medbuddyai.domain.dataclass.postWithReply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.Post
+import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
+import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithReply
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -25,6 +26,7 @@ class communityVM: ViewModel() {
     private lateinit var _auth: FirebaseAuth
     private lateinit var _firestoreRef: DatabaseReference
     private lateinit var _username: String
+    private lateinit var _communityDBVM: communityDBVM
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
     private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
     private val _postCount= MutableStateFlow(0L)
@@ -32,11 +34,17 @@ class communityVM: ViewModel() {
     val feedContents= _postFeed.asStateFlow()
     val replyContents= _replyFeed.asStateFlow()
 
-    fun initialize(instance: FirebaseAuth, dbReference: DatabaseReference, username: String){
+    fun initialize(
+        instance: FirebaseAuth,
+        dbReference: DatabaseReference,
+        username: String,
+        communityDBVModel: communityDBVM
+    ){
         _auth= instance
         _firestoreRef= dbReference
         Log.d("loginStatus", _auth.currentUser?.uid ?: "nullified")
         _username= username
+        _communityDBVM= communityDBVModel
     }
 
     fun addReply(
@@ -67,6 +75,9 @@ class communityVM: ViewModel() {
                             .setValue(reply)
                             .addOnCompleteListener { task ->
                                 if (task.isSuccessful) {
+                                    viewModelScope.launch {
+                                        _communityDBVM.addReplies(listOf(reply))
+                                    }
                                     onCompleteLambda(reply)
                                     Log.d("authUserAction", "Reply successful")
                                 } else {
@@ -80,17 +91,13 @@ class communityVM: ViewModel() {
 
     fun post(
         content: String,
-        onCompleteLambda: () -> Unit
+        onCompleteLambda: (Post) -> Unit
     ){
         viewModelScope.launch {
             Log.d("authUserAction", "post invoked")
             if (_auth.currentUser!=null){
                 Log.d("authUsername", _username)
-                    _firestoreRef.child("posts").child(_username).get()
-                    .addOnSuccessListener {
-                        _postCount.value= it.childrenCount+1L
-                        Log.d("postCountInner", _postCount.value.toString())
-                    }
+                _postCount.value= _communityDBVM.getPostCountByUsername(_username) +1L
                 Log.d("postCount", _postCount.value.toString())
                 val postID= "${_username}: ${_postCount.value}"
                 val newPost= Post(
@@ -104,7 +111,10 @@ class communityVM: ViewModel() {
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("authUserAction", "Post successful")
-                            onCompleteLambda()
+                            viewModelScope.launch {
+                                _communityDBVM.addPosts(listOf(newPost))
+                            }
+                            onCompleteLambda(newPost)
                         } else {
                             Log.e("authUserAction", "Post unsuccessful", task.exception)
                         }
@@ -158,6 +168,12 @@ class communityVM: ViewModel() {
                         }
                         _postFeed.value=posts
                         _replyFeed.value= replies
+                        viewModelScope.launch {
+                            _communityDBVM.clearPosts()
+                            _communityDBVM.clearReplies()
+                            _communityDBVM.addPosts(_postFeed.value)
+                            _communityDBVM.addReplies(_replyFeed.value)
+                        }
                         Log.d("dataSnapReplyPosts", "posts: ${_postFeed.value}\nreplies: ${_replyFeed.value}")
                     }
             }

@@ -22,6 +22,7 @@ import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
+import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
@@ -64,6 +65,7 @@ fun bottomNavGraph(
     val userAuth= viewModel<userAuthVM>()
     val currentUserVM= viewModel<currentUserDataVM>()
     val questionVM= viewModel<questionVM>()
+    val communityDBVModel= viewModel<communityDBVM>()
     val _auth= FirebaseAuth.getInstance()
     val chatVM= viewModel<chatVM>()
 
@@ -84,7 +86,7 @@ fun bottomNavGraph(
 
     val dbRef= Firebase.database.reference
     userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM)
-    communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value)
+    communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value, communityDBVModel = communityDBVModel)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
     val chatdbVM= viewModel<chatDB_VM>()
@@ -96,9 +98,11 @@ fun bottomNavGraph(
 
     Log.d("dbStatus", "state: ${diseaseDBviewModel.updatingDiseaseDB.collectAsState().value}")
     LaunchedEffect(key1 = true){
+        communityVM.getFeed()
         Log.d("dbStatus", "Starting VM")
         delay(750L)
         diseaseDBviewModel.fetchUpdatedDB(versionName = packageInfo.versionName, context = context)
+        communityDBVModel.mergePostReplies()
         Log.d("dbStatus", "Ending VM")
     }
 
@@ -120,7 +124,8 @@ fun bottomNavGraph(
                 padding = padding,
                 navController = navController,
                 snackBarViewModel = snackBarVM,
-                communityViewModel = communityVM
+                communityViewModel = communityVM,
+                communityDBVM = communityDBVModel
             )
         }
         composable(route = bottomNavItems.CommunityReply.route,
@@ -130,7 +135,7 @@ fun bottomNavGraph(
                     }
                 )
             ){
-            CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM)
+            CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel)
         }
         composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding)

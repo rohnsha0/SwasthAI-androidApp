@@ -33,7 +33,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,7 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.rohnsha.medbuddyai.domain.dataclass.Reply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -58,20 +61,32 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communityVM, snackBarToggleVM:snackBarToggleVM) {
-
-    val replyData= communityVM.replyContents.collectAsState().value
+fun CommunityReply(
+    padding: PaddingValues,
+    postID: String,
+    communityVM: communityVM,
+    snackBarToggleVM:snackBarToggleVM,
+    communityDBVM: communityDBVM
+) {
+    val replyData= remember {
+        mutableStateListOf<Reply>()
+    }
+    val replie= communityDBVM.replyFeed.collectAsState().value
+    LaunchedEffect(key1 = true) {
+        for(reply in communityDBVM.filterReplies(postID = postID)){
+            replyData.add(reply)
+            Log.d("repliesa", "replyDataTxt: $reply")
+        }
+    }
     Log.d("replies", replyData.toString())
     val replies = remember {
-        replyData.filter { it.id?.substringBeforeLast(": ") == postID } as MutableList<Reply>
+        mutableStateListOf<Reply>()
+        //replyData.filter { it.id.substringBeforeLast(":").trim() == postID } as MutableList<Reply>
     }
     Log.d("replies", "replyData: ${replyData}\nreplies: $replies")
     val messageField= remember {
         mutableStateOf("")
     }
-    val postDetails= communityVM.feedContents.collectAsState().value.filter {
-        it.id == postID
-    }[0]
     val scope= rememberCoroutineScope()
     Scaffold(
         topBar = {
@@ -117,22 +132,25 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                     .background(color = Color.White, shape = RoundedCornerShape(8.dp))
                     .padding(top = 30.dp)
             ){
-                item {
-                    Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
-                        Text(
-                            text = "Viewing replies to ${postDetails.author}'s post",
-                            color = lightTextAccent,
-                            fontFamily = fontFamily,
-                            fontSize = 13.sp,
-                        )
+                if (replies.isNotEmpty()){
+                    //val postDetails= communityDBVM.getPostDetails(postID)
+                    item {
+                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center){
+                            Text(
+                                text = "Viewing replies to ",//${postDetails.author}'s post",
+                                color = lightTextAccent,
+                                fontFamily = fontFamily,
+                                fontSize = 13.sp,
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
                 }
-                items(replies){
+                items(replyData){
                     Box(modifier = Modifier.padding(horizontal = 20.dp)){
                         CommunityPostItem(
-                            title = it.author.toString(),
-                            subtitle = "${it.id}",
+                            title = it.author,
+                            subtitle = it.id,
                             data = "",
                             colorLogo = customBlue,
                             postData = it.content.toString(),
@@ -180,9 +198,9 @@ fun CommunityReply(padding: PaddingValues, postID: String, communityVM: communit
                                         replyContent = messageField.value,
                                         postID = postID,
                                         onCompleteLambda = {
-                                            val reply= it
+                                            val reply = it
                                             messageField.value = ""
-                                            replies.add(reply)
+                                            replyData.add(reply)
                                             snackBarToggleVM.SendToast(
                                                 message = "Reply was uploaded successfully",
                                                 indicator_color = customGreen,

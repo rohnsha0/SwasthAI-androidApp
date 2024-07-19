@@ -13,17 +13,24 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageDAO
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.database.userdata.communityTable.Post
+import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDAO
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDAO
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryDAO
 
 @Database(
-    entities = [scanHistory::class, chatEntity::class, messageEntity::class, fieldValueDC::class],
-    version = 3,
+    entities = [
+        scanHistory::class, chatEntity::class, messageEntity::class,
+        fieldValueDC::class, Post::class, Reply::class
+               ],
+    version = 4,
     exportSchema = true,
     autoMigrations = [
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4)
     ]
 )
 abstract class userDataDB: RoomDatabase() {
@@ -32,6 +39,7 @@ abstract class userDataDB: RoomDatabase() {
     abstract fun chatDA0(): chatDAO
     abstract fun messageDAO(): messageDAO
     abstract fun currentUserDAO(): currentUserDAO
+    abstract fun communityDAO(): communityDAO
 
     companion object{
         @Volatile
