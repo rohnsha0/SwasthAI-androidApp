@@ -18,19 +18,22 @@ import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
 import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDAO
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDAO
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDAO
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryDAO
 
 @Database(
     entities = [
         scanHistory::class, chatEntity::class, messageEntity::class,
-        fieldValueDC::class, Post::class, Reply::class
+        fieldValueDC::class, Post::class, Reply::class, keyDC::class
                ],
-    version = 4,
+    version = 5,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4)
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5)
     ]
 )
 abstract class userDataDB: RoomDatabase() {
@@ -40,6 +43,7 @@ abstract class userDataDB: RoomDatabase() {
     abstract fun messageDAO(): messageDAO
     abstract fun currentUserDAO(): currentUserDAO
     abstract fun communityDAO(): communityDAO
+    abstract fun keyDAO(): keyDAO
 
     companion object{
         @Volatile

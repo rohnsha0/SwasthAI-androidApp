@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.domain.dataclass.modelMarketPlace
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
@@ -68,7 +69,8 @@ fun ScanCategoryScreen(
     photoCaptureViewModel: photoCaptureViewModel,
     snackBarViewModel: snackBarToggleVM,
     sideStateVM: sideStateVM,
-    currentUserDataVM: currentUserDataVM
+    currentUserDataVM: currentUserDataVM,
+    keyVM: keyVM
     ) {
 
     val bomStateDUser= remember {
@@ -177,7 +179,7 @@ fun ScanCategoryScreen(
                 onDismissRequest = { bomStateDUser.value = false },
                 containerColor = Color.White
             ) {
-                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM) {
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
                 }

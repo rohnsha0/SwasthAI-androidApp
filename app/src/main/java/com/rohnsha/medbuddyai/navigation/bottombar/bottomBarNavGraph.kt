@@ -24,6 +24,7 @@ import com.rohnsha.medbuddyai.database.appData.disease_questions.questionVM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.chatVM
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
@@ -64,6 +65,7 @@ fun bottomNavGraph(
     val communityVM= viewModel<communityVM>()
     val userAuth= viewModel<userAuthVM>()
     val currentUserVM= viewModel<currentUserDataVM>()
+    val keyVM= viewModel<keyVM>()
     val questionVM= viewModel<questionVM>()
     val communityDBVModel= viewModel<communityDBVM>()
     val _auth= FirebaseAuth.getInstance()
@@ -138,10 +140,7 @@ fun bottomNavGraph(
             CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel)
         }
         composable(route = bottomNavItems.Preferences.route){
-            MoreScreen(padding = padding)
-        }
-        composable(route = bottomNavItems.Preferences.route){
-            MoreScreen(padding = padding)
+            MoreScreen(padding = padding, navController = navController)
         }
         composable(
             route = bottomNavItems.Scan.route,
@@ -157,7 +156,8 @@ fun bottomNavGraph(
                 photoCaptureVM = savePhotoViewModel,
                 classifierVM = classifierVM,
                 index = it.arguments!!.getInt(scanIndexKey),
-                sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM
+                sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM,
+                keyVM = keyVM
             )
         }
 
@@ -184,7 +184,8 @@ fun bottomNavGraph(
                 navController,
                 photoCaptureViewModel = savePhotoViewModel,
                 snackBarViewModel = snackBarVM,
-                sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM
+                sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM,
+                keyVM = keyVM
             )
         }
 
@@ -217,7 +218,8 @@ fun bottomNavGraph(
         ){
             BMIScreen(
                 padding = padding,
-                navController = navController
+                navController = navController,
+                keyVM = keyVM
             )
         }
 
@@ -250,7 +252,8 @@ fun bottomNavGraph(
                 diseaseDBviewModel = diseaseDBviewModel,
                 sideStateVM = sideDrawerState,
                 currentUserDataVM = currentUserVM,
-                chatVM = chatVM
+                chatVM = chatVM,
+                keyVM = keyVM
             )
         }
 

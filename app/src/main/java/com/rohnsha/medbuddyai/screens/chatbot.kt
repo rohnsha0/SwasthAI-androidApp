@@ -65,6 +65,8 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
@@ -99,6 +101,7 @@ fun ChatBotScreen(
     chatVM: chatVM,
     scanHistoryViewModel: scanHistoryViewModel,
     communityVM: communityVM,
+    keyVM: keyVM,
     mode: Int //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
 ) {
     Log.d("chatDB", chatID.toString())
@@ -297,10 +300,10 @@ fun ChatBotScreen(
                 onDismissRequest = { bomStateDUser.value = false },
                 containerColor = Color.White
             ) {
-                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM, onClickListener = {
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
-                }
+                })
             }
         }
 
@@ -765,19 +768,28 @@ fun SymptomsList(title: String, onClickListener: () -> Unit) {
 
 @Composable
 fun BOMChangeDUser(
+    keyVM: keyVM,
     currentUserDataVM: currentUserDataVM,
     onClickListener: (Int) -> Unit
 ) {
     val users= remember{
         mutableStateListOf<fieldValueDC>()
     }
+    val services= remember {
+        mutableStateListOf<keyDC>()
+    }
     val index= currentUserDataVM.defaultUserIndex.collectAsState().value
     val defUserIndnex= remember {
         mutableStateOf(index)
     }
+    val engine= keyVM.defaultEngine.collectAsState().value
+    val defaultEngine= remember {
+        mutableStateOf(engine)
+    }
     LaunchedEffect(key1 = true) {
         val defUsers= currentUserDataVM.getAllUsers()
         defUsers.forEach { users.add(it) }
+        keyVM.getKeySecretPairs().forEach { services.add(it) }
     }
     LazyColumn(
         modifier = Modifier
@@ -787,7 +799,7 @@ fun BOMChangeDUser(
                 Text(
                     modifier = Modifier
                         .padding(start = 30.dp),
-                    text = "Type Error",
+                    text = "Settings",
                     fontSize = 19.sp,
                     fontWeight = FontWeight(600),
                     fontFamily = fontFamily
@@ -797,6 +809,7 @@ fun BOMChangeDUser(
                     modifier = Modifier
                         .clickable {
                             onClickListener(defUserIndnex.value)
+                            keyVM.switchDefaultEngine(defaultEngine.value)
                         }
                         .padding(end = 30.dp),
                     text = "Save",
@@ -812,12 +825,24 @@ fun BOMChangeDUser(
             DataListFull(
                 title = "${it.fname} ${it.lname}",
                 subtitle = if (it.isDefaultUser) "default" else "patient:${it.index}",
-                imageVector = if (defUserIndnex.value== it.index)Icons.Outlined.Done else Icons.Outlined.MedicalInformation,
+                imageVector = if (defUserIndnex.value== it.index) Icons.Outlined.Done else Icons.Outlined.MedicalInformation,
                 colorLogo = Color.White,
                 additionalDataColor = lightTextAccent,
                 colorLogoTint = Color.Black,
                 onClickListener = {
                     defUserIndnex.value= it.index
+                }
+            )
+        }
+        item { Spacer(modifier = Modifier.height(12.dp)) }
+        items(services){
+            DataListFull(
+                title = it.serviceName,
+                subtitle = it.serviceName,
+                imageVector = if (defaultEngine.value==it.serviceName) Icons.Outlined.Done else Icons.Outlined.Merge,
+                colorLogo = customBlue,
+                onClickListener = {
+                    defaultEngine.value= it.serviceName
                 }
             )
         }

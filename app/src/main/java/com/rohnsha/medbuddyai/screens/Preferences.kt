@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -52,7 +54,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    padding: PaddingValues
+    padding: PaddingValues,
+    navController: NavHostController
 ) {
     Scaffold(
         topBar = {
@@ -75,7 +78,10 @@ fun MoreScreen(
         containerColor = BGMain
     ) { values ->
         val profileAction= listOf(
-            moreActions("Personal Informations") {  },
+            moreActions(title = "Personal Informations", onClick = {
+                Log.d("action", "MoreScreen: Personal Informations")
+                navController.navigate(bottomNavItems.BMI.route)
+            }) ,
             moreActions("Email id verification") {  }
         )
         val settingActions= listOf(
@@ -263,7 +269,7 @@ fun MoreOptions(
                 .fillMaxWidth()
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
                 .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
-                .clickable { data.onClick },
+                .clickable { data.onClick() },
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ){

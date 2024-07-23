@@ -93,6 +93,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.rohnsha.medbuddyai.ContextUtill
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.domain.analyzer
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
@@ -119,7 +120,8 @@ fun ScanScreen(
     classifierVM: classificationVM,
     index: Int,
     sideStateVM: sideStateVM,
-    currentUserDataVM: currentUserDataVM
+    currentUserDataVM: currentUserDataVM,
+    keyVM: keyVM
 ) {
     viewModelPhotoSave = photoCaptureVM
     viewModelClassification = classifierVM
@@ -190,7 +192,7 @@ fun ScanScreen(
                 onDismissRequest = { bomStateDUser.value = false },
                 containerColor = Color.White
             ) {
-                BOMChangeDUser(currentUserDataVM = currentUserDataVM) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM) {
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
                 }

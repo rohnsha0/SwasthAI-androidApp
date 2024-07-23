@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,18 +50,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BMIScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    keyVM: keyVM
 ) {
+
+    val scope= rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -185,7 +193,22 @@ fun BMIScreen(
                     .padding(top = 26.dp)
                     .align(Alignment.CenterHorizontally)
                 ,
-                onClick = { /*TODO*/ },
+                onClick = {
+                    scope.launch {
+                        keyVM.addKeySecretPair(
+                            keyDC = keyDC(
+                                serviceName = "testOne",
+                                secretKey = "ABC123"
+                            )
+                        )
+                        keyVM.addKeySecretPair(
+                            keyDC = keyDC(
+                                serviceName = "testTwo",
+                                secretKey = "XYZ123"
+                            )
+                        )
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White
