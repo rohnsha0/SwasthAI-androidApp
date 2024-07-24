@@ -195,16 +195,17 @@ fun BMIScreen(
                 ,
                 onClick = {
                     scope.launch {
-                        keyVM.addKeySecretPair(
-                            keyDC = keyDC(
-                                serviceName = "testOne",
-                                secretKey = "ABC123"
-                            )
-                        )
-                        keyVM.addKeySecretPair(
-                            keyDC = keyDC(
-                                serviceName = "testTwo",
-                                secretKey = "XYZ123"
+
+                        keyVM.updateKeySecretPair(
+                            keyDC = listOf(
+                                keyDC(
+                                    serviceName = "swasthai",
+                                    secretKey = "ABC123"
+                                ),
+                                keyDC(
+                                    serviceName = "testTwo",
+                                    secretKey = "XYZ123"
+                                )
                             )
                         )
                     }

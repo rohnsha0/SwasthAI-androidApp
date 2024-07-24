@@ -199,7 +199,8 @@ fun ChatBotScreen(
                     chatID = chatID,
                     mode = mode,
                     currentUserIndex = currentUser,
-                    timeStampAttachment = chatM.value.timestamp
+                    timeStampAttachment = chatM.value.timestamp,
+                    keyVM = keyVM
                 )
             }
         }
@@ -533,7 +534,8 @@ fun ChatBotScreen(
                                         chatID = chatID,
                                         mode = mode,
                                         currentUserIndex = currentUser,
-                                        timeStampAttachment = attachmentTimeStamp.value
+                                        timeStampAttachment = attachmentTimeStamp.value,
+                                        keyVM = keyVM
                                     )
                                     optionEnabled.value = false
                                 } else {
@@ -839,10 +841,10 @@ fun BOMChangeDUser(
             DataListFull(
                 title = it.serviceName,
                 subtitle = it.serviceName,
-                imageVector = if (defaultEngine.value==it.serviceName) Icons.Outlined.Done else Icons.Outlined.Merge,
+                imageVector = if (defaultEngine.value.serviceName==it.serviceName) Icons.Outlined.Done else Icons.Outlined.Merge,
                 colorLogo = customBlue,
                 onClickListener = {
-                    defaultEngine.value= it.serviceName
+                    defaultEngine.value= it
                 }
             )
         }

@@ -10,6 +10,10 @@ class keyRepo(private val keyDAO: keyDAO) {
         return keyDAO.getSecretKey(serviceName)
     }
 
+    suspend fun clearKeys(){
+        keyDAO.clearAllPairs()
+    }
+
     suspend fun queryKeyPairs(): List<keyDC>{
         return keyDAO.querySecrets()
     }

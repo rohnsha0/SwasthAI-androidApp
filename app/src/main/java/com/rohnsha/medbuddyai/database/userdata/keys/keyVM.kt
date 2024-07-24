@@ -11,7 +11,10 @@ class keyVM(application: Application): AndroidViewModel(application) {
     private val repo: keyRepo
     private val dao: keyDAO
 
-    private val _defaultEngine= MutableStateFlow("testOne")
+    private val _defaultEngine= MutableStateFlow(keyDC(
+        serviceName = "swasthai",
+        secretKey = "secretOne"
+    ))
     val defaultEngine= _defaultEngine.asStateFlow()
 
     init {
@@ -19,7 +22,7 @@ class keyVM(application: Application): AndroidViewModel(application) {
         repo= keyRepo(dao)
     }
 
-    suspend fun addKeySecretPair(keyDC: keyDC){
+    private suspend fun addKeySecretPair(keyDC: keyDC){
         repo.insertKeyPair(keyDC)
     }
 
@@ -31,7 +34,16 @@ class keyVM(application: Application): AndroidViewModel(application) {
         return repo.queryKeyPairs()
     }
 
-    fun switchDefaultEngine(engine: String){
+    fun switchDefaultEngine(engine: keyDC){
         _defaultEngine.value= engine
+    }
+
+    suspend fun updateKeySecretPair(keyDC: List<keyDC>){
+        repo.clearKeys()
+        for (pair in keyDC){
+            if (pair.secretKey != ""){
+                addKeySecretPair(pair)
+            }
+        }
     }
 }

@@ -8,12 +8,14 @@ import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import org.json.JSONObject
 import java.io.IOException
 import kotlin.math.pow
 
@@ -128,8 +130,10 @@ class chatVM: ViewModel() {
         chatID: Int,
         isRetrying: Boolean= false,
         timeStampAttachment: Long = 0L,
-        mode: Int //0 -> qna, 1 -> ai_symptoms_checker
+        mode: Int, //0 -> qna, 1 -> ai_symptoms_checker,
+        keyVM: keyVM
     ){
+        val defaultService= keyVM.defaultEngine.value
         if (!isRetrying){
             val messageBody= messageEntity(
                 message = message,
@@ -153,21 +157,22 @@ class chatVM: ViewModel() {
             userIndex = currentUserIndex
         )
         Log.d("chatVM", "Adding new chat: $newChat")
+        Log.d("chatVM", "service name: $defaultService")
         vmChat.addChat(newChat)
         Log.d("chatVM", "added new chat: $newChat")
 
         val dynamicURL= when(mode){
             0 -> {
-                "https://api-jjtysweprq-el.a.run.app/chat/$message"
+                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/$message"
             }
             1 -> {
                 "https://api-jjtysweprq-el.a.run.app/symptoms/$message"
             }
             2 ->{
-                "https://api-jjtysweprq-el.a.run.app/chat/I have been diagnosed with ${_lastScanAsAttachment.value.title} with ${_lastScanAsAttachment.value.confidence}% confidence. ${message}"
+                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/I have been diagnosed with ${_lastScanAsAttachment.value.title} with ${_lastScanAsAttachment.value.confidence}% confidence. ${message}"
             }
             else -> {
-                "https://api-jjtysweprq-el.a.run.app/chat/$message"
+                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/$message"
             }
         }
         try {
@@ -190,6 +195,15 @@ class chatVM: ViewModel() {
                         504 -> "Gateway timeout: The server is not responding"
                         500 -> "Internal server error"
                         404 -> "Resource not found"
+                        401 -> {
+                            val errorBody = e.response()!!.errorBody()?.string()
+                            try {
+                                val jsonObject = JSONObject(errorBody!!)
+                                jsonObject.optString("message", "Unauthorized: Invalid service name or secret code")
+                            } catch (jsonException: Exception) {
+                                "Unauthorized: Invalid service name or secret code"
+                            }
+                        }
                         // Add more cases for other HTTP error codes
                         else -> "An HTTP error occurred: ${e.code()} ${e.message()}"
                     }
@@ -206,6 +220,10 @@ class chatVM: ViewModel() {
                     )
                     _listMessages.emit(errorData)
                     vmChat.addMessages(errorData)
+                    if (e.code()==404 || e.code()==401){
+                        _messageCount.value += 1
+                        return
+                    }
                 }
                 is IOException -> {
                     Log.d("errorChat", e.stackTrace.toString())
@@ -239,7 +257,6 @@ class chatVM: ViewModel() {
                 }
             }
             _messageCount.value += 1
-
             val delayMillis = calculateExponentialBackoff(retryCount)
             val retryMessage= messageEntity(
                 message = "Retrying in ${delayMillis/1000} second(s)",
@@ -253,7 +270,7 @@ class chatVM: ViewModel() {
             vmChat.addMessages(retryMessage)
             delay(delayMillis)
             chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode,
-                isRetrying = true, currentUserIndex = currentUserIndex, timeStampAttachment = timeStampAttachment)
+                isRetrying = true, currentUserIndex = currentUserIndex, timeStampAttachment = timeStampAttachment, keyVM = keyVM)
         }
     }
 
