@@ -161,22 +161,22 @@ class chatVM: ViewModel() {
         vmChat.addChat(newChat)
         Log.d("chatVM", "added new chat: $newChat")
 
-        val dynamicURL= when(mode){
-            0 -> {
-                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/$message"
-            }
-            1 -> {
-                "https://api-jjtysweprq-el.a.run.app/symptoms/$message"
-            }
-            2 ->{
-                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/I have been diagnosed with ${_lastScanAsAttachment.value.title} with ${_lastScanAsAttachment.value.confidence}% confidence. ${message}"
-            }
-            else -> {
-                "https://api-jjtysweprq-el.a.run.app/chat/${defaultService.serviceName}/${defaultService.secretKey}/$message"
-            }
-        }
         try {
-            val response= chatService.getChatReply(dynamicURL)
+            val response= when(mode){
+                0, 2 -> {
+                    chatService.sendMessage(
+                        serviceName = defaultService.serviceName,
+                        secretCode = defaultService.secretKey,
+                        message = message
+                    )
+                }
+                1 -> {
+                    chatService.getChatReply(url = "https://api-jjtysweprq-el.a.run.app/symptoms/$message")
+                }
+                else -> {
+                    chatService.getChatReply(url = "https://api-jjtysweprq-el.a.run.app/symptoms/$message")
+                }
+            }
             val resultAPI= messageEntity(
                 message = response.message,
                 isBotMessage = true,

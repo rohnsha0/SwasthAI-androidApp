@@ -12,5 +12,4 @@ object chatbot_obj {
         .build()
 
     val chatService = retrofit.create(chatbot_interface::class.java)
-
 }
