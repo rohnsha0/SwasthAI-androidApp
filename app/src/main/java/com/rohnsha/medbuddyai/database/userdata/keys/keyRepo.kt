@@ -6,7 +6,7 @@ class keyRepo(private val keyDAO: keyDAO) {
         keyDAO.insertSecretKey(keyDC)
     }
 
-    suspend fun querySecrets(serviceName: String): String{
+    suspend fun querySecrets(serviceName: String): keyDC{
         return keyDAO.getSecretKey(serviceName)
     }
 

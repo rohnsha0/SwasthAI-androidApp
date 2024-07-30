@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.database.userdata.keys
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import com.rohnsha.medbuddyai.database.userdata.userDataDB
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +27,7 @@ class keyVM(application: Application): AndroidViewModel(application) {
         repo.insertKeyPair(keyDC)
     }
 
-    suspend fun getSecretKey(serviceName: String): String {
+    suspend fun getSecretKey(serviceName: String): keyDC {
         return repo.querySecrets(serviceName)
     }
 
@@ -41,9 +42,11 @@ class keyVM(application: Application): AndroidViewModel(application) {
     suspend fun updateKeySecretPair(keyDC: List<keyDC>){
         repo.clearKeys()
         for (pair in keyDC){
+            Log.d("adding", "adding")
             if (pair.secretKey != ""){
                 addKeySecretPair(pair)
             }
+            Log.d("adding", "added ${pair.serviceName}")
         }
     }
 }

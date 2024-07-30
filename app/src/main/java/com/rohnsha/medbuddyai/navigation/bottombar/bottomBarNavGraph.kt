@@ -280,7 +280,8 @@ fun bottomNavGraph(
                 snackbarHostState = snackBarVM,
                 communityVM = communityVM,
                 currentUserDataVM = currentUserVM,
-                chatdbVm = chatdbVM
+                chatdbVm = chatdbVM,
+                keyVM = keyVM
             )
         }
         composable(

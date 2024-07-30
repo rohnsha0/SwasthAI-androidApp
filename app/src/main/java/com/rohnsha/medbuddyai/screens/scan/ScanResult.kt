@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.screens.scan
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -82,6 +83,8 @@ import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
@@ -109,6 +112,7 @@ import kotlinx.coroutines.launch
 import kotlin.properties.Delegates
 
 private lateinit var disease_results: MutableState<disease_data_dataClass>
+private lateinit var verificationResults: MutableState<rbStructure>
 private lateinit var photoCaptureViewModel: photoCaptureViewModel
 private lateinit var diseaseDBvm: diseaseDBviewModel
 private lateinit var scanHistoryVM: scanHistoryViewModel
@@ -135,7 +139,8 @@ fun ScanResultScreen(
     communityVM: communityVM,
     chatdbVm: chatDB_VM,
     chatVM: chatVM,
-    currentUserDataVM: currentUserDataVM
+    currentUserDataVM: currentUserDataVM,
+    keyVM: keyVM
 ) {
     photoCaptureViewModel = viewModel
     diseaseDBvm = diseaseDBviewModel
@@ -211,7 +216,7 @@ fun ScanResultScreen(
                                 },
                                 fontFamily = fontFamily,
                                 color = lightTextAccent,
-                                fontSize = 13.sp,
+                                fontSize = 13.sp
                             )
                         }
                     },
@@ -251,22 +256,26 @@ fun ScanResultScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
+
         val rbList= remember {
-            mutableStateListOf(
-                rbStructure(
-                    isChecked = indexClassification==0,
-                    title = "Lungs"
-                ),
-                rbStructure(
-                    isChecked = indexClassification==1,
-                    title = "Brain"
-                ),
-                rbStructure(
-                    isChecked = indexClassification==2,
-                    title = "Skin Manifestions"
-                ),
-            )
+            mutableStateListOf<rbStructure>()
         }
+        verificationResults= remember {
+            mutableStateOf(rbStructure(false, ""))
+        }
+
+        LaunchedEffect(key1 = true) {
+            val keys= keyVM.getKeySecretPairs().filter { it.secretKey != ""  && it.serviceName != "swasthai" }
+            keys.forEach {
+                rbList.add(
+                    rbStructure(
+                        isChecked = false,
+                        title = it.serviceName
+                    )
+                )
+            }
+        }
+
         val scope= rememberCoroutineScope()
         if (!isStillLoading){
             if (isNormal){
@@ -283,7 +292,7 @@ fun ScanResultScreen(
                     navController = navController,
                     currentUserDataVM = currentUserDataVM,
                     chatdbVm = chatdbVm,
-                    chatVM = chatVM
+                    chatVM = chatVM,
                 )
                 if (modalState.value){
                     ModalBottomSheet(
@@ -294,33 +303,14 @@ fun ScanResultScreen(
                     ) {
                         BOMContent(
                             rbList = rbList,
-                            rbSnapFunc = {
-                                rbList.clear()
-                                rbList.addAll(it)
+                            resultsRB = {
+                                verificationResults.value= it
                             },
                             coroutineScope=scope,
                             buttonClicked = {
-                                if (rbList[0].isChecked){
-                                    scope.launch {
-                                        photoCaptureViewModel.resetReloadBoolean()
-                                        delay(500L)
-                                        photoCaptureViewModel.onClassify(context, 0)
-                                        modalState.value= false
-                                    }
-                                    Log.d("checkedState", "lungs checked")
-                                } else if (rbList[1].isChecked){
-                                    scope.launch {
-                                        photoCaptureViewModel.resetReloadBoolean()
-                                        delay(500L)
-                                        photoCaptureViewModel.onClassify(context, 1)
-                                        modalState.value= false
-                                    }
-                                    Log.d("checkedState", "brain checked")
-                                } else if (rbList[2].isChecked){
-                                    Log.d("checkedState", "skin checked")
-                                    modalState.value= false
-                                }
-                            }
+                                modalState.value= false
+                            },
+                            keyVM = keyVM
                         )
                     }
                 }
@@ -436,6 +426,29 @@ fun ScanResultsSuccess(
                 )
                 Spacer(
                     modifier = Modifier.height(30.dp)
+                )
+                if (verificationResults.value.isChecked){
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .fillMaxWidth()
+                            .background(color = ViewDash, shape = RoundedCornerShape(16.dp))
+                            .padding(vertical = 13.dp),
+                        contentAlignment = Alignment.CenterStart
+                    ){
+                        Text(
+                            text = verificationResults.value.title,
+                            color = Color.Black,
+                            fontFamily = fontFamily,
+                            fontSize = 14.sp,
+                            modifier = Modifier
+                                .padding(horizontal = 25.dp),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+                }
+                Spacer(
+                    modifier = Modifier.height(16.dp)
                 )
                 DataBox(
                     title = "Know About Disease",
@@ -726,116 +739,164 @@ fun DataListFull(
 @Composable
 fun BOMContent(
     rbList: SnapshotStateList<rbStructure>,
-    rbSnapFunc: (SnapshotStateList<rbStructure>) -> Unit,
     coroutineScope: CoroutineScope,
     buttonClicked: () -> Unit,
+    keyVM: keyVM,
+    resultsRB: (rbStructure) -> Unit,
 ) {
 
     val list= remember {
         rbList.toList().toMutableStateList()
     }
 
-    Column(
+    val currentlySelected= remember {
+        mutableStateOf("")
+    }
+
+    val currentlySelectedKeyPairs= remember {
+        mutableStateOf(keyDC("",""))
+    }
+
+    LaunchedEffect(key1 = currentlySelected.value) {
+        currentlySelectedKeyPairs.value= keyVM.getSecretKey(serviceName = currentlySelected.value)
+    }
+
+    Log.d("bom", currentlySelected.value.toString())
+
+    val isProcessing= remember {
+        mutableStateOf(false)
+    }
+    val context= LocalContext.current
+
+    LazyColumn(
         modifier = Modifier
-            .padding(horizontal = 24.dp, vertical = 30.dp)
+            .padding(start = 24.dp, bottom = 30.dp, end = 24.dp)
     ) {
-        Row {
-            Text(
-                text = "Choose other models",
-                fontSize = 18.sp,
-                fontWeight = FontWeight(600),
-                fontFamily = fontFamily
-            )
-            Spacer(modifier = Modifier.weight(1f))
-            Row(
-                modifier = Modifier
-                    .animateContentSize(
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = LinearOutSlowInEasing
-                        )
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        item {
+            Row {
                 Text(
-                    text = "Done",
+                    text = "Remote Models",
                     fontSize = 18.sp,
                     fontWeight = FontWeight(600),
-                    fontFamily = fontFamily,
-                    color = lightTextAccent,
-                    modifier = Modifier.clickable {
-                        rbSnapFunc(list)
-                        buttonClicked()
-                    }
+                    fontFamily = fontFamily
                 )
-                if (photoCaptureViewModel.isReLoadingBoolean.collectAsState().value){
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .padding(start = 6.dp)
-                            .size(16.dp),
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    modifier = Modifier
+                        .animateContentSize(
+                            animationSpec = tween(
+                                durationMillis = 300,
+                                easing = LinearOutSlowInEasing
+                            )
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Done",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight(600),
+                        fontFamily = fontFamily,
                         color = lightTextAccent,
-                        strokeWidth = 1.5.dp
+                        modifier = Modifier.clickable {
+                            isProcessing.value= true
+                            coroutineScope.launch {
+                                photoCaptureViewModel.verifyFromRemote(
+                                    keyPair = currentlySelectedKeyPairs.value,
+                                    disease_name = disease_results.value.disease_name,
+                                    isSuccessfulListerner = { successBool, response ->
+                                        isProcessing.value= false
+                                        if (successBool){
+                                            buttonClicked()
+                                            resultsRB(
+                                                rbStructure(
+                                                    isChecked = true,
+                                                    title = if (response.isMatched){
+                                                        "Validations found matching results (${response.confidence*100} confidence)"
+                                                    } else {
+                                                        "Validations found contradictory results (${response.confidence*100} confidence)"
+                                                    }
+                                                )
+                                            )
+                                        } else{
+                                            Toast.makeText(context, "Error", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+                                )
+                            }
+                        }
                     )
+                    if (isProcessing.value){
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .padding(start = 6.dp)
+                                .size(16.dp),
+                            color = lightTextAccent,
+                            strokeWidth = 1.5.dp
+                        )
+                    }
                 }
             }
         }
-        Spacer(modifier = Modifier.height(18.dp))
-        list.forEachIndexed { _, data ->
-            Column {
-                Spacer(modifier = Modifier.height(12.dp))
-                Row(
+        item {
+            Spacer(modifier = Modifier.height(18.dp))
+        }
+        items(list){ data ->
+            if (data.isChecked){
+                currentlySelected.value= data.title
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+            Row(
+                modifier = Modifier
+                    .pointerInput(key1 = true) {
+                        detectTapGestures {
+                            list.replaceAll {
+                                it.copy(
+                                    isChecked = (it.title==data.title)
+                                )
+                            }
+                        }},
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Image(
+                    imageVector = Icons.Outlined.MedicalInformation,
+                    contentDescription = "options pre",
                     modifier = Modifier
-                        .pointerInput(key1 = true) {
-                            detectTapGestures {
-                                list.replaceAll {
-                                    it.copy(
-                                        isChecked = (it.title==data.title)
-                                    )
-                                }
-                            }},
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        imageVector = Icons.Outlined.MedicalInformation,
-                        contentDescription = "options pre",
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(ViewDash, RoundedCornerShape(16.dp))
-                            .padding(10.dp)
-                    )
-                    Spacer(modifier = Modifier.width(18.dp))
-                    Text(
-                        text = data.title,
-                        fontFamily = fontFamily,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight(600)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .then(
-                                if (!data.isChecked) Modifier.border(
-                                    width = 1.dp,
-                                    color = Color(0xFFD4D4D4),
-                                    shape = CircleShape
-                                ) else Modifier
-                            )
-                    ){
-                        if (data.isChecked){
-                            Image(
-                                imageVector = Icons.Outlined.Check,
-                                contentDescription = "options",
-                                modifier = Modifier
-                                    .background(Color.Black, CircleShape)
-                                    .padding(3.dp),
-                                colorFilter = ColorFilter.tint(color = Color.White)
-                            )
-                        }
+                        .size(40.dp)
+                        .background(ViewDash, RoundedCornerShape(16.dp))
+                        .padding(10.dp)
+                )
+                Spacer(modifier = Modifier.width(18.dp))
+                Text(
+                    text = data.title,
+                    fontFamily = fontFamily,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight(600)
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .then(
+                            if (!data.isChecked) Modifier.border(
+                                width = 1.dp,
+                                color = Color(0xFFD4D4D4),
+                                shape = CircleShape
+                            ) else Modifier
+                        )
+                ){
+                    if (data.isChecked){
+                        Image(
+                            imageVector = Icons.Outlined.Check,
+                            contentDescription = "options",
+                            modifier = Modifier
+                                .background(Color.Black, CircleShape)
+                                .padding(3.dp),
+                            colorFilter = ColorFilter.tint(color = Color.White)
+                        )
                     }
                 }
-                Spacer(modifier = Modifier.height(12.dp))
             }
+            Spacer(modifier = Modifier.height(12.dp))
         }
     }
 }
@@ -846,6 +907,8 @@ fun OptionScanResults(
     navController: NavHostController,
     indexClassification: Int
 ) {
+    val context= LocalContext.current
+    val scope= rememberCoroutineScope()
     Row(
         modifier = Modifier
             .padding(horizontal = 24.dp)

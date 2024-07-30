@@ -204,7 +204,7 @@ fun BMIScreen(
                                 ),
                                 keyDC(
                                     serviceName = "google",
-                                    secretKey = ""
+                                    secretKey = "AIzaSyATDPFn1eElqU2RnjoREDJ30BPnPCsGpVI"
                                 ),
                                 keyDC(
                                     serviceName = "openai",
@@ -214,7 +214,6 @@ fun BMIScreen(
                                     serviceName = "anthropic",
                                     secretKey = ""
                                 ),
-
                             )
                         )
                     }

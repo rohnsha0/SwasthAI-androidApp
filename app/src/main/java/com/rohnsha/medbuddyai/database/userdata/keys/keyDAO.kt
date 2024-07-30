@@ -14,8 +14,8 @@ interface keyDAO {
     @Query("SELECT * FROM secrets")
     suspend fun querySecrets(): List<keyDC>
 
-    @Query("SELECT secretKey FROM secrets where serviceName like :serviceName")
-    suspend fun getSecretKey(serviceName: String): String
+    @Query("SELECT * FROM secrets where serviceName like :serviceName")
+    suspend fun getSecretKey(serviceName: String): keyDC
 
     @Query("DELETE FROM secrets")
     suspend fun clearAllPairs()

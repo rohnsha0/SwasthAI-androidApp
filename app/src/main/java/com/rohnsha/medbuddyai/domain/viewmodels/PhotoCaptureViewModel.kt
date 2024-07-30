@@ -11,13 +11,20 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.rohnsha.medbuddyai.ContextUtill
+import com.rohnsha.medbuddyai.api.verify.verifyDC
+import com.rohnsha.medbuddyai.api.verify.verifyObj.verifyService
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
 import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 import com.rohnsha.medbuddyai.domain.dataclass.disease_version
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.await
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.ByteArrayOutputStream
 
 class photoCaptureViewModel: ViewModel() {
 
@@ -171,6 +178,36 @@ class photoCaptureViewModel: ViewModel() {
         val updatedConfidence= (_maxIndex.value.confident + confidence)/2
         Log.d("percecntagesScan", "final: $updatedConfidence")
         _maxIndex.value= _maxIndex.value.copy(confident = updatedConfidence)
+    }
+
+
+    suspend fun verifyFromRemote(
+        keyPair: keyDC,
+        disease_name: String,
+        isSuccessfulListerner: (Boolean, verifyDC) -> Unit
+    ){
+        val bitmapp = _bitmaps.value
+
+        val stream = ByteArrayOutputStream()
+        bitmapp?.compress(Bitmap.CompressFormat.JPEG, 100, stream)
+        val byteArray = stream.toByteArray()
+
+        val requestBody = byteArray.toRequestBody("image/jpeg".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("file", "image.jpg", requestBody)
+
+        try {
+            val call = verifyService.verifyRemoteModels(
+                serviceName = keyPair.serviceName,
+                secretCode = keyPair.secretKey,
+                diseaseName = disease_name,
+                bitmp = body
+            )
+            Log.d("verifySuccess", call.toString())
+            isSuccessfulListerner(true, call)
+        } catch (e: Exception){
+            Log.d("verifyError", e.message.toString())
+            isSuccessfulListerner(false, verifyDC(0.2, false))
+        }
     }
 
     fun getDiseaseVersionData(
