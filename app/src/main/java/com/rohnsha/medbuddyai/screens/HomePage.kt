@@ -123,7 +123,7 @@ fun HomeScreen(
         mutableStateListOf<fieldValueDC>()
     }
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(key1 = userList) {
         val users= currentUserDataVM.getAllUsers()
         users.forEach {
             userList.add(it)
@@ -250,22 +250,23 @@ fun HomeScreen(
                         )
                     }
                     Spacer(modifier = Modifier.height(24.dp))
+
                     TextInputThemed(
                         value = pfname.value,
                         onValueChanged = { pfname.value= it },
-                        label = "Enter patient first name to be monitored",
+                        label = "First Name",
                         icon = Icons.Outlined.ShortText,
                         onClose = { pfname.value = "" },
-                        singleLine = false
+                        singleLine = true
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     TextInputThemed(
                         value = plname.value,
                         onValueChanged = { plname.value= it },
-                        label = "Enter patient last name to be monitored",
+                        label = "Last Name",
                         icon = Icons.Outlined.ShortText,
                         onClose = { plname.value = "" },
-                        singleLine = false
+                        singleLine = true
                     )
                     Spacer(modifier = Modifier.height(28.dp))
                 }

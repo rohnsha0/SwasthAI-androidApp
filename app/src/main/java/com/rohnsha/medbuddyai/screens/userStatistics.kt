@@ -1,20 +1,27 @@
 package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -62,7 +69,7 @@ fun UserStatScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Community",
+                        text = "Activity",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -70,7 +77,30 @@ fun UserStatScreen(
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = BGMain
-                )
+                ),
+                actions = {
+                    IconButton(onClick = {
+
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.DeleteSweep,
+                            contentDescription = "Delete Icon"
+                        )
+                    }
+                },
+                navigationIcon = {
+                    Image(
+                        imageVector = Icons.Outlined.ArrowBackIosNew,
+                        contentDescription = "Show accuracy button",
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .size(24.dp)
+                            .padding(2.dp)
+                            .clickable {
+
+                            }
+                    )
+                }
             )
         },
         modifier = Modifier

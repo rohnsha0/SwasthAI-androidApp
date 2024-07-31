@@ -2,6 +2,7 @@ package com.rohnsha.medbuddyai.screens.scan
 
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -154,6 +155,9 @@ fun ScanResultScreen(
     }
     when(resultsLevel){
         0 -> {
+            BackHandler {
+                navController.popBackStack(bottomNavItems.ScanQA.returnScanIndex(indexClassification), inclusive = true)
+            }
             isStillLoading = photoCaptureViewModel.isLoadingBoolean.collectAsState().value
             isNormal = photoCaptureViewModel.isNormalBoolean.collectAsState().value
             isErrored = photoCaptureViewModel.isErroredBoolean.collectAsState().value
@@ -446,10 +450,10 @@ fun ScanResultsSuccess(
                             textAlign = TextAlign.Start
                         )
                     }
+                    Spacer(
+                        modifier = Modifier.height(16.dp)
+                    )
                 }
-                Spacer(
-                    modifier = Modifier.height(16.dp)
-                )
                 DataBox(
                     title = "Know About Disease",
                     data = disease_results.value.introduction
@@ -811,9 +815,9 @@ fun BOMContent(
                                                 rbStructure(
                                                     isChecked = true,
                                                     title = if (response.isMatched){
-                                                        "Validations found matching results (${response.confidence*100} confidence)"
+                                                        "Validations found matching results (${response.confidence*100}% confidence)"
                                                     } else {
-                                                        "Validations found contradictory results (${response.confidence*100} confidence)"
+                                                        "Validations found contradictory results (${response.confidence*100}% confidence)"
                                                     }
                                                 )
                                             )

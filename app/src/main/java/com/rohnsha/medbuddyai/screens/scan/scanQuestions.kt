@@ -5,10 +5,12 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -62,12 +65,12 @@ import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
+import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private lateinit var otherDiseaseData: List<disease_version>
 private lateinit var disease_results: MutableState<disease_data_dataClass>
-
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -250,14 +253,27 @@ fun ScanQuestions(
                         state = scrollState
                     ) {
                         items(questions){
-                            Messages(
-                                messageInfo = messageEntity(
-                                    message = it.questions.question,
-                                    isError =  false,
-                                    isBotMessage = it.isBotMessage,
-                                    chatId = Int.MAX_VALUE,
-                                    timestamp = System.currentTimeMillis()
-                                ))
+                            if (it.isErrored){
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
+                                    Text(
+                                        text = it.questions.question,
+                                        color = lightTextAccent,
+                                        fontFamily = fontFamily,
+                                        fontSize = 10.sp,
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(6.dp))
+                            } else {
+                                Messages(
+                                    messageInfo = messageEntity(
+                                        message = it.questions.question,
+                                        isError =  it.isErrored,
+                                        isBotMessage = it.isBotMessage,
+                                        chatId = Int.MAX_VALUE,
+                                        timestamp = System.currentTimeMillis()
+                                    ))
+                            }
                         }
                     }
                     Spacer(modifier = Modifier.height(10.dp))
@@ -301,7 +317,8 @@ fun ScanQuestions(
                                                             index = Int.MAX_VALUE.toLong(),
                                                             question = "You are done with the self declaration. Navigating to main menu"
                                                         ),
-                                                        isBotMessage = true
+                                                        isBotMessage = true,
+                                                        isErrored = true
                                                     )
                                                 )
                                                 scope.launch {

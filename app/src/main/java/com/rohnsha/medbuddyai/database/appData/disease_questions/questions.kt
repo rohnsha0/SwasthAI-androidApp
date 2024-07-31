@@ -13,5 +13,6 @@ data class questions(
 
 data class questionMsg(
     val questions: questions,
-    val isBotMessage: Boolean
+    val isBotMessage: Boolean,
+    val isErrored: Boolean = false
 )

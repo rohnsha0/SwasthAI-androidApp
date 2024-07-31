@@ -234,7 +234,7 @@ fun RegisterUI(
                     value = firstName.value,
                     onValueChanged = { firstName.value = it },
                     label = "First name",
-                    onClose = { /*TODO*/ },
+                    onClose = { firstName.value= "" },
                     errorBool = fnameError.value
                 )
                 Spacer(modifier = Modifier.height(15.dp))
@@ -242,7 +242,7 @@ fun RegisterUI(
                     value = lastName.value,
                     onValueChanged = { lastName.value = it },
                     label = "Last name",
-                    onClose = { /*TODO*/ },
+                    onClose = { lastName.value="" },
                     errorBool = lnameError.value
                 )
                 Spacer(modifier = Modifier.height(15.dp))
@@ -400,13 +400,9 @@ fun LoginUI(
             regexUnMatchErrorText = "Must be in `__@_._` format"
         )
         Spacer(modifier = Modifier.height(15.dp))
-        TextInputThemed(
-            value = password.value,
-            onValueChanged = { password.value = it },
-            label = "Enter your Password",
-            onClose = { password.value= "" },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            errorBool = passwordError.value
+        PasswordTextField(
+            password = password.value,
+            onPasswordChanged = { password.value= it }
         )
         Spacer(modifier = Modifier.height(24.dp))
         AuthCTA(
