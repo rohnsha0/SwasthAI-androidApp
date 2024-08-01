@@ -82,7 +82,7 @@ fun MoreScreen(
                 Log.d("action", "MoreScreen: Personal Informations")
                 navController.navigate(bottomNavItems.BMI.route)
             }) ,
-            moreActions("Email id verification") {  }
+            moreActions("API Secrets") { navController.navigate(bottomNavItems.ApiScreen.route) }
         )
         val settingActions= listOf(
             moreActions("Account Deactivate & Deletion") {  },

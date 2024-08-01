@@ -181,4 +181,11 @@ sealed class bottomNavItems(
             return "userStatScreen/$userIndex"
         }
     }
+
+    object ApiScreen: bottomNavItems(
+        title = "apiScreen",
+        route = "apiScreen",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    )
 }

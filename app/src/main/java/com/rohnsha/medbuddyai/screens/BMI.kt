@@ -200,7 +200,7 @@ fun BMIScreen(
                             keyDC = listOf(
                                 keyDC(
                                     serviceName = "swasthai",
-                                    secretKey = ""
+                                    secretKey = "rohnsha0"
                                 ),
                                 keyDC(
                                     serviceName = "google",
@@ -250,7 +250,8 @@ fun TextInputThemed(
     keyboardOptions: KeyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Text),
     errorBool: Boolean= false,
     errorText: String= "This is a required filed",
-    regexUnMatchErrorText: String= "Invalid input"
+    regexUnMatchErrorText: String= "Invalid input",
+    isEnabled: Boolean= true
 ) {
     val errorState= remember {
         mutableStateOf(false)
@@ -272,12 +273,13 @@ fun TextInputThemed(
                 ),
             textStyle = LocalTextStyle.current.copy(fontFamily = fontFamily, fontSize = 18.sp),
             value = value,
+            enabled = isEnabled,
             readOnly = readOnly,
             onValueChange = { onValueChanged(it) },
             suffix = { if (suffix!=null) Text(text = suffix) },
             keyboardOptions = keyboardOptions,
             trailingIcon = {
-                if (value!="" && !readOnly){
+                if (value!="" && !readOnly && isEnabled){
                     Image(
                         modifier = Modifier
                             .size(30.dp)
@@ -308,6 +310,7 @@ fun TextInputThemed(
                 errorContainerColor = Color.White,
                 errorIndicatorColor = customRed,
                 errorSupportingTextColor = customRed,
+                disabledContainerColor = Color.White
             ),
             isError = errorState.value || errorBool,
             singleLine = singleLine

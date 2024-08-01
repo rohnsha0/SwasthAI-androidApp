@@ -45,6 +45,7 @@ import com.rohnsha.medbuddyai.screens.UserStatScreen
 import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
+import com.rohnsha.medbuddyai.screens.preferences.APIScreen
 import com.rohnsha.medbuddyai.screens.scan.DoctorScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanCategoryScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanQuestions
@@ -304,6 +305,11 @@ fun bottomNavGraph(
             WelcomeLogoScreen(
                 navController = navController
             )
+        }
+        composable(
+            route = bottomNavItems.ApiScreen.route
+        ){
+            APIScreen(keyVM)
         }
         composable(
             route = bottomNavItems.userStatScreen.route,
