@@ -88,7 +88,7 @@ fun bottomNavGraph(
     Log.d("username", "bottomNavGraph: ${username.value}")
 
     val dbRef= Firebase.database.reference
-    userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM)
+    userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM, keyVM = keyVM)
     communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value, communityDBVModel = communityDBVModel)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
@@ -141,7 +141,7 @@ fun bottomNavGraph(
             CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel)
         }
         composable(route = bottomNavItems.Preferences.route){
-            MoreScreen(padding = padding, navController = navController)
+            MoreScreen(padding = padding, navController = navController, currentUserDataVM = currentUserVM)
         }
         composable(
             route = bottomNavItems.Scan.route,

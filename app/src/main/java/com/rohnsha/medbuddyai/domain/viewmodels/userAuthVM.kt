@@ -11,6 +11,8 @@ import com.google.firebase.database.DatabaseReference
 import com.rohnsha.medbuddyai.api.authUsername.usernameOBJ.usernameCheckService
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.currentUser.fieldValueDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyDC
+import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.domain.dataclass.userInfoDC
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -20,15 +22,18 @@ class userAuthVM: ViewModel() {
     private lateinit var _auth: FirebaseAuth
     private lateinit var _firestoreRef: DatabaseReference
     private lateinit var _currentUserVM: currentUserDataVM
+    private lateinit var _keyVM: keyVM
 
     fun initialize(
         instance: FirebaseAuth,
         dbReference: DatabaseReference,
         currentUserVM: currentUserDataVM,
+        keyVM: keyVM
     ){
         _auth = instance
         _firestoreRef = dbReference
         _currentUserVM= currentUserVM
+        _keyVM= keyVM
     }
 
     suspend fun isUsernameValid(username: String): Boolean {
@@ -70,6 +75,9 @@ class userAuthVM: ViewModel() {
                             Log.d("loginSuccess", userInfo.toString())
                             _currentUserVM.addDataCurrentUser(
                                 userInfo
+                            )
+                            _keyVM.updateKeySecretPair(
+                                listOf(keyDC(serviceName = "swasthai", secretKey = userInfo.username))
                             )
                             onSuccess()
                         }
@@ -117,6 +125,9 @@ class userAuthVM: ViewModel() {
                                     lname = lname,
                                     isDefaultUser = true
                                 )
+                            )
+                            _keyVM.updateKeySecretPair(
+                                listOf(keyDC(serviceName = "swasthai", secretKey = username))
                             )
                         }
                         onSucess()

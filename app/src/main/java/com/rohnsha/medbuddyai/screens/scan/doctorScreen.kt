@@ -25,8 +25,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.EditLocation
 import androidx.compose.material.icons.outlined.Link
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -55,6 +55,7 @@ import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.doctors.doctor
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
 import com.rohnsha.medbuddyai.screens.OptionsFilter
+import com.rohnsha.medbuddyai.screens.SymptomsList
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
@@ -74,6 +75,9 @@ fun DoctorScreen(
         mutableStateOf(
             returnSpeciality(domain = domain)
         )
+    }
+    val location= remember {
+        mutableStateOf("")
     }
     val lockedDept= returnSpeciality(domain = domain)
 
@@ -128,8 +132,10 @@ fun DoctorScreen(
                     containerColor = BGMain
                 ),
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(imageVector = Icons.Outlined.LocationOn, contentDescription = "location button")
+                    if (location.value != ""){
+                        IconButton(onClick = { location.value= "" }) {
+                            Icon(imageVector = Icons.Outlined.EditLocation, contentDescription = "location button")
+                        }
                     }
                 },
                 navigationIcon = {
@@ -158,6 +164,11 @@ fun DoctorScreen(
         val selectedDomain= remember {
             mutableIntStateOf(Int.MAX_VALUE)
         }
+        val locationSupported= remember {
+            mutableStateListOf(
+                "Kolkata"
+            )
+        }
 
         if (bomState.value){
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
@@ -171,7 +182,6 @@ fun DoctorScreen(
                 )
             }
         }
-
         LazyColumn(
             modifier = Modifier
                 .padding(value)
@@ -182,48 +192,70 @@ fun DoctorScreen(
         ){
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-                LazyRow(
-                    modifier = Modifier
-                        .padding(start = 24.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    item {
-                        if (isSelected.value){
-                            Text(
-                                text = "Clear all",
-                                fontFamily = fontFamily,
-                                fontSize = 14.sp,
-                                color = customBlue,
-                                fontWeight = FontWeight(600),
-                                modifier = Modifier.clickable {
-                                    dept.value= returnSpeciality(domain)
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                        OptionsFilter(
-                            text = "Department",
-                            imageVector = Icons.Outlined.ArrowDropDown,
-                            onClickListener = {
-                                bomState.value= true
-                            },
-                            state = isSelected.value
-                        )
+            }
+            if (location.value == ""){
+                item {
+                    Text(
+                        text = "Select location to proceed",
+                        fontFamily = fontFamily,
+                        fontWeight = FontWeight(600),
+                        fontSize = 15.sp,
+                        modifier = Modifier
+                            .padding(bottom = 12.dp, start = 24.dp)
+                    )
+                }
+                items(locationSupported){
+                    Box(modifier = Modifier.padding(horizontal = 24.dp)){
+                        SymptomsList(title = it, onClickListener = {
+                            location.value= it
+                        })
                     }
                 }
-                Spacer(modifier = Modifier.height(10.dp))
-            }
-            items(doctorList){
-                DataListFull(
-                    imageVector = Icons.Outlined.Link,
-                    title = it.name,
-                    subtitle = "${extractYears(it.experience)}+ years",
-                    additionalDataColor = lightTextAccent,
-                    colorLogo = Color.White,
-                    data = it.pricing,
-                    additionData = it.area,
-                    colorLogoTint = customGrey
-                )
+            } else {
+                item {
+                    LazyRow(
+                        modifier = Modifier
+                            .padding(start = 24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        item {
+                            if (isSelected.value){
+                                Text(
+                                    text = "Clear all",
+                                    fontFamily = fontFamily,
+                                    fontSize = 14.sp,
+                                    color = customBlue,
+                                    fontWeight = FontWeight(600),
+                                    modifier = Modifier.clickable {
+                                        dept.value= returnSpeciality(domain)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            OptionsFilter(
+                                text = "Department",
+                                imageVector = Icons.Outlined.ArrowDropDown,
+                                onClickListener = {
+                                    bomState.value= true
+                                },
+                                state = isSelected.value
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+                items(doctorList){
+                    DataListFull(
+                        imageVector = Icons.Outlined.Link,
+                        title = it.name,
+                        subtitle = "${extractYears(it.experience)}+ years",
+                        additionalDataColor = lightTextAccent,
+                        colorLogo = Color.White,
+                        data = it.pricing,
+                        additionData = it.area,
+                        colorLogoTint = customGrey
+                    )
+                }
             }
         }
     }

@@ -34,6 +34,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -43,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -55,7 +60,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 @Composable
 fun MoreScreen(
     padding: PaddingValues,
-    navController: NavHostController
+    navController: NavHostController,
+    currentUserDataVM: currentUserDataVM
 ) {
     Scaffold(
         topBar = {
@@ -77,6 +83,16 @@ fun MoreScreen(
             .fillMaxSize(),
         containerColor = BGMain
     ) { values ->
+        val scope= rememberCoroutineScope()
+        val name= remember {
+            mutableStateOf("")
+        }
+
+        LaunchedEffect(key1 = true) {
+            val userData= currentUserDataVM.getAllUsers().filter { it.isDefaultUser }[0]
+            name.value= "${userData.fname} ${userData.lname}"
+        }
+
         val profileAction= listOf(
             moreActions(title = "Personal Informations", onClick = {
                 Log.d("action", "MoreScreen: Personal Informations")
@@ -117,7 +133,7 @@ fun MoreScreen(
                             fontFamily = fontFamily
                         )
                         Text(
-                            text = "Rohan Shaw",
+                            text = name.value,
                             fontSize = 18.sp,
                             fontWeight = FontWeight(600),
                             fontFamily = fontFamily,
