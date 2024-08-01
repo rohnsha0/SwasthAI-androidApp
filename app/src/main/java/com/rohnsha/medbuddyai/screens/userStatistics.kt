@@ -14,8 +14,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteSweep
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -39,6 +40,7 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
+import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
@@ -47,6 +49,7 @@ import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -61,8 +64,10 @@ fun UserStatScreen(
     scanHistoryViewModel: scanHistoryViewModel,
     diseaseDBviewModel: diseaseDBviewModel,
     navController: NavHostController,
-    chatdbVm: chatDB_VM
+    chatdbVm: chatDB_VM,
+    currentUserDataVM: currentUserDataVM,
 ) {
+    val scope= rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -80,10 +85,14 @@ fun UserStatScreen(
                 ),
                 actions = {
                     IconButton(onClick = {
-
+                        scope.launch {
+                            currentUserDataVM.deleteUser(userIndexx)
+                            chatdbVm.deleteChats(userIndexx)
+                            navController.popBackStack()
+                        }
                     }) {
                         Icon(
-                            imageVector = Icons.Default.DeleteSweep,
+                            imageVector = Icons.Default.PersonRemove,
                             contentDescription = "Delete Icon"
                         )
                     }
@@ -141,15 +150,13 @@ fun UserStatScreen(
                         fontWeight = FontWeight(600),
                         fontSize = 15.sp,
                         modifier = Modifier
-                            .padding(bottom = 12.dp)
+                            .padding(bottom = 12.dp, start = 24.dp)
                     )
                 }
                 items(filteredScanHistory){ data ->
                     DataListFull(
                         title = data.title,
-                        subtitle = data.domain,
-                        data = data.domain,
-                        additionData = data.timestamp.let {
+                        subtitle = data.timestamp.let {
                             val instant = Instant.ofEpochMilli(it)
                             val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                             val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())

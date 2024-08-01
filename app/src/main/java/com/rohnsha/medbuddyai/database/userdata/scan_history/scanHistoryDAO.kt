@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -23,4 +24,8 @@ interface scanHistoryDAO {
 
     @Query("SELECT * FROM scan_history WHERE timestamp = :timeStamp")
     suspend fun getScanDataByTimeStamp(timeStamp: Long): scanHistory
+
+    @Transaction
+    @Query("DELETE FROM scan_history WHERE userIndex = :userIndex")
+    suspend fun deleteScanHistories(userIndex: Int)
 }

@@ -331,24 +331,6 @@ fun HomeScreen(
                         navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 1, chatID =  chatCount.value+1))
                     }
                 )
-                val scope = rememberCoroutineScope()
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "View More",
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(600),
-                        fontSize = 15.sp,
-                        modifier = Modifier
-                            .padding(top = 14.dp)
-                            .clickable {
-                                scope.launch { navController.navigate(bottomNavItems.Explore.route) }
-                            },
-                        color = customBlue
-                    )
-                }
             }
             item {
                 Text(
@@ -377,9 +359,7 @@ fun HomeScreen(
             items(lastScans.take(n = 3)){data ->
                 DataListFull(
                     title = data.title,
-                    subtitle = data.domain,
-                    data = data.domain,
-                    additionData = data.timestamp.let {
+                    subtitle = data.timestamp.let {
                         val instant = Instant.ofEpochMilli(it)
                         val dateTime = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
                         val formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy", Locale.getDefault())

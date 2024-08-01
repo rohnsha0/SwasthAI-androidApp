@@ -22,4 +22,8 @@ class scanHistoryRepo(private val scanHistoryDAO: scanHistoryDAO) {
         return  scanHistoryDAO.getScanDataByTimeStamp(timeStamp = timeStamp)
     }
 
+    suspend fun deleteScanHistory(userIndnex: Int){
+        scanHistoryDAO.deleteScanHistories(userIndex = userIndnex)
+    }
+
 }

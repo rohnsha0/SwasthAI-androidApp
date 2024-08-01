@@ -53,4 +53,10 @@ class chatDB_VM(application: Application): AndroidViewModel(application) {
         }
     }
 
+    suspend fun deleteChats(userIndex: Int){
+        viewModelScope.launch {
+            repo.deleteChatwMessage(userIndex)
+        }
+    }
+
 }

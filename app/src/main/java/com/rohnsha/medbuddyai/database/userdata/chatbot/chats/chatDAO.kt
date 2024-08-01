@@ -22,4 +22,11 @@ interface chatDAO {
 
     @Query("select count(*) from chats")
     suspend fun getChatCount(): Int
+
+    @Transaction
+    @Query("delete from chats where userIndex like :userIndex")
+    suspend fun deleteChat(userIndex: Int)
+
+    @Query("select id from chats where userIndex like :userIndex")
+    suspend fun getChatIDwUserIndex(userIndex: Int): List<Int>
 }

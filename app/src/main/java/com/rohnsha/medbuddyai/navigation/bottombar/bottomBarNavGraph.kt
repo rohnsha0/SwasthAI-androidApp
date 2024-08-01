@@ -328,7 +328,8 @@ fun bottomNavGraph(
             UserStatScreen(
                 userIndexx = it.arguments!!.getInt(userIndex),
                 navController = navController,padding = padding, scanHistoryViewModel = scanHistoryviewModel, diseaseDBviewModel = diseaseDBviewModel,
-                chatdbVm = chatdbVM
+                chatdbVm = chatdbVM,
+                currentUserDataVM = currentUserVM
             )
         }
         composable(

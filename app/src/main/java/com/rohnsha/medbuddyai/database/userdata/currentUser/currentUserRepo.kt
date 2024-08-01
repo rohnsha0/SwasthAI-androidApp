@@ -18,4 +18,8 @@ class currentUserRepo(private val currentUser: currentUserDAO) {
         return  currentUser.getuserInformaton(userIndex)
     }
 
+    suspend fun deleteUser(userIndex: Int){
+        currentUser.deleteUser(userIndex)
+    }
+
 }

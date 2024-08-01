@@ -38,6 +38,10 @@ class currentUserDataVM(application: Application): AndroidViewModel(application)
         return repo.getUserInfo(userIndex)
     }
 
+    suspend fun deleteUser(userIndex: Int){
+        repo.deleteUser(userIndex)
+    }
+
     fun switchDefafultUser(index: Int){
         _defaultUserIndex.value= index
     }

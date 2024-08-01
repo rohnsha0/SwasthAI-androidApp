@@ -157,6 +157,10 @@ fun APIScreen(
                             keyVM.updateKeySecretPair(
                                 listOf(
                                     keyDC(
+                                        serviceName = "swasthai",
+                                        secretKey = google.value
+                                    ),
+                                    keyDC(
                                         serviceName = "google",
                                         secretKey = google.value
                                     ),

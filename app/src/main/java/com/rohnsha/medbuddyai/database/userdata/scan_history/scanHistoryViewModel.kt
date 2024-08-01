@@ -38,6 +38,10 @@ class scanHistoryViewModel(application: Application): AndroidViewModel(applicati
         return scanHistoryRepo.getScanDataByTimeStamp(timeStamp)
     }
 
+    suspend fun deleteScanHistory(userIndex: Int){
+        scanHistoryRepo.deleteScanHistory(userIndex)
+    }
+
     suspend fun readScanHistory(){
         scanHistoryDAO.readScanHistory().collect {
             Log.d("dataDBA", it.toString())

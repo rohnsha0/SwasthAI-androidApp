@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
 interface currentUserDAO {
@@ -19,4 +20,8 @@ interface currentUserDAO {
 
     @Query("select * from currentUserTable where `index` like :userIndex")
     suspend fun getuserInformaton(userIndex: Int): fieldValueDC
+
+    @Transaction
+    @Query("delete from currentUserTable where `index` like :userIndex")
+    suspend fun deleteUser(userIndex: Int)
 }

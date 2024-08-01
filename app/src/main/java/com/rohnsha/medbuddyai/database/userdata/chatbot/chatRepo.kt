@@ -23,6 +23,13 @@ class chatRepo(private val chatDAO: chatDAO, private val  messageDAO: messageDAO
         messageDAO.addChat(messageEntity)
     }
 
+    suspend fun deleteChatwMessage(userIndex: Int){
+        chatDAO.getChatIDwUserIndex(userIndex = userIndex).forEach {
+            messageDAO.deleteMessages(it)
+        }
+        chatDAO.deleteChat(userIndex)
+    }
+
     suspend fun readChats(chatID: Int): List<chatWithMessage> {
         return chatDAO.getChatWithMessages(chatID)
     }
