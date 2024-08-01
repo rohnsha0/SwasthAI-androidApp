@@ -45,6 +45,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -172,7 +173,10 @@ fun ChatBotScreen(
         mutableListOf<symptomDC>()
     }
 
-    val currentUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
+    val cUser= currentUserDataVModel.defaultUserIndex.collectAsState().value
+    val currentUser= remember {
+        mutableIntStateOf(cUser)
+    }
     val chatM= remember {
         mutableStateOf(messageEntity(
             message = "",
@@ -198,7 +202,7 @@ fun ChatBotScreen(
                     vmChat = chatdbVm,
                     chatID = chatID,
                     mode = mode,
-                    currentUserIndex = currentUser,
+                    currentUserIndex = currentUser.intValue,
                     timeStampAttachment = chatM.value.timestamp,
                     keyVM = keyVM
                 )
@@ -215,6 +219,7 @@ fun ChatBotScreen(
         chatdbVm.readChatWithMessages(chatID).forEach {
             it.messages.forEach {
                 messaageList.add(it)
+                currentUser.intValue= it.id
             }
         }
     }
@@ -259,8 +264,8 @@ fun ChatBotScreen(
                         text = when(mode){
                             0 -> "QnA"
                             1 -> "Symptom Checker"
-                            2 -> "QnA w/Attachment(s)"
-                            else -> { "Undetected categorization of chat mode" }
+                            2 -> "QnA"
+                            else -> { "Chat" }
                         },
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
@@ -278,11 +283,13 @@ fun ChatBotScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { bomStateDUser.value = true }) {
-                        Icon(
-                            imageVector = Icons.Default.SettingsSuggest,
-                            contentDescription = "Menu Icon"
-                        )
+                    if (messaageList.isEmpty()){
+                        IconButton(onClick = { bomStateDUser.value = true }) {
+                            Icon(
+                                imageVector = Icons.Default.SettingsSuggest,
+                                contentDescription = "Menu Icon"
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -344,7 +351,7 @@ fun ChatBotScreen(
                                     }
                                     optionEnabled.value= true
                                 },
-                                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser
+                                diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser.intValue
                             )
                         }
                     } },
@@ -435,7 +442,7 @@ fun ChatBotScreen(
                                 }
                                 optionEnabled.value = true
                             },
-                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser,
+                            diseaseDBviewModel = diseaseDBviewModel, currentUserIndex = currentUser.intValue,
                             selectedDisease = selectedSymptom
                         )
                         Log.d("selectedSymptom", selectedSymptom.toString())
@@ -533,7 +540,7 @@ fun ChatBotScreen(
                                         vmChat = chatdbVm,
                                         chatID = chatID,
                                         mode = mode,
-                                        currentUserIndex = currentUser,
+                                        currentUserIndex = currentUser.intValue,
                                         timeStampAttachment = attachmentTimeStamp.value,
                                         keyVM = keyVM
                                     )

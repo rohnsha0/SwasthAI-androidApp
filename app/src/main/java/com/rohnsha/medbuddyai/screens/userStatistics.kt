@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.PersonRemove
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,10 +44,12 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistoryViewModel
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.scan.DataListFull
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customRed
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 import kotlinx.coroutines.launch
@@ -66,6 +69,7 @@ fun UserStatScreen(
     navController: NavHostController,
     chatdbVm: chatDB_VM,
     currentUserDataVM: currentUserDataVM,
+    snackBarToggleVM: snackBarToggleVM
 ) {
     val scope= rememberCoroutineScope()
 
@@ -86,9 +90,17 @@ fun UserStatScreen(
                 actions = {
                     IconButton(onClick = {
                         scope.launch {
-                            currentUserDataVM.deleteUser(userIndexx)
-                            chatdbVm.deleteChats(userIndexx)
-                            navController.popBackStack()
+                            if (currentUserDataVM.isDefaultUser(userIndexx)){
+                                snackBarToggleVM.SendToast(
+                                    message = "Cannot delete Default User",
+                                    indicator_color = customRed,
+                                    icon = Icons.Outlined.Warning
+                                )
+                            } else {
+                                currentUserDataVM.deleteUser(userIndexx)
+                                chatdbVm.deleteChats(userIndexx)
+                                navController.popBackStack()
+                            }
                         }
                     }) {
                         Icon(
