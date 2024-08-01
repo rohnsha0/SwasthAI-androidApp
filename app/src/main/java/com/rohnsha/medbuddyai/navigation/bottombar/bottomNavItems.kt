@@ -188,4 +188,11 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Assistant,
         selectedIcon = Icons.Filled.Assistant
     )
+
+    object ProfileScreen: bottomNavItems(
+        title = "profileScreen",
+        route = "profileScreen",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    )
 }

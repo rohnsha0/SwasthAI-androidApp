@@ -823,6 +823,16 @@ fun BOMChangeDUser(
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
+        item {
+            Text(
+                text = "Select Patients",
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600),
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .padding(bottom = 12.dp, start = 24.dp)
+            )
+        }
         items(users){
             DataListFull(
                 title = "${it.fname} ${it.lname}",
@@ -837,12 +847,24 @@ fun BOMChangeDUser(
             )
         }
         item { Spacer(modifier = Modifier.height(12.dp)) }
+        item {
+            Text(
+                text = "Select LLM Engine",
+                fontFamily = fontFamily,
+                fontWeight = FontWeight(600),
+                fontSize = 15.sp,
+                modifier = Modifier
+                    .padding(bottom = 12.dp, start = 24.dp)
+            )
+        }
         items(services){
             DataListFull(
                 title = it.serviceName,
                 subtitle = it.serviceName,
                 imageVector = if (defaultEngine.value.serviceName==it.serviceName) Icons.Outlined.Done else Icons.Outlined.Merge,
-                colorLogo = customBlue,
+                colorLogo = Color.White,
+                additionalDataColor = lightTextAccent,
+                colorLogoTint = Color.Black,
                 onClickListener = {
                     defaultEngine.value= it
                 }

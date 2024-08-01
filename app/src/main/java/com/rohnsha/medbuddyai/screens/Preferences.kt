@@ -96,7 +96,7 @@ fun MoreScreen(
         val profileAction= listOf(
             moreActions(title = "Personal Informations", onClick = {
                 Log.d("action", "MoreScreen: Personal Informations")
-                navController.navigate(bottomNavItems.BMI.route)
+                navController.navigate(bottomNavItems.ProfileScreen.route)
             }) ,
             moreActions("API Secrets") { navController.navigate(bottomNavItems.ApiScreen.route) }
         )

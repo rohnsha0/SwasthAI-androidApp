@@ -46,6 +46,7 @@ import com.rohnsha.medbuddyai.screens.auth.UserAuthScreen
 import com.rohnsha.medbuddyai.screens.auth.WelcomeLogoScreen
 import com.rohnsha.medbuddyai.screens.mAIScreen
 import com.rohnsha.medbuddyai.screens.preferences.APIScreen
+import com.rohnsha.medbuddyai.screens.preferences.ProfileInfoScreen
 import com.rohnsha.medbuddyai.screens.scan.DoctorScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanCategoryScreen
 import com.rohnsha.medbuddyai.screens.scan.ScanQuestions
@@ -310,6 +311,11 @@ fun bottomNavGraph(
             route = bottomNavItems.ApiScreen.route
         ){
             APIScreen(keyVM)
+        }
+        composable(route = bottomNavItems.ProfileScreen.route){
+            ProfileInfoScreen(
+                currentUserDataVM = currentUserVM
+            )
         }
         composable(
             route = bottomNavItems.userStatScreen.route,
