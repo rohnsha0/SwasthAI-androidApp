@@ -38,6 +38,7 @@ import com.rohnsha.medbuddyai.screens.ChatBotScreen
 import com.rohnsha.medbuddyai.screens.CommunityReply
 import com.rohnsha.medbuddyai.screens.CommunityScreen
 import com.rohnsha.medbuddyai.screens.DiseasesCatelogue
+import com.rohnsha.medbuddyai.screens.DocumentationScreen
 import com.rohnsha.medbuddyai.screens.ExploreScreen
 import com.rohnsha.medbuddyai.screens.HomeScreen
 import com.rohnsha.medbuddyai.screens.MoreScreen
@@ -318,6 +319,16 @@ fun bottomNavGraph(
             ProfileInfoScreen(
                 currentUserDataVM = currentUserVM, navController = navController
             )
+        }
+        composable(
+            route = bottomNavItems.documentations.route,
+            arguments = listOf(
+                navArgument(docIndex){
+                    type= NavType.IntType
+                }
+            )
+        ){
+            DocumentationScreen(index = it.arguments!!.getInt(docIndex), navController)
         }
         composable(
             route = bottomNavItems.userStatScreen.route,

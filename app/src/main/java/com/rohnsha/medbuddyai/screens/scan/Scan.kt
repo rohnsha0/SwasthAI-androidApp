@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -483,10 +482,13 @@ fun ScanMainScreen(
                     .clip(RoundedCornerShape(16.dp)),
                 imgBitmap = viewModelPhotoSave.bitmaps.collectAsState().value,
             )
+
+            /* TODO */
+/*
             CameraPreviewSegmentOp(
                 title = "C1: ",
-                dataItem = errorText.value
-            )
+                dataItem = ""//errorText.value
+            )*/
         }
         Spacer(modifier = Modifier.weight(1f))
         Row(
@@ -498,20 +500,18 @@ fun ScanMainScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.Delete,
-                contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan",
-                modifier = Modifier
-                    .size(24.dp)
-                    .padding(2.dp)
-                    .clickable {
-                        if (!isConfirming.value) {
+            IconButton(onClick = {
+                if (!isConfirming.value) {
 
-                        } else {
-                            isConfirming.value = false
-                        }
-                    }
-            )
+                } else {
+                    isConfirming.value = false
+                }
+            }) {
+                Icon(
+                    imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.Delete,
+                    contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan"
+                )
+            }
             val bitmapImg= viewModelPhotoSave.bitmaps.collectAsState().value
             Button(
                 onClick = {

@@ -118,7 +118,7 @@ fun APIScreen(
             modifier = Modifier.padding(values)
         ) {
             Text(
-                text = "We get your personal information from the verification process. If you want to make changes on your personal information, contact our support.",
+                text = "We do not sync these keys to the cloud and are stored privately and locally.",
                 fontFamily = fontFamily,
                 fontSize = 14.sp,
                 modifier = Modifier

@@ -24,6 +24,7 @@ const val authMode= "authMode"
 const val domainID= "domainID"
 const val userIndex= "userIndex"
 const val viewMode= "viewMode"
+const val docIndex="docIndex"
 
 sealed class bottomNavItems(
     val title: String,
@@ -180,6 +181,17 @@ sealed class bottomNavItems(
     ){
         fun returnUserIndexx(userIndex: Int, viewModeInt: Int): String{
             return "userStatScreen/$userIndex/$viewModeInt"
+        }
+    }
+
+    object documentations: bottomNavItems(
+        title = "documentations",
+        route = "documentations/{$docIndex}",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    ){
+        fun returnDoc(index: Int): String{
+            return "documentations/$index"
         }
     }
 

@@ -102,9 +102,7 @@ fun MoreScreen(
         )
         val settingActions= listOf(
             moreActions("Account Deactivate & Deletion") {  },
-            moreActions("Data Policy") {  },
-            moreActions("Service Status") {  },
-            moreActions("Help and Support") {  },
+            moreActions("Legaly") { navController.navigate(bottomNavItems.documentations.returnDoc(0)) }
         )
         LazyColumn(
             modifier = Modifier

@@ -32,10 +32,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.QuestionMark
 import androidx.compose.material.icons.outlined.AltRoute
 import androidx.compose.material.icons.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.BlurOff
-import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Camera
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.ConnectWithoutContact
@@ -227,16 +226,14 @@ fun ScanResultScreen(
                         }
                     },
                     actions = {
-                        Image(
-                            imageVector = if (infoStateOpen.value) Icons.Outlined.BlurOff else Icons.Outlined.BlurOn,
-                            contentDescription = "Show accuracy button",
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .size(24.dp)
-                                .clickable {
-                                    infoStateOpen.value = !infoStateOpen.value
-                                }
-                        )
+                        IconButton(onClick = {
+                            navController.navigate(bottomNavItems.documentations.returnDoc(2))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.QuestionMark,
+                                contentDescription = "Documentations Icon"
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = {

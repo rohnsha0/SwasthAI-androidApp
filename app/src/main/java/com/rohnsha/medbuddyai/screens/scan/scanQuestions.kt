@@ -2,7 +2,6 @@ package com.rohnsha.medbuddyai.screens.scan
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,7 +21,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.outlined.BlurOn
+import androidx.compose.material.icons.outlined.QuestionMark
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -200,16 +198,17 @@ fun ScanQuestions(
                         containerColor = BGMain
                     ),
                     actions = {
-                        Image(
-                            imageVector = Icons.Outlined.BlurOn,
-                            contentDescription = "Show accuracy button",
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .size(24.dp)
-                                .clickable {
-                                    sideStateVM.toggleState()
-                                }
-                        )
+                        IconButton(onClick = {
+                            navHostController.navigate(
+                                bottomNavItems.documentations.returnDoc(
+                                    1
+                                )
+                            )}) {
+                            Icon(
+                                imageVector = Icons.Outlined.QuestionMark,
+                                contentDescription = "Documentations button"
+                            )
+                        }
                     },
                     navigationIcon = {
                         IconButton(onClick = {
@@ -301,7 +300,7 @@ fun ScanQuestions(
                                             )
                                             questions.add(
                                                 questionMsg(
-                                                    questions= q[index.intValue],
+                                                    questions = q[index.intValue],
                                                     isBotMessage = true
                                                 )
                                             )

@@ -116,7 +116,7 @@ fun ProfileInfoScreen(
                 TextInputThemed(
                     value = userInfo.value.lname,
                     onValueChanged = {  },
-                    label = "First Name",
+                    label = "Last Name",
                     onClose = {  },
                     isEnabled = false
                 )
@@ -124,7 +124,7 @@ fun ProfileInfoScreen(
                 TextInputThemed(
                     value = userInfo.value.username,
                     onValueChanged = {  },
-                    label = "First Name",
+                    label = "Username",
                     onClose = {  },
                     isEnabled = false
                 )
