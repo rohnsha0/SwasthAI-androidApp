@@ -273,6 +273,11 @@ fun mAIScreen(
                             modifier = Modifier
                                 .padding(top = 14.dp)
                                 .clickable {
+                                    navController.navigate(
+                                        bottomNavItems.userStatScreen.returnUserIndexx(
+                                            userIndex = Int.MAX_VALUE, viewModeInt = 2
+                                        )
+                                    )
                                 },
                             color = customBlue
                         )

@@ -302,7 +302,7 @@ fun HomeScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
-                        navController.navigate(bottomNavItems.userStatScreen.returnUserIndexx(it.index))
+                        navController.navigate(bottomNavItems.userStatScreen.returnUserIndexx(userIndex = it.index, viewModeInt = 0))
                     }
                 )
             }
@@ -398,6 +398,11 @@ fun HomeScreen(
                             modifier = Modifier
                                 .padding(top = 14.dp)
                                 .clickable {
+                                    navController.navigate(
+                                        bottomNavItems.userStatScreen.returnUserIndexx(
+                                            userIndex = Int.MAX_VALUE, viewModeInt = 1
+                                        )
+                                    )
                                 },
                             color = customBlue,
                         )

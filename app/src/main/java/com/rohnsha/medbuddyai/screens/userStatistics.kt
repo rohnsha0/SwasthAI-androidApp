@@ -4,9 +4,12 @@ import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -69,7 +72,8 @@ fun UserStatScreen(
     navController: NavHostController,
     chatdbVm: chatDB_VM,
     currentUserDataVM: currentUserDataVM,
-    snackBarToggleVM: snackBarToggleVM
+    snackBarToggleVM: snackBarToggleVM,
+    viewMode: Int // 0: both 1: scanHistory 2: chatHistory
 ) {
     val scope= rememberCoroutineScope()
 
@@ -99,6 +103,7 @@ fun UserStatScreen(
                             } else {
                                 currentUserDataVM.deleteUser(userIndexx)
                                 chatdbVm.deleteChats(userIndexx)
+                                scanHistoryViewModel.deleteScanHistory(userIndexx)
                                 navController.popBackStack()
                             }
                         }
@@ -132,17 +137,38 @@ fun UserStatScreen(
         val filteredScanHistory= remember {
             mutableStateListOf<scanHistory>()
         }
-        val history= scanHistoryViewModel.scanHistoryEntries.collectAsState().value.filter { it.userIndex == userIndexx }
-        filteredScanHistory.clear()
-        filteredScanHistory.addAll(history)
+        if (viewMode == 0 || viewMode == 1){
+            val history= scanHistoryViewModel.scanHistoryEntries.collectAsState().value.filter { it.userIndex == userIndexx }
+            filteredScanHistory.clear()
+            filteredScanHistory.addAll(history)
+        }
 
         val filteredChatHistory= remember {
             mutableStateListOf<chatEntity>()
         }
         LaunchedEffect(key1 = Unit) {
-            val chatHistory= chatdbVm.readChatHistory().filter { it.userIndex == userIndexx }
-            filteredChatHistory.clear()
-            filteredChatHistory.addAll(chatHistory)
+            if (viewMode==0 || viewMode==2){
+                val chatHistory= chatdbVm.readChatHistory().filter { it.userIndex == userIndexx }
+                filteredChatHistory.clear()
+                filteredChatHistory.addAll(chatHistory)
+            }
+        }
+
+        LaunchedEffect(key1 = true) {
+            if (viewMode==2 && userIndexx== Int.MAX_VALUE){
+                chatdbVm.readChatHistory().let {
+                    filteredChatHistory.clear()
+                    filteredChatHistory.addAll(it)
+                }
+            }
+        }
+
+        if (viewMode==1){
+            val history= scanHistoryViewModel.scanHistoryEntries.collectAsState().value
+            history.let {
+                filteredScanHistory.clear()
+                filteredScanHistory.addAll(it)
+            }
         }
 
         LazyColumn(
@@ -165,7 +191,7 @@ fun UserStatScreen(
                             .padding(bottom = 12.dp, start = 24.dp)
                     )
                 }
-                items(filteredScanHistory){ data ->
+                items(if (viewMode==0) filteredScanHistory.take(5) else filteredScanHistory){ data ->
                     DataListFull(
                         title = data.title,
                         subtitle = data.timestamp.let {
@@ -191,6 +217,34 @@ fun UserStatScreen(
                         }
                     )
                 }
+                if (filteredScanHistory.size>5 && viewMode==0){
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 21.dp),
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "View More",
+                                fontFamily = fontFamily,
+                                fontWeight = FontWeight(600),
+                                fontSize = 15.sp,
+                                modifier = Modifier
+                                    .padding(top = 14.dp)
+                                    .clickable {
+                                        navController.navigate(
+                                            bottomNavItems.userStatScreen.returnUserIndexx(
+                                                userIndex = userIndexx,
+                                                viewModeInt = 1
+                                            )
+                                        )
+                                    },
+                                color = customBlue,
+                            )
+                        }
+                    }
+                }
             }
             if (filteredChatHistory.isNotEmpty()){
                 item {
@@ -204,7 +258,7 @@ fun UserStatScreen(
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                items(filteredChatHistory){
+                items(if (viewMode==0) filteredChatHistory.take(5) else filteredChatHistory){
                     DataListFull(
                         title = when(it.mode){
                             0 -> "QnA"
@@ -220,13 +274,49 @@ fun UserStatScreen(
                     )
                 }
             }
+            if (filteredChatHistory.size>5 && viewMode==0){
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 21.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "View More",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 15.sp,
+                            modifier = Modifier
+                                .padding(top = 14.dp)
+                                .clickable {
+                                    navController.navigate(
+                                        bottomNavItems.userStatScreen.returnUserIndexx(
+                                            userIndex = userIndexx,
+                                            viewModeInt = 2
+                                        )
+                                    )
+                                },
+                            color = customBlue,
+                        )
+                    }
+                }
+            }
             if (filteredChatHistory.isEmpty() && filteredScanHistory.isEmpty()){
                 item {
-                    Text(
-                        text = "No History",
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(600),
-                        fontSize = 15.sp)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 21.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ){
+                        Text(
+                            text = "No History",
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600),
+                            fontSize = 15.sp
+                        )
+                    }
                 }
             }
         }

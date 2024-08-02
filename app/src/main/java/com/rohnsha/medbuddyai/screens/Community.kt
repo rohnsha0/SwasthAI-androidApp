@@ -154,7 +154,7 @@ fun CommunityScreen(
                     explore_tabs(
                         title = if (isCreateExpanded.value) "Post Now" else "Write",
                         icon = if (isCreateExpanded.value) Icons.Outlined.TaskAlt else Icons.Outlined.PostAdd,
-                        weight = if (isCreateExpanded.value) .56f else .49f,
+                        weight = if (isCreateExpanded.value) .56f else 1f,
                         onClickListener = { 
                             if (isCreateExpanded.value) {
                                 if (content.value!=""){
@@ -193,7 +193,7 @@ fun CommunityScreen(
                     explore_tabs(
                         title = if (isCreateExpanded.value) "Close" else "Activity",
                         icon = if (isCreateExpanded.value) Icons.Outlined.CloseFullscreen else Icons.Outlined.FeaturedPlayList,
-                        weight = 1f,
+                        weight = if(isCreateExpanded.value) 1f else 0f,
                         onClickListener = {
                             if (isCreateExpanded.value) isCreateExpanded.value= false else snackBarViewModel.SendToast(
                                 message = "The feature is still under making!",

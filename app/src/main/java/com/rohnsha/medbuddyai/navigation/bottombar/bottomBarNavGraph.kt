@@ -322,6 +322,9 @@ fun bottomNavGraph(
             arguments = listOf(
                 navArgument(userIndex){
                     type= NavType.IntType
+                },
+                navArgument(viewMode){
+                    type= NavType.IntType
                 }
             )
         ){
@@ -330,7 +333,8 @@ fun bottomNavGraph(
                 navController = navController,padding = padding, scanHistoryViewModel = scanHistoryviewModel, diseaseDBviewModel = diseaseDBviewModel,
                 chatdbVm = chatdbVM,
                 currentUserDataVM = currentUserVM,
-                snackBarToggleVM = snackBarVM
+                snackBarToggleVM = snackBarVM,
+                viewMode = it.arguments!!.getInt(viewMode)
             )
         }
         composable(
