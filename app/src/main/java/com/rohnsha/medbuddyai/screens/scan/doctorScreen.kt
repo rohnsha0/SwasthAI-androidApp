@@ -22,7 +22,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.EditLocation
@@ -51,6 +51,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.doctors.doctor
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
@@ -68,7 +69,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun DoctorScreen(
     padding: PaddingValues,
     diseaseDBviewModel: diseaseDBviewModel,
-    domain: Int
+    domain: Int,
+    navController: NavHostController
 ) {
     Log.d("selectedDep", "domain: $domain")
     val dept= remember {
@@ -139,17 +141,14 @@ fun DoctorScreen(
                     }
                 },
                 navigationIcon = {
-                    Image(
-                        imageVector = Icons.Outlined.ArrowBackIosNew,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .size(24.dp)
-                            .padding(2.dp)
-                            .clickable {
-
-                            }
-                    )
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back Icon"
+                        )
+                    }
                 }
             )
         },

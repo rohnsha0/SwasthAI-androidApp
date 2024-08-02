@@ -22,10 +22,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -210,17 +212,14 @@ fun ScanQuestions(
                         )
                     },
                     navigationIcon = {
-                        Image(
-                            imageVector = Icons.Outlined.ArrowBackIosNew,
-                            contentDescription = "Show accuracy button",
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .size(24.dp)
-                                .padding(2.dp)
-                                .clickable {
-
-                                }
-                        )
+                        IconButton(onClick = {
+                            navHostController.popBackStack()
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back Icon"
+                            )
+                        }
                     }
                 )
             }

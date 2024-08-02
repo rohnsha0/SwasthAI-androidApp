@@ -139,7 +139,7 @@ fun bottomNavGraph(
                     }
                 )
             ){
-            CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel)
+            CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel, navController = navController)
         }
         composable(route = bottomNavItems.Preferences.route){
             MoreScreen(padding = padding, navController = navController, currentUserDataVM = currentUserVM)
@@ -255,7 +255,8 @@ fun bottomNavGraph(
                 sideStateVM = sideDrawerState,
                 currentUserDataVM = currentUserVM,
                 chatVM = chatVM,
-                keyVM = keyVM
+                keyVM = keyVM,
+                navController = navController
             )
         }
 
@@ -297,7 +298,8 @@ fun bottomNavGraph(
             DoctorScreen(
                 padding = padding,
                 diseaseDBviewModel = diseaseDBviewModel,
-                domain = it.arguments!!.getInt(domainID)
+                domain = it.arguments!!.getInt(domainID),
+                navController = navController
             )
         }
         composable(
@@ -310,11 +312,11 @@ fun bottomNavGraph(
         composable(
             route = bottomNavItems.ApiScreen.route
         ){
-            APIScreen(keyVM)
+            APIScreen(keyVM, navController = navController)
         }
         composable(route = bottomNavItems.ProfileScreen.route){
             ProfileInfoScreen(
-                currentUserDataVM = currentUserVM
+                currentUserDataVM = currentUserVM, navController = navController
             )
         }
         composable(

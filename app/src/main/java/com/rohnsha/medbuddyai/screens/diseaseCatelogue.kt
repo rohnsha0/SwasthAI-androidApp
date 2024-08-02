@@ -22,15 +22,15 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.BlurOn
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -95,7 +95,7 @@ fun DiseasesCatelogue(
                     containerColor = BGMain
                 ),
                 actions = {
-                    Image(
+                    /*Image(
                         imageVector = Icons.Outlined.BlurOn,
                         contentDescription = "Show accuracy button",
                         modifier = Modifier
@@ -104,10 +104,18 @@ fun DiseasesCatelogue(
                             .clickable {
 
                             }
-                    )
+                    )*/
                 },
                 navigationIcon = {
-                    Image(
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back Icon"
+                        )
+                    }
+                    /*Image(
                         imageVector = Icons.Outlined.ArrowBackIosNew,
                         contentDescription = "Show accuracy button",
                         modifier = Modifier
@@ -117,7 +125,7 @@ fun DiseasesCatelogue(
                             .clickable {
 
                             }
-                    )
+                    )*/
                 }
             )
         },

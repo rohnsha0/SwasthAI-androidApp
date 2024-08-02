@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
@@ -103,7 +104,8 @@ fun ChatBotScreen(
     scanHistoryViewModel: scanHistoryViewModel,
     communityVM: communityVM,
     keyVM: keyVM,
-    mode: Int //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
+    mode: Int, //0 -> qna, 1 -> ai_symptoms_checker, 2 -> chat with attachments
+    navController: NavHostController
 ) {
     Log.d("chatDB", chatID.toString())
     val scope= rememberCoroutineScope()
@@ -274,7 +276,7 @@ fun ChatBotScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-
+                        navController.popBackStack()
                     }) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,

@@ -39,12 +39,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CenterFocusStrong
 import androidx.compose.material.icons.filled.MotionPhotosAuto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
 import androidx.compose.material.icons.filled.SettingsSuggest
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.BrowseGallery
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Delete
@@ -167,17 +167,14 @@ fun ScanScreen(
                     }
                 },
                 navigationIcon = {
-                    Image(
-                        imageVector = Icons.Outlined.ArrowBackIosNew,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .size(24.dp)
-                            .padding(2.dp)
-                            .clickable {
-
-                            }
-                    )
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back Icon"
+                        )
+                    }
                 }
             )
         },

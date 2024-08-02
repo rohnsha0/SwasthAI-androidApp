@@ -31,8 +31,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.AltRoute
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.BlurOff
 import androidx.compose.material.icons.outlined.BlurOn
@@ -48,6 +48,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -237,18 +239,14 @@ fun ScanResultScreen(
                         )
                     },
                     navigationIcon = {
-                        Image(
-                            imageVector = Icons.Outlined.ArrowBackIosNew,
-                            contentDescription = "back button",
-                            modifier = Modifier
-                                .padding(start = 16.dp)
-                                .size(24.dp)
-                                .clip(CircleShape)
-                                .clickable {
-                                    navController.popBackStack()
-                                }
-                                .padding(5.dp)
-                        )
+                        IconButton(onClick = {
+                            navController.popBackStack(bottomNavItems.ScanQA.returnScanIndex(indexClassification), inclusive = true)
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBackIosNew,
+                                contentDescription = "Back Icon"
+                            )
+                        }
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                         containerColor = BGMain

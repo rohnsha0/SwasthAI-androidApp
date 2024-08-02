@@ -13,15 +13,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -93,7 +92,7 @@ fun UserAuthScreen(
                     )
                 },
                 actions = {
-                    Image(
+                    /*Image(
                         imageVector = Icons.Outlined.AdminPanelSettings,
                         contentDescription = "Show accuracy button",
                         modifier = Modifier
@@ -102,7 +101,17 @@ fun UserAuthScreen(
                             .clickable {
                                 //navController.navigate(bottomNavItems.Preferences.route)
                             }
-                    )
+                    )*/
+                },
+                navigationIcon = {
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back Icon"
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
                     containerColor = BGMain

@@ -19,8 +19,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.SettingsSuggest
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.AutoMode
 import androidx.compose.material.icons.outlined.Hub
@@ -103,17 +103,14 @@ fun ScanCategoryScreen(
                     }
                 },
                 navigationIcon = {
-                    Image(
-                        imageVector = Icons.Outlined.ArrowBackIosNew,
-                        contentDescription = "Show accuracy button",
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .size(24.dp)
-                            .padding(2.dp)
-                            .clickable {
-
-                            }
-                    )
+                    IconButton(onClick = {
+                        navController.popBackStack()
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBackIosNew,
+                            contentDescription = "Back Icon"
+                        )
+                    }
                 }
             )
         },
