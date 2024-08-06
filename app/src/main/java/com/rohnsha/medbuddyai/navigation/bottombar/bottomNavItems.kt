@@ -139,7 +139,7 @@ sealed class bottomNavItems(
     }
 
     object mAI: bottomNavItems(
-        title = "sAI Chat",
+        title = "Chat",
         route = "m_ai",
         unselectedIcon = Icons.Outlined.Assistant,
         selectedIcon = Icons.Filled.Assistant

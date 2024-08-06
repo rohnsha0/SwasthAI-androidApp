@@ -42,6 +42,7 @@ import androidx.compose.material.icons.outlined.JoinLeft
 import androidx.compose.material.icons.outlined.MedicalInformation
 import androidx.compose.material.icons.outlined.QuestionAnswer
 import androidx.compose.material.icons.outlined.VolunteerActivism
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -293,7 +294,7 @@ fun ScanResultScreen(
                     chatdbVm = chatdbVm,
                     chatVM = chatVM,
                 )
-                if (modalState.value){
+                if (modalState.value && rbList.isNotEmpty()){
                     ModalBottomSheet(
                         onDismissRequest = {
                             modalState.value=false
@@ -312,6 +313,13 @@ fun ScanResultScreen(
                             keyVM = keyVM
                         )
                     }
+                } else if (rbList.isEmpty() && modalState.value){
+                    snackbarHostState.SendToast(
+                        message = "Add API secrets to enable verification",
+                        indicator_color = customRed,
+                        icon = Icons.Outlined.Warning
+                    )
+                    modalState.value= false
                 }
             }
         } else {

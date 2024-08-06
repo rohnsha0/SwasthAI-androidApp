@@ -110,7 +110,8 @@ fun ProfileInfoScreen(
                     onValueChanged = {  },
                     label = "First Name",
                     onClose = {  },
-                    isEnabled = false
+                    isEnabled = false,
+                    readOnly = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextInputThemed(
@@ -118,7 +119,8 @@ fun ProfileInfoScreen(
                     onValueChanged = {  },
                     label = "Last Name",
                     onClose = {  },
-                    isEnabled = false
+                    isEnabled = false,
+                    readOnly = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextInputThemed(
@@ -126,7 +128,8 @@ fun ProfileInfoScreen(
                     onValueChanged = {  },
                     label = "Username",
                     onClose = {  },
-                    isEnabled = false
+                    isEnabled = false,
+                    readOnly = true
                 )
             }
         }

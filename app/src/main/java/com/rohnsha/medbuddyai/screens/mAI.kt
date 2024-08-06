@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Engineering
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -44,11 +45,13 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.domain.dataclass.moreActionsWithSubheader
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.scan.DataListFull
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 
@@ -57,7 +60,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun mAIScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    chatdbVm: chatDB_VM
+    chatdbVm: chatDB_VM,
+    snackBarToggleVM: snackBarToggleVM
 ) {
 
     val chatCount= remember {
@@ -155,19 +159,14 @@ fun mAIScreen(
             val taskSpecificBots= listOf(
                 moreActionsWithSubheader(
                     title = "QnA - Pathology",
-                    subheader = "Task Specific Chat",
-                    onClick = {}
+                    subheader = "know about disease",
+                    onClick = { navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 3, chatID = chatCount.value+1)) }
                 ),
                 moreActionsWithSubheader(
                     title = "QnA - Medicinology",
-                    subheader = "Task Specific Chat",
-                    onClick = {}
-                ),
-                moreActionsWithSubheader(
-                    title = "QnA - Allergy",
-                    subheader = "Task Specific Chat",
-                    onClick = {}
-                ),
+                    subheader = "medicine specific suggestions",
+                    onClick = { navController.navigate(bottomNavItems.Chatbot.returnChatID(chatMode = 4, chatID = chatCount.value+1)) }
+                )
             )
             item {
                 Text(
@@ -214,6 +213,12 @@ fun mAIScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
+                        snackBarToggleVM.SendToast(
+                            message = "Feature not ready yet!",
+                            indicator_color = customYellow,
+                            padding = PaddingValues(2.dp),
+                            icon = Icons.Outlined.Engineering
+                        )
                         Log.d("logStatus", "clicked")
                     }
                 )
@@ -225,6 +230,12 @@ fun mAIScreen(
                     additionalDataColor = lightTextAccent,
                     colorLogoTint = Color.Black,
                     onClickListener = {
+                        snackBarToggleVM.SendToast(
+                            message = "Feature not ready yet!",
+                            indicator_color = customYellow,
+                            padding = PaddingValues(2.dp),
+                            icon = Icons.Outlined.Engineering
+                        )
                         Log.d("logStatus", "clicked")
                     }
                 )
@@ -244,7 +255,7 @@ fun mAIScreen(
             items(chatHistory.value.take(n = 3)){
                 DataListFull(
                     title = when(it.mode){
-                        0 -> "QnA"
+                        0, 3, 4, 5 -> "QnA"
                         1 -> "Symptom Checker"
                         2 -> "Qna w/Attachment(s)"
                         else -> "Unknown"

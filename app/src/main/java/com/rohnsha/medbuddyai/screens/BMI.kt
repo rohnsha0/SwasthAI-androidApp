@@ -200,11 +200,11 @@ fun BMIScreen(
                             keyDC = listOf(
                                 keyDC(
                                     serviceName = "swasthai",
-                                    secretKey = "rohnsha0"
+                                    secretKey = ""
                                 ),
                                 keyDC(
                                     serviceName = "google",
-                                    secretKey = "AIzaSyATDPFn1eElqU2RnjoREDJ30BPnPCsGpVI"
+                                    secretKey = ""
                                 ),
                                 keyDC(
                                     serviceName = "openai",

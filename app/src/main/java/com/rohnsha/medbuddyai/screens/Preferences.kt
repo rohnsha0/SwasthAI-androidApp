@@ -1,5 +1,7 @@
 package com.rohnsha.medbuddyai.screens
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,9 +27,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Code
-import androidx.compose.material.icons.filled.Percent
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.StarHalf
+import androidx.compose.material.icons.outlined.Engineering
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -40,18 +41,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.database.userdata.currentUser.currentUserDataVM
 import com.rohnsha.medbuddyai.domain.dataclass.moreActions
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.ViewDash
+import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.formAccent
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
@@ -61,7 +69,8 @@ import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
 fun MoreScreen(
     padding: PaddingValues,
     navController: NavHostController,
-    currentUserDataVM: currentUserDataVM
+    currentUserDataVM: currentUserDataVM,
+    snackBarToggleVM: snackBarToggleVM
 ) {
     Scaffold(
         topBar = {
@@ -101,8 +110,15 @@ fun MoreScreen(
             moreActions("API Secrets") { navController.navigate(bottomNavItems.ApiScreen.route) }
         )
         val settingActions= listOf(
-            moreActions("Account Deactivate & Deletion") {  },
-            moreActions("Legaly") { navController.navigate(bottomNavItems.documentations.returnDoc(0)) }
+            moreActions("Account Deactivate & Deletion") {
+                snackBarToggleVM.SendToast(
+                    message = "Feature not ready yet!",
+                    indicator_color = customYellow,
+                    padding = PaddingValues(2.dp),
+                    icon = Icons.Outlined.Engineering
+                )
+            },
+            moreActions("Data Usage") { navController.navigate(bottomNavItems.documentations.returnDoc(0)) }
         )
         LazyColumn(
             modifier = Modifier
@@ -205,8 +221,9 @@ fun AboutApp() {
                     .padding(start = 13.dp, top = 13.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                AboutUsTitleData(title = "Version", data = "1.0 Plant Sown")
-                AboutUsTitleData(title = "Build Number", data = "2024.3.14.645")
+                AboutUsTitleData(title = "Version", data = "0.6.2 Plant Sown")
+                AboutUsTitleData(title = "Build Number", data = "2024.08.02.11")
+                val context= LocalContext.current
                 Row(
                     modifier = Modifier
                         .weight(1f),
@@ -217,10 +234,18 @@ fun AboutApp() {
                         contentDescription = "github code",
                         modifier = Modifier
                             .size(24.dp)
+                            .clip(CircleShape)
                             .background(Color.White, CircleShape)
+                            .clickable {
+                                val githubUrl = "https://github.com/rohnsha0/SwasthAI-androidApp"
+
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(githubUrl))
+                                context.startActivity(intent)
+                            }
                             .padding(4.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
+                    /*
                     Image(
                         imageVector = Icons.Filled.StarHalf,
                         contentDescription = "rate code",
@@ -228,18 +253,19 @@ fun AboutApp() {
                             .size(24.dp)
                             .background(Color.White, CircleShape)
                             .padding(4.dp)
-                    )
+                    )*/
                 }
                 AboutUsTitleData(title = "Maintainer", data = "Rohan Shaw", isLightAccent = true)
                 Spacer(modifier = Modifier.height(13.dp))
             }
             Spacer(modifier = Modifier.weight(1f))
             Image(
-                imageVector = Icons.Filled.Percent,
-                contentDescription = "",
+                painter = painterResource(id = R.drawable.logo_welcme),
+                contentDescription = "logo",
                 modifier = Modifier
                     .size(125.dp)
-                    .padding(20.dp)
+                    .padding(20.dp),
+                colorFilter = ColorFilter.tint(color = customBlue)
             )
         }
         Spacer(modifier = Modifier.height(20.dp))

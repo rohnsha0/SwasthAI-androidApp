@@ -16,4 +16,12 @@ interface chatbot_interface {
         @Query("secretCode") secretCode: String,
         @Query("message") message: String
     ): chatbot_dc
+
+    @POST("task/chat/")
+    suspend fun sendTaskMsg(
+        @Query("serviceName") serviceName: String,
+        @Query("secretCode") secretCode: String,
+        @Query("message") message: String,
+        @Query("task") task: Int
+    ): chatbot_dc
 }

@@ -24,9 +24,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.ArrowDropDown
-import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.MedicalInformation
+import androidx.compose.material.icons.outlined.TipsAndUpdates
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -240,7 +240,7 @@ fun DiseasesCatelogue(
 
             items(lists.value){
                 DataListFull(
-                    imageVector = Icons.Outlined.Book,
+                    imageVector = Icons.Outlined.TipsAndUpdates,
                     title = it.disease_name,
                     colorLogo = Color.White,
                     colorLogoTint = Color.Black,

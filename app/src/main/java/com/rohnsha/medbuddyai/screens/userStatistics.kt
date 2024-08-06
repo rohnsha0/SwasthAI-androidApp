@@ -90,6 +90,7 @@ fun UserStatScreen(
                     containerColor = BGMain
                 ),
                 actions = {
+                    if (viewMode==0 || viewMode==1)
                     IconButton(onClick = {
                         scope.launch {
                             if (currentUserDataVM.isDefaultUser(userIndexx)){
@@ -106,10 +107,12 @@ fun UserStatScreen(
                             }
                         }
                     }) {
-                        Icon(
-                            imageVector = Icons.Default.PersonRemove,
-                            contentDescription = "Delete Icon"
-                        )
+                        if (viewMode==0){
+                            Icon(
+                                imageVector = Icons.Default.PersonRemove,
+                                contentDescription = "Delete Icon"
+                            )
+                        }
                     }
                 },
                 navigationIcon = {

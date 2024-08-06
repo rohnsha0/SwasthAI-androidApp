@@ -113,7 +113,7 @@ fun ChatBotScreen(
     currentUserDataVModel= currentUserDataVM
 
     val messageFieldState= remember {
-        mutableStateOf(mode==0 || mode==2)
+        mutableStateOf(mode!=1)
     }
 
     val bomState= remember {
@@ -390,7 +390,7 @@ fun ChatBotScreen(
                         ){
                             Text(
                                 text = when(mode){
-                                    0 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
+                                    0, 3, 4, 5, 2 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
                                             " questions about medical"
                                     1 -> "You are chatting with SwasthAI Symptom checker bot trained to detect possible" +
                                             "symtoms associated with a disease"

@@ -47,6 +47,7 @@ import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.BrowseGallery
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Engineering
 import androidx.compose.material.icons.outlined.FlashAuto
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
@@ -98,11 +99,13 @@ import com.rohnsha.medbuddyai.domain.dataclass.classification
 import com.rohnsha.medbuddyai.domain.viewmodels.classificationVM
 import com.rohnsha.medbuddyai.domain.viewmodels.photoCaptureViewModel
 import com.rohnsha.medbuddyai.domain.viewmodels.sideStateVM
+import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.screens.BOMChangeDUser
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
+import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -120,7 +123,8 @@ fun ScanScreen(
     index: Int,
     sideStateVM: sideStateVM,
     currentUserDataVM: currentUserDataVM,
-    keyVM: keyVM
+    keyVM: keyVM,
+    snackBarToggleVM: snackBarToggleVM
 ) {
     viewModelPhotoSave = photoCaptureVM
     viewModelClassification = classifierVM
@@ -204,7 +208,7 @@ fun ScanScreen(
         ) {
             ScanMainScreen(
                 navController,
-                index
+                index, snackBarToggleVM = snackBarToggleVM
             )
         }
     }
@@ -407,7 +411,8 @@ private fun takePhoto(
 @Composable
 fun ScanMainScreen(
     navController: NavHostController,
-    index: Int
+    index: Int,
+    snackBarToggleVM: snackBarToggleVM
 ) {
     val conttext= LocalContext.current
     var itt= classification(0, 6f)
@@ -502,7 +507,12 @@ fun ScanMainScreen(
         ) {
             IconButton(onClick = {
                 if (!isConfirming.value) {
-
+                    snackBarToggleVM.SendToast(
+                        message = "Feature not ready yet!",
+                        indicator_color = customYellow,
+                        padding = PaddingValues(2.dp),
+                        icon = Icons.Outlined.Engineering
+                    )
                 } else {
                     isConfirming.value = false
                 }

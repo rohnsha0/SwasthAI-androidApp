@@ -139,7 +139,8 @@ fun APIScreen(
                     onValueChanged = { swasthai.value = it },
                     label = "SwasthAI API Key",
                     onClose = { swasthai.value = "" },
-                    isEnabled = false
+                    isEnabled = false,
+                    readOnly = true
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextInputThemed(

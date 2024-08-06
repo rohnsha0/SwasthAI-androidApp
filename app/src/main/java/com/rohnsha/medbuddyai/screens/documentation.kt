@@ -36,7 +36,7 @@ fun DocumentationScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (index==0) "Legally" else "Documentation",
+                        text = if (index==0) "Data Usage" else "Documentation",
                         fontFamily = fontFamily,
                         fontWeight = FontWeight(600),
                         fontSize = 26.sp
@@ -117,9 +117,9 @@ private fun returnDoc(index: Int): String {
     }
 
     return when(index){
-        1 -> legally()
-        2 -> scanQuestions()
-        3 -> scanResults()
+        0 -> legally()
+        1 -> scanQuestions()
+        2 -> scanResults()
         else -> ""
     }
 

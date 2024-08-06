@@ -173,6 +173,14 @@ class chatVM: ViewModel() {
                 1 -> {
                     chatService.getChatReply(url = "https://api-jjtysweprq-el.a.run.app/symptoms/$message")
                 }
+                3, 4, 5 -> {
+                    chatService.sendTaskMsg(
+                        serviceName = defaultService.serviceName,
+                        secretCode = defaultService.secretKey,
+                        message = message,
+                        task = mode
+                    )
+                }
                 else -> {
                     chatService.getChatReply(url = "https://api-jjtysweprq-el.a.run.app/symptoms/$message")
                 }

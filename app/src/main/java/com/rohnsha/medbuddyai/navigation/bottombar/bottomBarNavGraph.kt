@@ -143,7 +143,7 @@ fun bottomNavGraph(
             CommunityReply(padding, postID = it.arguments?.getString(postID)!!, communityVM, snackBarVM, communityDBVModel, navController = navController)
         }
         composable(route = bottomNavItems.Preferences.route){
-            MoreScreen(padding = padding, navController = navController, currentUserDataVM = currentUserVM)
+            MoreScreen(padding = padding, navController = navController, currentUserDataVM = currentUserVM, snackBarToggleVM = snackBarVM)
         }
         composable(
             route = bottomNavItems.Scan.route,
@@ -160,7 +160,7 @@ fun bottomNavGraph(
                 classifierVM = classifierVM,
                 index = it.arguments!!.getInt(scanIndexKey),
                 sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM,
-                keyVM = keyVM
+                keyVM = keyVM, snackBarToggleVM = snackBarVM
             )
         }
 
@@ -229,7 +229,7 @@ fun bottomNavGraph(
         composable(route = bottomNavItems.mAI.route){
             mAIScreen(
                 padding = padding,
-                navController, chatdbVM
+                navController, chatdbVM, snackBarToggleVM = snackBarVM
             )
         }
 

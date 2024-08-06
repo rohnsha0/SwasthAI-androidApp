@@ -29,12 +29,9 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.outlined.Biotech
 import androidx.compose.material.icons.outlined.CameraAlt
-import androidx.compose.material.icons.outlined.EmojiPeople
+import androidx.compose.material.icons.outlined.CollectionsBookmark
 import androidx.compose.material.icons.outlined.Engineering
 import androidx.compose.material.icons.outlined.MedicalInformation
-import androidx.compose.material.icons.outlined.Psychology
-import androidx.compose.material.icons.outlined.ReadMore
-import androidx.compose.material.icons.outlined.SelfImprovement
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.SmartToy
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -203,8 +200,7 @@ fun HomeScreen(
                 ) {
                     Row {
                         Text(
-                            modifier = Modifier
-                                .padding(start = 30.dp),
+                            modifier = Modifier,
                             text = "Add User",
                             fontSize = 19.sp,
                             fontWeight = FontWeight(600),
@@ -235,8 +231,7 @@ fun HomeScreen(
                                             padding = PaddingValues(2.dp),
                                         )
                                     }
-                                }
-                                .padding(end = 30.dp),
+                                },
                             text = "Save",
                             fontSize = 17.sp,
                             color = customBlue,
@@ -454,11 +449,11 @@ fun explore_diseases(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Neural", icon = Icons.Outlined.Psychology, weight = .49f, onClickListener = {
+            explore_tabs(title = "Neural", icon = Icons.Outlined.CollectionsBookmark, weight = .49f, onClickListener = {
                 navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(3))
             })
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Derma", icon = Icons.Outlined.EmojiPeople, weight = 1f, onClickListener = {
+            explore_tabs(title = "Derma", icon = Icons.Outlined.CollectionsBookmark, weight = 1f, onClickListener = {
                 navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(8))
             })
         }
@@ -467,11 +462,11 @@ fun explore_diseases(
                 .padding(top = 12.dp)
                 .fillMaxWidth()
         ) {
-            explore_tabs(title = "Respiratory", icon = Icons.Outlined.SelfImprovement, weight = .49f, onClickListener = {
+            explore_tabs(title = "Respiratory", icon = Icons.Outlined.CollectionsBookmark, weight = .49f, onClickListener = {
                 navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(6))
             })
             Spacer(modifier = Modifier.width(12.dp))
-            explore_tabs(title = "Digestive", icon = Icons.Outlined.ReadMore, weight = 1f, onClickListener = {
+            explore_tabs(title = "Digestive", icon = Icons.Outlined.CollectionsBookmark, weight = 1f, onClickListener = {
                 navController.navigate(bottomNavItems.DiseaseCatelogue.returnDiseaseCatelogue(1))
             })
         }
