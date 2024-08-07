@@ -118,6 +118,15 @@ class communityVM: ViewModel() {
                         } else {
                             Log.e("authUserAction", "Post unsuccessful", task.exception)
                         }
+                        task.addOnFailureListener {
+                            Log.e("authUserAction", "unsuccessful")
+                        }
+                    }
+                    .addOnFailureListener {
+                        Log.e("authUserAction", "unsuccessful")
+                    }
+                    .addOnCanceledListener {
+                        Log.e("authUserAction", "canceled")
                     }
             }
         }

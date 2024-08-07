@@ -3,19 +3,11 @@ package com.rohnsha.medbuddyai.database.userdata.communityTable
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.rohnsha.medbuddyai.database.userdata.userDataDB
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class communityDBVM(application: Application): AndroidViewModel(application) {
 
     private val communityRepo: communityRepo
     private val communityDAO: communityDAO
-
-    private val _communityFeed= MutableStateFlow<List<postWithReply>>(emptyList())
-    val feed= _communityFeed.asStateFlow()
-
-    private val _replies= MutableStateFlow<List<Reply>>(emptyList())
-    val replyFeed= _replies.asStateFlow()
 
     init {
         communityDAO= userDataDB.getUserDBRefence(application).communityDAO()
@@ -71,7 +63,6 @@ class communityDBVM(application: Application): AndroidViewModel(application) {
         for (reply in replyList){
             replyData.add(reply)
         }
-        _replies.value= replyList
         val postsWithReplies = mutableListOf<postWithReply>()
         for (post in postData) {
             val postReplies = if (postID == null) {
@@ -81,7 +72,6 @@ class communityDBVM(application: Application): AndroidViewModel(application) {
             }
             postsWithReplies.add(postWithReply(post, postReplies))
         }
-        _communityFeed.value= postsWithReplies
 
         return postsWithReplies
     }

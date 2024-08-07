@@ -107,7 +107,6 @@ fun bottomNavGraph(
         Log.d("dbStatus", "Starting VM")
         delay(750L)
         diseaseDBviewModel.fetchUpdatedDB(versionName = packageInfo.versionName, context = context)
-        communityDBVModel.mergePostReplies()
         Log.d("dbStatus", "Ending VM")
     }
 

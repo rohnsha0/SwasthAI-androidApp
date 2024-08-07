@@ -95,17 +95,6 @@ fun CommunityScreen(
             mutableStateListOf<postWithReply>()
         }
 
-        val feed= remember {
-            mutableStateListOf<postWithReply>()
-        }
-
-        LaunchedEffect(key1 = postsWithReplies) {
-            communityDBVM.mergePostReplies()
-            for (data in communityDBVM.feed.value){
-                feed.add(data)
-            }
-        }
-
         LaunchedEffect(key1 = postsWithReplies) {
             for (data in communityDBVM.mergePostReplies()){
                 if (!postsWithReplies.contains(data)){
@@ -116,8 +105,6 @@ fun CommunityScreen(
         }
 
         Log.d("dataSnapCOmmPostReply", postsWithReplies.toString())
-        Log.d("dataSnapCOmmPostReply", feed.toString())
-        Log.d("dataSnapCOmmPostReply", feed.size.toString())
 
         val isCreateExpanded= remember {
             mutableStateOf(false)
