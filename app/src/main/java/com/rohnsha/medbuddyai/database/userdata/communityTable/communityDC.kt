@@ -25,3 +25,8 @@ data class postWithReply(
     val post: Post,
     val replies: List<Reply>
 )
+
+data class postWithState(
+    val post: Post,
+    val isPosted: Boolean
+)

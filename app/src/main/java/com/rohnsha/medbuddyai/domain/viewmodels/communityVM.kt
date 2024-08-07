@@ -12,9 +12,11 @@ import com.rohnsha.medbuddyai.database.userdata.communityTable.Post
 import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
 import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithReply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithState
 import com.rohnsha.medbuddyai.ui.theme.customYellow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -36,8 +38,12 @@ class communityVM: ViewModel() {
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
     private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
     private val _postCount= MutableStateFlow(0L)
-
+    private val _isCurrentlyPosting= MutableStateFlow(false)
     private var retryCount = 0
+    private val _postedList= MutableStateFlow<List<postWithState>>(emptyList())
+
+    val isCurrentlyPosting= _isCurrentlyPosting.asStateFlow()
+    val postedList= _postedList.asStateFlow()
 
     fun initialize(
         instance: FirebaseAuth,
@@ -73,7 +79,6 @@ class communityVM: ViewModel() {
                             timestamp = System.currentTimeMillis().toString(),
                             author = _username
                         )
-
                         _firestoreRef
                             .child("replies")
                             .child(_username)
@@ -98,24 +103,34 @@ class communityVM: ViewModel() {
 
     fun post(
         content: String,
-        onCompleteLambda: (Post) -> Unit
+        onCompleteLambda: (Post) -> Unit,
+        resetValues: () -> Unit = {},
+        postCount: Long?= null,
+        isRetry: Boolean= false
     ){
+        resetValues()
         viewModelScope.launch {
+            _isCurrentlyPosting.value= true
+            _postCount.value= postCount ?: (_communityDBVM.getPostCountByUsername(_username) + _postedList.value.size + 1L)
+            val localPostCount= if (isRetry) postCount else _postCount.value
+            Log.d("postCount", _postCount.value.toString())
+            val postID= "${_username}: ${_postCount.value}"
+            val newPost= Post(
+                id = postID,
+                author = _username,
+                content = content,
+                timestamp = System.currentTimeMillis().toString(),
+            )
+            if (_postedList.value.none { it.post.id == newPost.id }) {
+                val updatedList = (_postedList.value + postWithState(newPost, false))
+                    .sortedByDescending { it.post.timestamp }
+                _postedList.value = updatedList
+            }
             Log.d("authUserAction", "post invoked")
             if (_auth.currentUser!=null){
                 Log.d("authUsername", _username)
-
                 try {
                     val response= commVerifyService.isAllowedToBePosted(content)
-                    _postCount.value= _communityDBVM.getPostCountByUsername(_username) +1L
-                    Log.d("postCount", _postCount.value.toString())
-                    val postID= "${_username}: ${_postCount.value}"
-                    val newPost= Post(
-                        id = postID,
-                        author = _username,
-                        content = content,
-                        timestamp = System.currentTimeMillis().toString(),
-                    )
                     if (response.isMedicalText){
                         Log.d("authUserAction", newPost.toString())
                         _firestoreRef.child("posts").child(_username).child(postID).setValue(newPost)
@@ -126,6 +141,8 @@ class communityVM: ViewModel() {
                                         _communityDBVM.addPosts(listOf(newPost))
                                     }
                                     onCompleteLambda(newPost)
+                                    _isCurrentlyPosting.value= false
+                                    _postedList.value = _postedList.value.filter { it.post.id != newPost.id }
                                 } else {
                                     Log.e("authUserAction", "Post unsuccessful", task.exception)
                                 }
@@ -139,11 +156,14 @@ class communityVM: ViewModel() {
                             .addOnCanceledListener {
                                 Log.e("authUserAction", "canceled")
                             }
+
                     } else{
                         _snackBarToggleVM.SendToast(
                             message = response.message,
                             indicator_color = customYellow
                         )
+                        _isCurrentlyPosting.value= false
+                        _postedList.value = _postedList.value.filter { it.post.id != newPost.id }
                     }
                 } catch (e: Exception){
                     when (e) {
@@ -170,7 +190,7 @@ class communityVM: ViewModel() {
                             if (e.code()!=404 || e.code()!=401){
                                 val delayMillis = calculateExponentialBackoff(retryCount)
                                 delay(delayMillis)
-                                post(content, onCompleteLambda)
+                                post(content, onCompleteLambda, postCount = localPostCount, isRetry = true)
                             }
                         }
                         is IOException -> {
@@ -179,14 +199,14 @@ class communityVM: ViewModel() {
                             Log.d("errorChat", e.toString())
                             val delayMillis = calculateExponentialBackoff(retryCount)
                             delay(delayMillis)
-                            post(content, onCompleteLambda)
+                            post(content, onCompleteLambda, postCount = localPostCount, isRetry = true)
                         } else -> {
                             Log.d("errorChat", e.stackTrace.toString())
                             Log.d("errorChat", e.message ?: "An unknown error occurred")
                             Log.d("errorChat", e.toString())
                             val delayMillis = calculateExponentialBackoff(retryCount)
                             delay(delayMillis)
-                            post(content, onCompleteLambda)
+                            post(content, onCompleteLambda, postCount = localPostCount, isRetry = true)
                         }
                     }
                 }

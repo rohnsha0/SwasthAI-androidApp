@@ -29,11 +29,13 @@ import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.TaskAlt
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithReply
+import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithState
 import com.rohnsha.medbuddyai.domain.viewmodels.communityVM
 import com.rohnsha.medbuddyai.domain.viewmodels.snackBarToggleVM
 import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
@@ -71,6 +74,10 @@ fun CommunityScreen(
     communityViewModel: communityVM,
     communityDBVM: communityDBVM
 ) {
+
+    val processingState= communityViewModel.isCurrentlyPosting.collectAsState().value
+    val listPosted= communityViewModel.postedList.collectAsState().value.filter { !it.isPosted }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -146,11 +153,14 @@ fun CommunityScreen(
                             if (isCreateExpanded.value) {
                                 if (content.value!=""){
                                     communityViewModel.post(
+                                        resetValues = {
+                                            title.value= ""
+                                            content.value= ""
+                                            isCreateExpanded.value= false
+                                        },
                                         content= content.value,
                                         onCompleteLambda = {
                                             isCreateExpanded.value= false
-                                            title.value= ""
-                                            content.value= ""
                                             scope.launch {
                                                 postsWithReplies.add(
                                                     postWithReply(
@@ -173,7 +183,6 @@ fun CommunityScreen(
                                     PaddingValues(0.dp)
                                 )
                             } else isCreateExpanded.value= true
-
                         }
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -204,13 +213,34 @@ fun CommunityScreen(
                         )
                     }
                 }
+                if (processingState){
+                    Spacer(modifier = Modifier.height(6.dp))
+                }
+            }
+            if (processingState){
+                items(listPosted){ it: postWithState ->
+                    val data= it.post
+                    CommunityPostItem(
+                        title =data.author,
+                        subtitle =data.id,
+                        colorLogo = customBlue,
+                        postData =data.content,
+                        onClickListener = null
+                    )
+                }
+            }
+            item {
                 Text(
                     text = "Recent Posts",
                     fontFamily = fontFamily,
                     fontWeight = FontWeight(600),
                     fontSize = 15.sp,
                     modifier = Modifier
-                        .padding(bottom = 6.dp, top = 18.dp)
+                        .then(
+                            if (processingState){
+                                Modifier.padding(bottom = 6.dp, top = 12.dp)
+                            } else Modifier.padding(bottom = 6.dp, top = 18.dp)
+                        )
                 )
             }
             if (postsWithReplies.isNotEmpty()){
@@ -244,7 +274,7 @@ fun CommunityScreen(
 fun CommunityPostItem(
     title: String,
     subtitle: String,
-    data: String,
+    data: String? = null,
     additionData: String? =null,
     imageVector: ImageVector= Icons.Outlined.Quickreply,
     colorLogo: Color,
@@ -316,13 +346,22 @@ fun CommunityPostItem(
                         .padding(end = 18.dp),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Text(
-                        modifier = Modifier,
-                        text = data,
-                        fontSize = 14.sp,
-                        fontFamily = fontFamily,
-                        fontWeight = FontWeight(600)
-                    )
+                    if (data==null && additionData==null){
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .width(32.dp)
+                                .align(Alignment.End)
+                        )
+                    }
+                    if (data != null) {
+                        Text(
+                            modifier = Modifier,
+                            text = data,
+                            fontSize = 14.sp,
+                            fontFamily = fontFamily,
+                            fontWeight = FontWeight(600)
+                        )
+                    }
                     additionData?.let {
                         Text(
                             modifier = Modifier
