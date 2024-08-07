@@ -91,7 +91,7 @@ fun bottomNavGraph(
 
     val dbRef= Firebase.database.reference
     userAuth.initialize(instance = _auth, dbReference = dbRef, currentUserVM, keyVM = keyVM)
-    communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value, communityDBVModel = communityDBVModel)
+    communityVM.initialize(instance = _auth, dbReference = dbRef, username = username.value, communityDBVModel = communityDBVModel, snackBarToggleVM = snackBarVM)
     val scanHistoryviewModel= viewModel<scanHistoryViewModel>()
     val diseaseDBviewModel= viewModel<diseaseDBviewModel>()
     val chatdbVM= viewModel<chatDB_VM>()

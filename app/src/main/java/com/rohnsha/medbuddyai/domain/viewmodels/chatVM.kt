@@ -247,8 +247,7 @@ class chatVM: ViewModel() {
                     )
                     _listMessages.emit(errorData)
                     vmChat.addMessages(errorData)
-                }
-                else -> {
+                } else -> {
                     Log.d("errorChat", e.stackTrace.toString())
                     Log.d("errorChat", e.message ?: "An unknown error occurred")
                     Log.d("errorChat", e.toString())

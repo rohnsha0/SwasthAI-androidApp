@@ -7,19 +7,24 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.getValue
+import com.rohnsha.medbuddyai.api.community.commVerifyObj.commVerifyService
 import com.rohnsha.medbuddyai.database.userdata.communityTable.Post
 import com.rohnsha.medbuddyai.database.userdata.communityTable.Reply
 import com.rohnsha.medbuddyai.database.userdata.communityTable.communityDBVM
 import com.rohnsha.medbuddyai.database.userdata.communityTable.postWithReply
+import com.rohnsha.medbuddyai.ui.theme.customYellow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.io.IOException
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import kotlin.math.pow
 
 class communityVM: ViewModel() {
 
@@ -27,24 +32,26 @@ class communityVM: ViewModel() {
     private lateinit var _firestoreRef: DatabaseReference
     private lateinit var _username: String
     private lateinit var _communityDBVM: communityDBVM
+    private lateinit var _snackBarToggleVM: snackBarToggleVM
     private val _postFeed= MutableStateFlow<List<Post>>(emptyList())
     private val _replyFeed= MutableStateFlow<List<Reply>>(emptyList())
     private val _postCount= MutableStateFlow(0L)
 
-    val feedContents= _postFeed.asStateFlow()
-    val replyContents= _replyFeed.asStateFlow()
+    private var retryCount = 0
 
     fun initialize(
         instance: FirebaseAuth,
         dbReference: DatabaseReference,
         username: String,
-        communityDBVModel: communityDBVM
+        communityDBVModel: communityDBVM,
+        snackBarToggleVM: snackBarToggleVM
     ){
         _auth= instance
         _firestoreRef= dbReference
         Log.d("loginStatus", _auth.currentUser?.uid ?: "nullified")
         _username= username
         _communityDBVM= communityDBVModel
+        _snackBarToggleVM= snackBarToggleVM
     }
 
     fun addReply(
@@ -97,37 +104,93 @@ class communityVM: ViewModel() {
             Log.d("authUserAction", "post invoked")
             if (_auth.currentUser!=null){
                 Log.d("authUsername", _username)
-                _postCount.value= _communityDBVM.getPostCountByUsername(_username) +1L
-                Log.d("postCount", _postCount.value.toString())
-                val postID= "${_username}: ${_postCount.value}"
-                val newPost= Post(
-                    id = postID,
-                    author = _username,
-                    content = content,
-                    timestamp = System.currentTimeMillis().toString(),
-                )
-                Log.d("authUserAction", newPost.toString())
-                _firestoreRef.child("posts").child(_username).child(postID).setValue(newPost)
-                    .addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("authUserAction", "Post successful")
-                            viewModelScope.launch {
-                                _communityDBVM.addPosts(listOf(newPost))
+
+                try {
+                    val response= commVerifyService.isAllowedToBePosted(content)
+                    _postCount.value= _communityDBVM.getPostCountByUsername(_username) +1L
+                    Log.d("postCount", _postCount.value.toString())
+                    val postID= "${_username}: ${_postCount.value}"
+                    val newPost= Post(
+                        id = postID,
+                        author = _username,
+                        content = content,
+                        timestamp = System.currentTimeMillis().toString(),
+                    )
+                    if (response.isMedicalText){
+                        Log.d("authUserAction", newPost.toString())
+                        _firestoreRef.child("posts").child(_username).child(postID).setValue(newPost)
+                            .addOnCompleteListener { task ->
+                                if (task.isSuccessful) {
+                                    Log.d("authUserAction", "Post successful")
+                                    viewModelScope.launch {
+                                        _communityDBVM.addPosts(listOf(newPost))
+                                    }
+                                    onCompleteLambda(newPost)
+                                } else {
+                                    Log.e("authUserAction", "Post unsuccessful", task.exception)
+                                }
+                                task.addOnFailureListener {
+                                    Log.e("authUserAction", "unsuccessful")
+                                }
                             }
-                            onCompleteLambda(newPost)
-                        } else {
-                            Log.e("authUserAction", "Post unsuccessful", task.exception)
+                            .addOnFailureListener {
+                                Log.e("authUserAction", "unsuccessful")
+                            }
+                            .addOnCanceledListener {
+                                Log.e("authUserAction", "canceled")
+                            }
+                    } else{
+                        _snackBarToggleVM.SendToast(
+                            message = response.message,
+                            indicator_color = customYellow
+                        )
+                    }
+                } catch (e: Exception){
+                    when (e) {
+                        is retrofit2.HttpException -> {
+                            val errorMessage = when (e.code()) {
+                                504 -> "Gateway timeout: The server is not responding"
+                                500 -> "Internal server error"
+                                404 -> "Resource not found"
+                                401 -> {
+                                    val errorBody = e.response()!!.errorBody()?.string()
+                                    try {
+                                        val jsonObject = JSONObject(errorBody!!)
+                                        jsonObject.optString("message", "Unknown error caused!")
+                                    } catch (jsonException: Exception) {
+                                        "Unauthorized: Invalid service name or secret code"
+                                    }
+                                }
+                                // Add more cases for other HTTP error codes
+                                else -> "An HTTP error occurred: ${e.code()} ${e.message()}"
+                            }
+                            Log.d("errorChat", e.stackTrace.toString())
+                            Log.d("errorChat", errorMessage)
+                            Log.d("errorChat", e.toString())
+                            if (e.code()!=404 || e.code()!=401){
+                                val delayMillis = calculateExponentialBackoff(retryCount)
+                                delay(delayMillis)
+                                post(content, onCompleteLambda)
+                            }
                         }
-                        task.addOnFailureListener {
-                            Log.e("authUserAction", "unsuccessful")
+                        is IOException -> {
+                            Log.d("errorChat", e.stackTrace.toString())
+                            Log.d("errorChat", "Network error: ${e.message}")
+                            Log.d("errorChat", e.toString())
+                            val delayMillis = calculateExponentialBackoff(retryCount)
+                            delay(delayMillis)
+                            post(content, onCompleteLambda)
+                        } else -> {
+                            Log.d("errorChat", e.stackTrace.toString())
+                            Log.d("errorChat", e.message ?: "An unknown error occurred")
+                            Log.d("errorChat", e.toString())
+                            val delayMillis = calculateExponentialBackoff(retryCount)
+                            delay(delayMillis)
+                            post(content, onCompleteLambda)
                         }
                     }
-                    .addOnFailureListener {
-                        Log.e("authUserAction", "unsuccessful")
-                    }
-                    .addOnCanceledListener {
-                        Log.e("authUserAction", "canceled")
-                    }
+                }
+
             }
         }
     }
@@ -232,6 +295,13 @@ class communityVM: ViewModel() {
             postsWithReplies.add(postWithReply(post, postReplies))
         }
         return postsWithReplies
+    }
+
+    private fun calculateExponentialBackoff(retryCount: Int): Long {
+        // Exponential backoff formula: base * 2^retryCount
+        val base = 1000L // Base delay in milliseconds (1 second)
+        val delayMillis = base * (2.0).pow(retryCount.toDouble()).toLong()
+        return delayMillis.coerceAtMost(30000L) // Cap the maximum delay to 30 seconds
     }
 
 }
