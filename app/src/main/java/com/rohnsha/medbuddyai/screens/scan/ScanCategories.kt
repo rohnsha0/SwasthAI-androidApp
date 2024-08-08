@@ -176,10 +176,10 @@ fun ScanCategoryScreen(
                 onDismissRequest = { bomStateDUser.value = false },
                 containerColor = Color.White
             ) {
-                BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM) {
+                BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM, onClickListener = {
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
-                }
+                }, isUserChangeable = true)
             }
         }
 

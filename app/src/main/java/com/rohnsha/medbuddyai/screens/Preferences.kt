@@ -222,7 +222,7 @@ fun AboutApp() {
                 horizontalAlignment = Alignment.Start
             ) {
                 AboutUsTitleData(title = "Version", data = "0.6.2 Plant Sown")
-                AboutUsTitleData(title = "Build Number", data = "2024.08.02.11")
+                AboutUsTitleData(title = "Build Number", data = "2024.08.07.35")
                 val context= LocalContext.current
                 Row(
                     modifier = Modifier

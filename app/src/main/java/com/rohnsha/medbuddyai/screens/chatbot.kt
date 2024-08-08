@@ -33,6 +33,7 @@ import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material.icons.outlined.ShortText
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -115,6 +116,10 @@ fun ChatBotScreen(
     val messageFieldState= remember {
         mutableStateOf(mode!=1)
     }
+
+    val isChatbotResponding= chatVM.isChatbotResponding.collectAsState().value
+
+    Log.d("isChatbotResponding", isChatbotResponding.toString())
 
     val bomState= remember {
         mutableStateOf(false)
@@ -285,13 +290,11 @@ fun ChatBotScreen(
                     }
                 },
                 actions = {
-                    if (messaageList.isEmpty()){
-                        IconButton(onClick = { bomStateDUser.value = true }) {
-                            Icon(
-                                imageVector = Icons.Default.SettingsSuggest,
-                                contentDescription = "Menu Icon"
-                            )
-                        }
+                    IconButton(onClick = { bomStateDUser.value = true }) {
+                        Icon(
+                            imageVector = Icons.Default.SettingsSuggest,
+                            contentDescription = "Menu Icon"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -313,7 +316,7 @@ fun ChatBotScreen(
                 BOMChangeDUser(currentUserDataVM = currentUserDataVM, keyVM = keyVM, onClickListener = {
                     bomStateDUser.value= false
                     currentUserDataVM.switchDefafultUser(it)
-                })
+                }, isUserChangeable = messaageList.isEmpty())
             }
         }
 
@@ -414,7 +417,7 @@ fun ChatBotScreen(
                             },
                             timeStamp = attachmentTimeStamp.value
                         )
-                    } else{
+                    } else {
                         Spacer(modifier = Modifier.height(6.dp))
                         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
                             Text(
@@ -523,44 +526,61 @@ fun ChatBotScreen(
                     enabled = messageFieldState.value
                 )
                 Spacer(modifier = Modifier.width(10.dp))
-                Icon(
-                    imageVector =Icons.Outlined.Send, contentDescription = "",
+                Box(
                     modifier = Modifier
                         .size(40.dp)
                         .clip(CircleShape)
-                        .clickable {
-                            scope.launch {
-                                if (messageField.value != "" && !messageField.value.matches(Regex("^\\s+$"))) {
-                                    chatbotViewModel.chat(
-                                        message = messageField.value.trim(),
-                                        resetMessageFeild = {
-                                            if (mode == 1) {
-                                                detectedSymptom.clear()
+                        .then(
+                            if (!isChatbotResponding){
+                                Modifier
+                                    .clickable {
+                                        scope.launch {
+                                            if (messageField.value != "" && !messageField.value.matches(Regex("^\\s+$"))) {
+                                                chatbotViewModel.chat(
+                                                    message = messageField.value.trim(),
+                                                    resetMessageFeild = {
+                                                        if (mode == 1) {
+                                                            detectedSymptom.clear()
+                                                        }
+                                                        messageField.value = ""
+                                                    },
+                                                    vmChat = chatdbVm,
+                                                    chatID = chatID,
+                                                    mode = mode,
+                                                    currentUserIndex = currentUser.intValue,
+                                                    timeStampAttachment = attachmentTimeStamp.value,
+                                                    keyVM = keyVM
+                                                )
+                                                optionEnabled.value = false
+                                            } else {
+                                                snackBarToggleVM.SendToast(
+                                                    message = "Enter a message to be sent",
+                                                    indicator_color = customYellow,
+                                                    padding = PaddingValues(2.dp),
+                                                    icon = Icons.Outlined.Warning
+                                                )
                                             }
-                                            messageField.value = ""
-                                        },
-                                        vmChat = chatdbVm,
-                                        chatID = chatID,
-                                        mode = mode,
-                                        currentUserIndex = currentUser.intValue,
-                                        timeStampAttachment = attachmentTimeStamp.value,
-                                        keyVM = keyVM
-                                    )
-                                    optionEnabled.value = false
-                                } else {
-                                    snackBarToggleVM.SendToast(
-                                        message = "Enter a message to be sent",
-                                        indicator_color = customYellow,
-                                        padding = PaddingValues(2.dp),
-                                        icon = Icons.Outlined.Warning
-                                    )
-                                }
-                            }
-                        }
+                                        }
+                                    }
+                            } else Modifier
+                        )
                         .background(customBlue)
-                        .padding(10.dp),
-                    tint = Color.White
-                )
+                        .padding(10.dp)
+                ){
+                    if (isChatbotResponding){
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector =Icons.Outlined.Send, contentDescription = "",
+                            modifier = Modifier,
+                            tint = Color.White
+                        )
+                    }
+                }
             }
         }
     }
@@ -781,7 +801,8 @@ fun SymptomsList(title: String, onClickListener: () -> Unit) {
 fun BOMChangeDUser(
     keyVM: keyVM,
     currentUserDataVM: currentUserDataVM,
-    onClickListener: (Int) -> Unit
+    onClickListener: (Int) -> Unit,
+    isUserChangeable: Boolean
 ) {
     val users= remember{
         mutableStateListOf<fieldValueDC>()
@@ -832,30 +853,32 @@ fun BOMChangeDUser(
             }
             Spacer(modifier = Modifier.height(24.dp))
         }
-        item {
-            Text(
-                text = "Select Patients",
-                fontFamily = fontFamily,
-                fontWeight = FontWeight(600),
-                fontSize = 15.sp,
-                modifier = Modifier
-                    .padding(bottom = 12.dp, start = 24.dp)
-            )
+        if (isUserChangeable){
+            item {
+                Text(
+                    text = "Select Patients",
+                    fontFamily = fontFamily,
+                    fontWeight = FontWeight(600),
+                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(bottom = 12.dp, start = 24.dp)
+                )
+            }
+            items(users){
+                DataListFull(
+                    title = "${it.fname} ${it.lname}",
+                    subtitle = if (it.isDefaultUser) "default" else "patient:${it.index}",
+                    imageVector = if (defUserIndnex.value== it.index) Icons.Outlined.Done else Icons.Outlined.MedicalInformation,
+                    colorLogo = Color.White,
+                    additionalDataColor = lightTextAccent,
+                    colorLogoTint = Color.Black,
+                    onClickListener = {
+                        defUserIndnex.value= it.index
+                    }
+                )
+            }
+            item { Spacer(modifier = Modifier.height(12.dp)) }
         }
-        items(users){
-            DataListFull(
-                title = "${it.fname} ${it.lname}",
-                subtitle = if (it.isDefaultUser) "default" else "patient:${it.index}",
-                imageVector = if (defUserIndnex.value== it.index) Icons.Outlined.Done else Icons.Outlined.MedicalInformation,
-                colorLogo = Color.White,
-                additionalDataColor = lightTextAccent,
-                colorLogoTint = Color.Black,
-                onClickListener = {
-                    defUserIndnex.value= it.index
-                }
-            )
-        }
-        item { Spacer(modifier = Modifier.height(12.dp)) }
         item {
             Text(
                 text = "Select LLM Engine",

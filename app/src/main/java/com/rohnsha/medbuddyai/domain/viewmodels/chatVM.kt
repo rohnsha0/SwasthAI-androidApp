@@ -10,7 +10,6 @@ import com.rohnsha.medbuddyai.database.userdata.chatbot.chats.chatEntity
 import com.rohnsha.medbuddyai.database.userdata.chatbot.messages.messageEntity
 import com.rohnsha.medbuddyai.database.userdata.keys.keyVM
 import com.rohnsha.medbuddyai.database.userdata.scan_history.scanHistory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,6 +25,9 @@ class chatVM: ViewModel() {
 
     private val _messageCount= MutableStateFlow(0)
     val messageCount= _messageCount.asStateFlow()
+
+    private val _isChatbotResponding= MutableStateFlow(false)
+    val isChatbotResponding= _isChatbotResponding.asStateFlow()
 
     private val _messageWithAttachment= MutableStateFlow(messageEntity(
         message = "",
@@ -133,6 +135,7 @@ class chatVM: ViewModel() {
         mode: Int, //0 -> qna, 1 -> ai_symptoms_checker,
         keyVM: keyVM
     ){
+        _isChatbotResponding.value= true
         val defaultService= keyVM.defaultEngine.value
         if (!isRetrying){
             val messageBody= messageEntity(
@@ -195,6 +198,7 @@ class chatVM: ViewModel() {
             _listMessages.emit(resultAPI)
             _messageCount.value += 1
             vmChat.addMessages(resultAPI)
+            _isChatbotResponding.value= false
             Log.d("errorChat", response.message)
         } catch (e: Exception){
             when (e) {
@@ -230,6 +234,7 @@ class chatVM: ViewModel() {
                     vmChat.addMessages(errorData)
                     if (e.code()==404 || e.code()==401){
                         _messageCount.value += 1
+                        _isChatbotResponding.value= false
                         return
                     }
                 }
@@ -264,20 +269,7 @@ class chatVM: ViewModel() {
                 }
             }
             _messageCount.value += 1
-            val delayMillis = calculateExponentialBackoff(retryCount)
-            val retryMessage= messageEntity(
-                message = "Retrying in ${delayMillis/1000} second(s)",
-                isBotMessage = true,
-                timestamp = System.currentTimeMillis(),
-                isError = true,
-                chatId = chatID,
-                hasAttachments = timeStampAttachment
-            )
-            _listMessages.emit(retryMessage)
-            vmChat.addMessages(retryMessage)
-            delay(delayMillis)
-            chat(message = message, resetMessageFeild = resetMessageFeild, vmChat = vmChat, chatID = chatID, mode = mode,
-                isRetrying = true, currentUserIndex = currentUserIndex, timeStampAttachment = timeStampAttachment, keyVM = keyVM)
+            _isChatbotResponding.value= false
         }
     }
 
