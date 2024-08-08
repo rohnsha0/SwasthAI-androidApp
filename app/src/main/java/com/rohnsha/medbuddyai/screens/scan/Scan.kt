@@ -40,6 +40,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CenterFocusStrong
+import androidx.compose.material.icons.filled.FlashOn
 import androidx.compose.material.icons.filled.MotionPhotosAuto
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PsychologyAlt
@@ -47,8 +48,7 @@ import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.BrowseGallery
 import androidx.compose.material.icons.outlined.CenterFocusWeak
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Engineering
-import androidx.compose.material.icons.outlined.FlashAuto
+import androidx.compose.material.icons.outlined.FlashOff
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
@@ -105,7 +105,6 @@ import com.rohnsha.medbuddyai.navigation.sidebar.screens.sideBarModifier
 import com.rohnsha.medbuddyai.screens.BOMChangeDUser
 import com.rohnsha.medbuddyai.ui.theme.BGMain
 import com.rohnsha.medbuddyai.ui.theme.customBlue
-import com.rohnsha.medbuddyai.ui.theme.customYellow
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -419,6 +418,9 @@ fun ScanMainScreen(
     val detecteddClassification= remember {
         mutableStateOf(itt.indexNumber)
     }
+    val flashLightMode= remember {
+        mutableStateOf(FlashlightMode.Off)
+    }
     Log.d("classificationCLassifier", detecteddClassification.value.toString())
    val errorText= remember {
        mutableStateOf("")
@@ -452,6 +454,10 @@ fun ScanMainScreen(
                 analyzer
             )
         }
+    }
+    when(flashLightMode.value){
+        FlashlightMode.On -> controller.cameraControl?.enableTorch(true)
+        FlashlightMode.Off -> controller.cameraControl?.enableTorch(false)
     }
     val isPredictingBool= remember {
         mutableStateOf(false)
@@ -507,18 +513,25 @@ fun ScanMainScreen(
         ) {
             IconButton(onClick = {
                 if (!isConfirming.value) {
-                    snackBarToggleVM.SendToast(
-                        message = "Feature not ready yet!",
-                        indicator_color = customYellow,
-                        padding = PaddingValues(2.dp),
-                        icon = Icons.Outlined.Engineering
-                    )
+                    when(flashLightMode.value){
+                        FlashlightMode.Off -> {
+                            flashLightMode.value = FlashlightMode.On
+                        }
+                        FlashlightMode.On -> {
+                            flashLightMode.value = FlashlightMode.Off
+                        }
+                    }
                 } else {
                     isConfirming.value = false
                 }
             }) {
                 Icon(
-                    imageVector = if (!isConfirming.value) Icons.Outlined.FlashAuto else Icons.Outlined.Delete,
+                    imageVector = if (!isConfirming.value){
+                        when(flashLightMode.value){
+                            FlashlightMode.Off -> Icons.Outlined.FlashOff
+                            FlashlightMode.On -> Icons.Filled.FlashOn
+                        }
+                    } else Icons.Outlined.Delete,
                     contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan"
                 )
             }
@@ -677,6 +690,11 @@ fun ScanMainScreen(
             }
         }
     }
+}
+
+enum class FlashlightMode {
+    Off,
+    On
 }
 
 @Composable
