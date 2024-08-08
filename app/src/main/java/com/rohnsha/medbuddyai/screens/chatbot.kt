@@ -2,6 +2,7 @@ package com.rohnsha.medbuddyai.screens
 
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,16 +53,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.BottomEnd
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.rohnsha.medbuddyai.R
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.symptoms.symptomDC
 import com.rohnsha.medbuddyai.database.userdata.chatbot.chatDB_VM
@@ -378,56 +383,109 @@ fun ChatBotScreen(
                 .background(color = Color.White, shape = RoundedCornerShape(8.dp))
                 .padding(top = 30.dp)
         ) {
-            LazyColumn(
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 24.dp, end = 24.dp),
-                state = scrollState,
-            ) {
-                if (messaageList.isEmpty()){
-                    item {
+            if (messaageList.isEmpty()){
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(start = 24.dp, end = 24.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //.shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
+                            .background(color = BGMain, shape = RoundedCornerShape(16.dp))
+                            .padding(13.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
                         Box(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            contentAlignment = Center
+                            //modifier = Modifier.background(customYellow),
+                            contentAlignment = BottomEnd
                         ){
+                            Image(
+                                painter = painterResource(id = R.drawable.logo_welcme),
+                                contentDescription = "logo",
+                                modifier = Modifier
+                                    .size(125.dp),
+                                colorFilter = ColorFilter.tint(color = customBlue)
+                            )
                             Text(
-                                text = when(mode){
-                                    0, 3, 4, 5, 2 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
-                                            " questions about medical"
-                                    1 -> "You are chatting with SwasthAI Symptom checker bot trained to detect possible" +
-                                            "symtoms associated with a disease"
-                                    else -> { "Undetected categorization of chat mode" }
-                                },
-                                color = lightTextAccent,
+                                text = "Chat",
+                                modifier = Modifier.padding(bottom = 20.dp),
+                                fontWeight = FontWeight(600),
                                 fontFamily = fontFamily,
-                                fontSize = 13.sp,
-                                modifier = Modifier.align(Center),
-                                textAlign = TextAlign.Center
+                                color = customBlue
                             )
                         }
+                        Text(
+                            text = when(mode){
+                                0, 3, 4, 5, 2 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
+                                        " questions about medical"
+                                1 -> "You are chatting with SwasthAI Symptom checker bot trained to detect possible" +
+                                        "symtoms associated with a disease"
+                                else -> { "Undetected categorization of chat mode" }
+                            },
+                            color = lightTextAccent,
+                            fontFamily = fontFamily,
+                            fontSize = 13.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
-                items(messaageList){
-                    if (!it.isError){
-                        Messages(
-                            messageInfo = it,
-                            onClickListenerAttachment = {
-                                attachmentBOMState.value= true
-                            },
-                            timeStamp = attachmentTimeStamp.value
-                        )
-                    } else {
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
-                            Text(
-                                text = it.message,
-                                color = lightTextAccent,
-                                fontFamily = fontFamily,
-                                fontSize = 10.sp,
-                            )
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 24.dp, end = 24.dp),
+                    state = scrollState,
+                ) {
+                    if (messaageList.isEmpty()){
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentAlignment = Center
+                            ){
+                                Text(
+                                    text = when(mode){
+                                        0, 3, 4, 5, 2 -> "You are chatting with SwasthAI QnA Bot trained to answer general" +
+                                                " questions about medical"
+                                        1 -> "You are chatting with SwasthAI Symptom checker bot trained to detect possible" +
+                                                "symtoms associated with a disease"
+                                        else -> { "Undetected categorization of chat mode" }
+                                    },
+                                    color = lightTextAccent,
+                                    fontFamily = fontFamily,
+                                    fontSize = 13.sp,
+                                    modifier = Modifier.align(Center),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         }
-                        Spacer(modifier = Modifier.height(6.dp))
+                    }
+                    items(messaageList){
+                        if (!it.isError){
+                            Messages(
+                                messageInfo = it,
+                                onClickListenerAttachment = {
+                                    attachmentBOMState.value= true
+                                },
+                                timeStamp = attachmentTimeStamp.value
+                            )
+                        } else {
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Center){
+                                Text(
+                                    text = it.message,
+                                    color = lightTextAccent,
+                                    fontFamily = fontFamily,
+                                    fontSize = 10.sp,
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                        }
                     }
                 }
             }
@@ -531,11 +589,14 @@ fun ChatBotScreen(
                         .size(40.dp)
                         .clip(CircleShape)
                         .then(
-                            if (!isChatbotResponding){
+                            if (!isChatbotResponding) {
                                 Modifier
                                     .clickable {
                                         scope.launch {
-                                            if (messageField.value != "" && !messageField.value.matches(Regex("^\\s+$"))) {
+                                            if (messageField.value != "" && !messageField.value.matches(
+                                                    Regex("^\\s+$")
+                                                )
+                                            ) {
                                                 chatbotViewModel.chat(
                                                     message = messageField.value.trim(),
                                                     resetMessageFeild = {
