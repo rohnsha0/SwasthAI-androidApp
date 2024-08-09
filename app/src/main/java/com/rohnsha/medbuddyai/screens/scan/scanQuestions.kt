@@ -80,7 +80,8 @@ fun ScanQuestions(
     photoCaptureViewModel: photoCaptureViewModel,
     sideStateVM: sideStateVM,
     padding: PaddingValues,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    scanMode: Int
 ) {
 
     val context= LocalContext.current
@@ -333,7 +334,8 @@ fun ScanQuestions(
                                                     navHostController.navigate(
                                                         bottomNavItems.ScanResult.returnScanResIndex(
                                                             level = 0,
-                                                            index = indexClassification
+                                                            index = indexClassification,
+                                                            mode = scanMode
                                                         )
                                                     )
                                                 }

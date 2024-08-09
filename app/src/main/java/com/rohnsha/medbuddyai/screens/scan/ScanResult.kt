@@ -143,8 +143,11 @@ fun ScanResultScreen(
     chatdbVm: chatDB_VM,
     chatVM: chatVM,
     currentUserDataVM: currentUserDataVM,
-    keyVM: keyVM
+    keyVM: keyVM,
+    scanMode: Int // 0 -> normal scan, 1 -> disease_catalogue scan
 ) {
+    Log.d("scanMode", scanMode.toString())
+
     photoCaptureViewModel = viewModel
     diseaseDBvm = diseaseDBviewModel
     snackbarControl = snackbarHostState
@@ -158,7 +161,21 @@ fun ScanResultScreen(
     when(resultsLevel){
         0 -> {
             BackHandler {
-                navController.popBackStack(bottomNavItems.ScanQA.returnScanIndex(indexClassification), inclusive = true)
+                when(scanMode){
+                    1 -> {
+                        navController.popBackStack(
+                            bottomNavItems.ScanResult.returnScanResIndex(
+                                2,
+                                9999,
+                                1
+                            ),
+                            inclusive = true
+                        )
+                    }
+                    else -> {
+                        navController.popBackStack(bottomNavItems.ScanQA.returnScanIndex(indexClassification, ), inclusive = true)
+                    }
+                }
             }
             isStillLoading = photoCaptureViewModel.isLoadingBoolean.collectAsState().value
             isNormal = photoCaptureViewModel.isNormalBoolean.collectAsState().value
@@ -947,8 +964,8 @@ fun OptionScanResults(
         OptionsScanResultUNI(
             title = when(mode){
                 0 -> { "Verify" }
-                1 -> { "Scan" }
-                else -> { "" }
+                1 -> {"Rescan"}
+                else -> { "Scan" }
             },
             icon = when(mode){
                 0 -> { Icons.Outlined.AltRoute }
@@ -959,7 +976,10 @@ fun OptionScanResults(
                     0 -> {
                         modalState.value= true
                     }
-                    1 -> {
+                    2 -> {
+                        navController.navigate(bottomNavItems.Scan.returnScanIndex(disease_results.value.domain.toInt(), mode = 1))
+                    }
+                    else -> {
                         navController.navigate(bottomNavItems.Scan.returnScanIndex(disease_results.value.domain.toInt()))
                     }
                 }

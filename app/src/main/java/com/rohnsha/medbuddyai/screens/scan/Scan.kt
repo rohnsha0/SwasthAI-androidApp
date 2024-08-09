@@ -47,11 +47,12 @@ import androidx.compose.material.icons.filled.PsychologyAlt
 import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.BrowseGallery
 import androidx.compose.material.icons.outlined.CenterFocusWeak
-import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Compare
 import androidx.compose.material.icons.outlined.FlashOff
 import androidx.compose.material.icons.outlined.MotionPhotosAuto
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PsychologyAlt
+import androidx.compose.material.icons.outlined.RestartAlt
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -123,7 +124,8 @@ fun ScanScreen(
     sideStateVM: sideStateVM,
     currentUserDataVM: currentUserDataVM,
     keyVM: keyVM,
-    snackBarToggleVM: snackBarToggleVM
+    snackBarToggleVM: snackBarToggleVM,
+    mode: Int //specifies if user is intended for normal scan [0] or from diseases catelogue [1]
 ) {
     viewModelPhotoSave = photoCaptureVM
     viewModelClassification = classifierVM
@@ -207,7 +209,7 @@ fun ScanScreen(
         ) {
             ScanMainScreen(
                 navController,
-                index, snackBarToggleVM = snackBarToggleVM
+                index, snackBarToggleVM = snackBarToggleVM, scannMode = mode
             )
         }
     }
@@ -411,7 +413,8 @@ private fun takePhoto(
 fun ScanMainScreen(
     navController: NavHostController,
     index: Int,
-    snackBarToggleVM: snackBarToggleVM
+    snackBarToggleVM: snackBarToggleVM,
+    scannMode: Int
 ) {
     val conttext= LocalContext.current
     var itt= classification(0, 6f)
@@ -531,7 +534,7 @@ fun ScanMainScreen(
                             FlashlightMode.Off -> Icons.Outlined.FlashOff
                             FlashlightMode.On -> Icons.Filled.FlashOn
                         }
-                    } else Icons.Outlined.Delete,
+                    } else Icons.Outlined.RestartAlt,
                     contentDescription = if (!isConfirming.value) "Show accuracy button" else "Rescan"
                 )
             }
@@ -563,7 +566,7 @@ fun ScanMainScreen(
                                     bomError.value=true
                                 } else {
                                     //navController.navigate(bottomNavItems.ScanResult.returnScanResIndex(0, index = index))
-                                    navController.navigate(bottomNavItems.ScanQA.returnScanIndex(index = index))
+                                    navController.navigate(bottomNavItems.ScanQA.returnScanIndex(index = index, mode = scannMode))
                                 }
                             }
                         }
@@ -628,8 +631,12 @@ fun ScanMainScreen(
                         contentDescription = "import from gallery"
                     )
                 }
-            } else {
-                Spacer(modifier = Modifier.width(24.dp))
+            } else {IconButton(onClick = {  }) {
+                Icon(
+                    imageVector = Icons.Outlined.Compare,
+                    contentDescription = "import from gallery"
+                )
+            }
             }
             if (bomError.value){
                 ModalBottomSheet(onDismissRequest = {

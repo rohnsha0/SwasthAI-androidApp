@@ -247,9 +247,11 @@ fun DiseasesCatelogue(
                     onClickListener = {
                         diseaseDBviewModel.saveData(data = it){
                             navController.navigate(
+                                // same navigation route used in ScanResults for managing BackStack
                                 bottomNavItems.ScanResult.returnScanResIndex(
                                     2,
-                                    9999
+                                    9999,
+                                    1
                                 )
                             )
                         }

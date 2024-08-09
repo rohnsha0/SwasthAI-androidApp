@@ -151,6 +151,9 @@ fun bottomNavGraph(
             arguments = listOf(
                 navArgument(scanIndexKey){
                     type= NavType.IntType
+                },
+                navArgument(scanMode){
+                    type= NavType.IntType
                 }
             )
         ){
@@ -161,7 +164,7 @@ fun bottomNavGraph(
                 classifierVM = classifierVM,
                 index = it.arguments!!.getInt(scanIndexKey),
                 sideStateVM = sideDrawerState, currentUserDataVM = currentUserVM,
-                keyVM = keyVM, snackBarToggleVM = snackBarVM
+                keyVM = keyVM, snackBarToggleVM = snackBarVM, mode = it.arguments!!.getInt(scanMode)
             )
         }
 
@@ -169,6 +172,9 @@ fun bottomNavGraph(
             route = bottomNavItems.ScanQA.route,
             arguments = listOf(
                 navArgument(scanIndexKey){
+                    type= NavType.IntType
+                },
+                navArgument(scanQAMode){
                     type= NavType.IntType
                 }
             )
@@ -178,7 +184,7 @@ fun bottomNavGraph(
                 photoCaptureViewModel = savePhotoViewModel,
                 sideStateVM = sideDrawerState,
                 padding = padding,
-                navHostController = navController
+                navHostController = navController, scanMode = it.arguments!!.getInt(scanQAMode)
             )
         }
 
@@ -270,6 +276,9 @@ fun bottomNavGraph(
                 },
                 navArgument(scanResultIndex){
                     type= NavType.IntType
+                },
+                navArgument(scanResultMode){
+                    type= NavType.IntType
                 }
             )
         ){
@@ -286,7 +295,7 @@ fun bottomNavGraph(
                 communityVM = communityVM,
                 currentUserDataVM = currentUserVM,
                 chatdbVm = chatdbVM,
-                keyVM = keyVM
+                keyVM = keyVM, scanMode = it.arguments!!.getInt(scanResultMode)
             )
         }
         composable(

@@ -15,6 +15,9 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 
 const val scanIndexKey= "indexScan"
+const val scanMode= "scanMode"
+const val scanQAMode= "scanQAMode"
+const val scanResultMode= "scanResultMode"
 const val scanResultKey= "scanResultKey"
 const val scanResultIndex= "scanResultIndex"
 const val chatID= "chatID"
@@ -77,23 +80,23 @@ sealed class bottomNavItems(
 
     object Scan: bottomNavItems(
         title = "scan",
-        route = "scan/{$scanIndexKey}",
+        route = "scan/{$scanIndexKey}/{$scanMode}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     ){
-        fun returnScanIndex(index: Int): String{
-            return this.route.replace(oldValue = "{$scanIndexKey}", newValue = index.toString())
+        fun returnScanIndex(index: Int, mode: Int= 0): String{
+            return "scan/$index/$mode"
         }
     }
 
     object ScanQA: bottomNavItems(
         title = "scanQA",
-        route = "scanQA/{$scanIndexKey}",
+        route = "scanQA/{$scanIndexKey}/{$scanQAMode}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     ){
-        fun returnScanIndex(index: Int): String{
-            return this.route.replace(oldValue = "{$scanIndexKey}", newValue = index.toString())
+        fun returnScanIndex(index: Int, mode: Int=0): String{
+            return "scanQA/$index/$mode"
         }
     }
 
@@ -106,12 +109,12 @@ sealed class bottomNavItems(
 
     object ScanResult: bottomNavItems(
         title = "ScanResults",
-        route = "scan_result/{$scanResultKey}/{$scanResultIndex}",
+        route = "scan_result/{$scanResultKey}/{$scanResultIndex}/{$scanResultMode}",
         unselectedIcon = Icons.Outlined.AdminPanelSettings,
         selectedIcon = Icons.Filled.AdminPanelSettings
     ){
-        fun returnScanResIndex(level: Int, index: Int): String {
-            return "scan_result/$level/$index"
+        fun returnScanResIndex(level: Int, index: Int, mode: Int=0): String {
+            return "scan_result/$level/$index/$mode"
         }
     }
 
