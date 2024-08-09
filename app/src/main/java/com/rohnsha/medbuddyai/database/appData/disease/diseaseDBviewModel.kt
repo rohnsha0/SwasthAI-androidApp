@@ -245,7 +245,9 @@ class diseaseDBviewModel(application: Application): AndroidViewModel(application
                     area = data?.get("area") as? String ?: "",
                     speciality = data?.get("speciality") as? String ?: "",
                     experience = data?.get("experience") as? String ?: "",
-                    pricing = data?.get("pricing") as? String ?: ""
+                    pricing = data?.get("pricing") as? String ?: "",
+                    rating = data?.get("rating") as? String ?: "NaN",
+                    link = data?.get("link") as? String ?: "https://www.practo.com/"
                 )
                 Log.d("doctorsList", dataL.toString())
                 doctorList.add(dataL)

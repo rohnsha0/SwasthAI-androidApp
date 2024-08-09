@@ -1,6 +1,7 @@
 package com.rohnsha.medbuddyai.database.appData
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -15,8 +16,9 @@ import com.rohnsha.medbuddyai.domain.dataclass.disease_data_dataClass
 
 @Database(
     entities = [disease_data_dataClass::class, symptomDC::class, questions::class, doctor::class],
-    version = 2,
-    exportSchema = true
+    version = 3,
+    exportSchema = true,
+    autoMigrations = [AutoMigration(from = 2, to = 3)]
 )
 abstract class appDataDB: RoomDatabase() {
 

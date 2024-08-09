@@ -1,7 +1,9 @@
 package com.rohnsha.medbuddyai.navigation.bottombar
 
+import WebViewLoaderSc
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -348,6 +350,18 @@ fun bottomNavGraph(
                 snackBarToggleVM = snackBarVM,
                 viewMode = it.arguments!!.getInt(viewMode)
             )
+        }
+        composable(
+            route= bottomNavItems.webUIScreen.route,
+            arguments = listOf(
+                navArgument(docURL){
+                    type= NavType.StringType
+                }
+            )
+        ){ backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString(docURL) ?: "https://www.practo.com/"
+            val decodedUrl = Uri.decode(encodedUrl)
+            WebViewLoaderSc(url = decodedUrl, navController = navController)
         }
         composable(
             route = bottomNavItems.userAuth.route,

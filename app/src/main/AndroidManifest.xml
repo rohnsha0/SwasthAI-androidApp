@@ -22,7 +22,8 @@
         android:roundIcon="@mipmap/ic_sw_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.DermBuddyAI.Splash"
-        tools:targetApi="31">
+        tools:targetApi="31"
+        android:usesCleartextTraffic="true">
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
             android:value="ocr"/>

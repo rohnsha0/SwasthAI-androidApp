@@ -1,5 +1,6 @@
 package com.rohnsha.medbuddyai.navigation.bottombar
 
+import android.net.Uri
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Assistant
@@ -25,6 +26,7 @@ const val domainID= "domainID"
 const val userIndex= "userIndex"
 const val viewMode= "viewMode"
 const val docIndex="docIndex"
+const val docURL= "docURL"
 
 sealed class bottomNavItems(
     val title: String,
@@ -151,6 +153,18 @@ sealed class bottomNavItems(
         unselectedIcon = Icons.Outlined.Assistant,
         selectedIcon = Icons.Filled.Assistant
     )
+
+    object webUIScreen: bottomNavItems(
+        title = "webUIScreen",
+        route = "webUIScreen/{$docURL}",
+        unselectedIcon = Icons.Outlined.Assistant,
+        selectedIcon = Icons.Filled.Assistant
+    ){
+        fun returnDocURL(URL: String): String{
+            val encodedUrl = Uri.encode(URL)
+            return "webUIScreen/$encodedUrl"
+        }
+    }
 
     object userAuth: bottomNavItems(
         title = "userAuth",

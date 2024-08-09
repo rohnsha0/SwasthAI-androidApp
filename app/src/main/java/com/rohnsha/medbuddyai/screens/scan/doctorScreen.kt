@@ -42,12 +42,14 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,6 +57,7 @@ import androidx.navigation.NavHostController
 import com.rohnsha.medbuddyai.database.appData.disease.diseaseDBviewModel
 import com.rohnsha.medbuddyai.database.appData.doctors.doctor
 import com.rohnsha.medbuddyai.domain.dataclass.rbStructure
+import com.rohnsha.medbuddyai.navigation.bottombar.bottomNavItems
 import com.rohnsha.medbuddyai.screens.OptionsFilter
 import com.rohnsha.medbuddyai.screens.SymptomsList
 import com.rohnsha.medbuddyai.ui.theme.BGMain
@@ -63,6 +66,7 @@ import com.rohnsha.medbuddyai.ui.theme.customBlue
 import com.rohnsha.medbuddyai.ui.theme.customGrey
 import com.rohnsha.medbuddyai.ui.theme.fontFamily
 import com.rohnsha.medbuddyai.ui.theme.lightTextAccent
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -168,6 +172,9 @@ fun DoctorScreen(
                 "Kolkata"
             )
         }
+        val scope= rememberCoroutineScope()
+
+        val context= LocalContext.current
 
         if (bomState.value){
             ModalBottomSheet(onDismissRequest = { bomState.value= false }, containerColor = Color.White) {
@@ -252,7 +259,12 @@ fun DoctorScreen(
                         colorLogo = Color.White,
                         data = it.pricing,
                         additionData = it.area,
-                        colorLogoTint = customGrey
+                        colorLogoTint = customGrey,
+                        onClickListener = {
+                            scope.launch {
+                                navController.navigate(bottomNavItems.webUIScreen.returnDocURL(it.link))
+                            }
+                        }
                     )
                 }
             }
